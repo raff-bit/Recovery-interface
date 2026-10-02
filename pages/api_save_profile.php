@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/ProfileRepository.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -24,7 +25,8 @@ if ($bodyWeightKg <= 0 || $bodyWeightKg > 400) {
     exit;
 }
 
+$userId = getCurrentUserId();
 $profileRepo = new ProfileRepository();
-$profileRepo->saveProfile($sex, $heightCm, $bodyWeightKg, $activityLevel);
+$profileRepo->saveProfile($userId, $sex, $heightCm, $bodyWeightKg, $activityLevel);
 
-echo json_encode(['success' => true, 'profile' => $profileRepo->getProfile()]);
+echo json_encode(['success' => true, 'profile' => $profileRepo->getProfile($userId)]);

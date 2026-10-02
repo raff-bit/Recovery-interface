@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -20,19 +21,20 @@ $workoutDate = $input['workout_date'] ?? date('Y-m-d H:i:s');
 $label       = trim($input['label'] ?? '') ?: null;
 $notes       = trim($input['notes'] ?? '') ?: null;
 
+$userId = getCurrentUserId();
 $workoutRepo = new WorkoutRepository();
 
 try {
     $workoutRepo->beginTransaction();
 
-    $workoutId = $workoutRepo->createWorkout($workoutDate, $label, $notes);
+    $workoutId = $workoutRepo->createWorkout($userId, $workoutDate, $label, $notes);
 
     $setNumberByExercise = [];
     $insertedSets = 0;
 
     foreach ($input['sets'] as $set) {
         if (empty($set['exercise_id']) || !isset($set['reps'])) {
-            continue; // skip malformed rows rather than aborting the whole workout
+            continue;
         }
 
         $exerciseId = (int) $set['exercise_id'];
@@ -52,7 +54,7 @@ try {
     if ($insertedSets === 0) {
         $workoutRepo->rollBack();
         http_response_code(400);
-        echo json_encode(['error' => 'No valid sets were provided (each set needs exercise_id and reps).']);
+        echo json_encode(['error' => 'No valid sets were provided.']);
         exit;
     }
 

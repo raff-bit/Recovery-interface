@@ -1,11 +1,13 @@
 <?php
 header('Content-Type: application/json');
+require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
 
+$userId = getCurrentUserId();
 $workoutRepo = new WorkoutRepository();
 
 $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 20;
-$workouts = $workoutRepo->getRecentWorkouts($limit);
+$workouts = $workoutRepo->getRecentWorkouts($userId, $limit);
 
 if (empty($workouts)) {
     echo json_encode(['workouts' => []]);

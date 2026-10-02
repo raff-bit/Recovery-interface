@@ -1,13 +1,6 @@
 <?php
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
 
-/**
- * AnalyticsService
- * ------------------------------------------------------------
- * Turns raw aggregate rows from the DAL into clean, chart-ready
- * data: fills in weeks with zero training so timelines don't have
- * gaps, and turns muscle-group counts into percentages.
- */
 class AnalyticsService
 {
     private WorkoutRepository $workoutRepo;
@@ -17,14 +10,9 @@ class AnalyticsService
         $this->workoutRepo = $workoutRepo;
     }
 
-    /**
-     * Total sets per week for the last $weeksBack weeks, oldest first.
-     * Weeks with zero logged sets are included as 0, not omitted —
-     * a chart needs a continuous timeline to be honest.
-     */
-    public function getWeeklyVolume(int $weeksBack = 8): array
+    public function getWeeklyVolume(int $userId, int $weeksBack = 8): array
     {
-        $raw = $this->workoutRepo->getWeeklyVolume($weeksBack);
+        $raw = $this->workoutRepo->getWeeklyVolume($userId, $weeksBack);
 
         $byWeek = [];
         foreach ($raw as $row) {
@@ -32,7 +20,7 @@ class AnalyticsService
         }
 
         $today = new DateTime();
-        $dayOfWeek = (int) $today->format('N'); // 1 (Mon) .. 7 (Sun)
+        $dayOfWeek = (int) $today->format('N');
         $mondayThisWeek = (clone $today)->modify('-' . ($dayOfWeek - 1) . ' days')->setTime(0, 0, 0);
 
         $result = [];
@@ -48,10 +36,9 @@ class AnalyticsService
         return $result;
     }
 
-    /** Sets per body region over the last $daysBack days, with each region's share of the total. */
-    public function getMuscleGroupBalance(int $daysBack = 30): array
+    public function getMuscleGroupBalance(int $userId, int $daysBack = 30): array
     {
-        $raw = $this->workoutRepo->getMuscleGroupSetCounts($daysBack);
+        $raw = $this->workoutRepo->getMuscleGroupSetCounts($userId, $daysBack);
         $total = array_sum(array_column($raw, 'total_sets'));
 
         $result = [];
@@ -67,9 +54,9 @@ class AnalyticsService
         return $result;
     }
 
-    public function getTopExercises(int $daysBack = 30, int $limit = 5): array
+    public function getTopExercises(int $userId, int $daysBack = 30, int $limit = 5): array
     {
-        $raw = $this->workoutRepo->getTopExercises($daysBack, $limit);
+        $raw = $this->workoutRepo->getTopExercises($userId, $daysBack, $limit);
         return array_map(function ($row) {
             return [
                 'exercise_name' => $row['exercise_name'],

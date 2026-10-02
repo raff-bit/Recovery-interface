@@ -69,11 +69,11 @@ class RecoveryCalculator
         $this->profileRepo = $profileRepo;
     }
 
-    public function getAllMuscleReadiness(): array
+    public function getAllMuscleReadiness(int $userId): array
     {
-        $profile = $this->profileRepo->getProfile();
+        $profile = $this->profileRepo->getProfile($userId);
         $muscles = $this->muscleRepo->getAll();
-        $sets = $this->workoutRepo->getRecentSetsWithActivation(self::LOOKBACK_DAYS);
+        $sets = $this->workoutRepo->getRecentSetsWithActivation($userId, self::LOOKBACK_DAYS);
 
         $byMuscle = [];
         foreach ($sets as $row) {
@@ -189,12 +189,12 @@ class RecoveryCalculator
      * is NOT applied here, since the planner doesn't currently collect a
      * planned weight for hypothetical sets.
      */
-    public function previewReadiness(array $hypotheticalSets, DateTime $referenceDate): array
+    public function previewReadiness(array $hypotheticalSets, DateTime $referenceDate, int $userId): array
     {
-        $profile = $this->profileRepo->getProfile();
+        $profile = $this->profileRepo->getProfile($userId);
         $muscles = $this->muscleRepo->getAll();
 
-        $realSets = $this->workoutRepo->getRecentSetsWithActivation(self::LOOKBACK_DAYS);
+        $realSets = $this->workoutRepo->getRecentSetsWithActivation($userId, self::LOOKBACK_DAYS);
         $byMuscleReal = [];
         foreach ($realSets as $row) {
             $byMuscleReal[$row['muscle_id']][] = $row;

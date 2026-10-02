@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/MuscleRepository.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
 require_once __DIR__ . '/../dal/ExerciseRepository.php';
@@ -47,13 +48,14 @@ if (empty($hypotheticalSets)) {
     exit;
 }
 
+$userId       = getCurrentUserId();
 $muscleRepo   = new MuscleRepository();
 $workoutRepo  = new WorkoutRepository();
 $exerciseRepo = new ExerciseRepository();
 $profileRepo  = new ProfileRepository();
 $calculator   = new RecoveryCalculator($muscleRepo, $workoutRepo, $exerciseRepo, $profileRepo);
 
-$preview = $calculator->previewReadiness($hypotheticalSets, $referenceDate);
+$preview = $calculator->previewReadiness($hypotheticalSets, $referenceDate, $userId);
 
 echo json_encode([
     'target_date' => $referenceDate->format(DateTime::ATOM),

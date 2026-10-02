@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -16,6 +17,7 @@ if (!$input || empty($input['workout_id']) || empty($input['sets']) || !is_array
     exit;
 }
 
+$userId      = getCurrentUserId();
 $workoutId   = (int) $input['workout_id'];
 $workoutDate = $input['workout_date'] ?? null;
 $label       = trim($input['label'] ?? '') ?: null;
@@ -23,20 +25,19 @@ $notes       = trim($input['notes'] ?? '') ?: null;
 
 $workoutRepo = new WorkoutRepository();
 
-$existing = $workoutRepo->getWorkoutById($workoutId);
+$existing = $workoutRepo->getWorkoutById($workoutId, $userId);
 if (!$existing) {
     http_response_code(404);
     echo json_encode(['error' => 'Workout not found.']);
     exit;
 }
 
-// Keep the original date unless the caller explicitly sent a new one.
 $workoutDate = $workoutDate ?: $existing['workout_date'];
 
 try {
     $workoutRepo->beginTransaction();
 
-    $workoutRepo->updateWorkoutMeta($workoutId, $workoutDate, $label, $notes);
+    $workoutRepo->updateWorkoutMeta($workoutId, $userId, $workoutDate, $label, $notes);
     $workoutRepo->deleteSetsForWorkout($workoutId);
 
     $setNumberByExercise = [];

@@ -1,10 +1,12 @@
 <?php
+require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
 
+$userId = getCurrentUserId();
 $format = strtolower($_GET['format'] ?? 'json');
 $workoutRepo = new WorkoutRepository();
 
-$workouts = $workoutRepo->getAllWorkoutsForExport();
+$workouts = $workoutRepo->getAllWorkoutsForExport($userId);
 $ids = array_column($workouts, 'id');
 $allSets = $workoutRepo->getSetsForWorkouts($ids);
 
@@ -46,9 +48,6 @@ if ($format === 'csv') {
     exit;
 }
 
-// Default: JSON. Keyed by exercise NAME rather than ID, so the backup
-// stays meaningful even if the database is ever rebuilt from scratch
-// and exercise IDs no longer match up.
 header('Content-Type: application/json');
 header('Content-Disposition: attachment; filename="recovery-interface-export-' . date('Y-m-d') . '.json"');
 

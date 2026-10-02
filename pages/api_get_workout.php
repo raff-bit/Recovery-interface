@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
 
 if (empty($_GET['id'])) {
@@ -8,10 +9,11 @@ if (empty($_GET['id'])) {
     exit;
 }
 
+$userId = getCurrentUserId();
 $workoutId = (int) $_GET['id'];
 $workoutRepo = new WorkoutRepository();
 
-$workout = $workoutRepo->getWorkoutById($workoutId);
+$workout = $workoutRepo->getWorkoutById($workoutId, $userId);
 if (!$workout) {
     http_response_code(404);
     echo json_encode(['error' => 'Workout not found.']);
