@@ -12,6 +12,7 @@ const state = {
   exercises: [],      // exercise library from api_exercises.php
   profile: null,
   hologramView: 'front', // 'front' | 'back'
+  unitSystem: localStorage.getItem('recovery_unit_system') || 'metric', // 'metric'
   activePickerRow: null,  // which set-row is currently choosing an exercise
   activePickerRegion: 'all',
   editingWorkoutId: null, // set when the Log Workout form is editing a past session instead of creating a new one
@@ -26,6 +27,43 @@ const MUSCLE_GROUPS = [
   { key: 'core',      label: 'Core' },
   { key: 'legs',      label: 'Legs' },
 ];
+
+/* ---------- UNIT CONVERSIONS ---------- */
+
+const LBS_PER_KG = 2.20462;
+const IN_PER_CM = 0.393701;
+
+function kgToDisplayWeight(kg) {
+  if (kg === null || kg === undefined || isNaN(kg)) return '';
+  return state.unitSystem === 'imperial'
+    ? Math.round(kg * LBS_PER_KG * 10) / 10
+    : Math.round(kg * 10) / 10;
+}
+
+function displayWeightToKg(val) {
+  if (!val || isNaN(val)) return 0;
+  return state.unitSystem === 'imperial'
+    ? Math.round((val / LBS_PER_KG) * 10) / 10
+    : Math.round(val * 10) / 10;
+}
+
+function cmToDisplayHeight(cm) {
+  if (cm === null || cm === undefined || isNaN(cm)) return '';
+  return state.unitSystem === 'imperial'
+    ? Math.round(cm * IN_PER_CM * 10) / 10
+    : Math.round(cm * 10) / 10;
+}
+
+function displayHeightToCm(val) {
+  if (!val || isNaN(val)) return null;
+  return state.unitSystem === 'imperial'
+    ? Math.round((val / IN_PER_CM) * 10) / 10
+    : Math.round(val * 10) / 10;
+}
+
+function getWeightUnitLabel() {
+  return state.unitSystem === 'imperial' ? 'lbs' : 'kg';
+}
 
 /* ---------- API CALLS ---------- */
 
@@ -166,7 +204,9 @@ function renderHistory(workouts) {
   workouts.forEach(w => {
     const bySets = {};
     w.sets.forEach(s => {
-      const line = `${s.reps} reps${s.weight_kg > 0 ? ' @ ' + s.weight_kg + 'kg' : ''}`;
+      const displayWeight = kgToDisplayWeight(s.weight_kg);
+      const unit = getWeightUnitLabel();
+      const line = `${s.reps} reps${s.weight_kg > 0 ? ' @ ' + displayWeight + unit : ''}`;
       (bySets[s.exercise_name] = bySets[s.exercise_name] || []).push(line);
     });
 
@@ -227,7 +267,7 @@ function enterEditMode(workout) {
     }
 
     row.querySelector('.set-reps').value = s.reps;
-    row.querySelector('.set-weight').value = s.weight_kg || '';
+    row.querySelector('.set-weight').value = s.weight_kg ? kgToDisplayWeight(s.weight_kg) : '';
     row.querySelector('.set-rpe').value = s.rpe ?? '';
   });
 
@@ -542,11 +582,12 @@ function addSetRow() {
   const container = document.getElementById('sets-container');
   const row = document.createElement('div');
   row.className = 'set-row';
+  const unit = getWeightUnitLabel();
   row.innerHTML = `
     <button type="button" class="exercise-picker-btn">Choose Exercise</button>
     <input type="hidden" class="set-exercise" value="">
     <input type="number" class="set-reps" placeholder="Reps" min="1" required>
-    <input type="number" class="set-weight" placeholder="kg" min="0" step="0.5">
+    <input type="number" class="set-weight" placeholder="${unit}" min="0" step="0.5">
     <button type="button" class="weight-help-btn" title="Weight logging help">?</button>
     <input type="number" class="set-rpe" placeholder="RPE" min="1" max="10" step="0.5">
     <button type="button" class="remove-set-btn" title="Remove set">×</button>
@@ -564,14 +605,15 @@ function collectSetsFromForm() {
   rows.forEach(row => {
     const exerciseId = row.querySelector('.set-exercise').value;
     const reps = row.querySelector('.set-reps').value;
-    const weight = row.querySelector('.set-weight').value;
+    const weightRaw = row.querySelector('.set-weight').value;
     const rpe = row.querySelector('.set-rpe').value;
 
     if (exerciseId && reps) {
+      const weightInKg = weightRaw ? displayWeightToKg(parseFloat(weightRaw)) : 0;
       sets.push({
         exercise_id: parseInt(exerciseId, 10),
         reps: parseInt(reps, 10),
-        weight_kg: weight ? parseFloat(weight) : 0,
+        weight_kg: weightInKg,
         rpe: rpe ? parseFloat(rpe) : null,
       });
     }
@@ -604,6 +646,21 @@ async function loadExercises() {
 
 /* ---------- PROFILE MODAL ---------- */
 
+function updateProfileUnitLabels() {
+  const isImperial = state.unitSystem === 'imperial';
+  document.getElementById('label-profile-weight').innerHTML = isImperial
+    ? 'Body Weight (lbs) *'
+    : 'Body Weight (kg) *';
+  document.getElementById('label-profile-height').innerHTML = isImperial
+    ? 'Height (in) <span class="profile-optional">(optional)</span>'
+    : 'Height (cm) <span class="profile-optional">(optional)</span>';
+
+  // Atualiza também os placeholders dos inputs de peso existentes no formulário de treino
+  document.querySelectorAll('.set-row .set-weight').forEach(input => {
+    input.placeholder = getWeightUnitLabel();
+  });
+}
+
 function updateProfileIndicator() {
   const indicator = document.getElementById('profile-indicator');
   const isComplete = Boolean(state.profile && state.profile.body_weight_kg > 0);
@@ -612,9 +669,16 @@ function updateProfileIndicator() {
 
 function openProfileModal() {
   const p = state.profile;
+  document.getElementById('profile-units').value = state.unitSystem;
+  updateProfileUnitLabels();
+
   document.getElementById('profile-sex').value = p ? p.sex : 'unspecified';
-  document.getElementById('profile-weight').value = p && p.body_weight_kg ? p.body_weight_kg : '';
-  document.getElementById('profile-height').value = p && p.height_cm ? p.height_cm : '';
+
+  const displayedWeight = p && p.body_weight_kg ? kgToDisplayWeight(parseFloat(p.body_weight_kg)) : '';
+  const displayedHeight = p && p.height_cm ? cmToDisplayHeight(parseFloat(p.height_cm)) : '';
+
+  document.getElementById('profile-weight').value = displayedWeight;
+  document.getElementById('profile-height').value = displayedHeight;
   document.getElementById('profile-activity').value = p ? p.activity_level : 'moderately_active';
 
   const feedback = document.getElementById('profile-feedback');
@@ -631,14 +695,23 @@ function closeProfileModal() {
 async function handleProfileSubmit(event) {
   event.preventDefault();
   const feedback = document.getElementById('profile-feedback');
+  const unitSelect = document.getElementById('profile-units').value;
   const sex = document.getElementById('profile-sex').value;
-  const weight = parseFloat(document.getElementById('profile-weight').value);
+  const weightInput = parseFloat(document.getElementById('profile-weight').value);
   const heightRaw = document.getElementById('profile-height').value;
-  const height = heightRaw ? parseFloat(heightRaw) : null;
   const activity = document.getElementById('profile-activity').value;
 
-  if (!weight || weight <= 0 || weight > 400) {
-    feedback.textContent = 'Please enter a valid body weight (kg).';
+  // Atualizar preferência de unidades
+  state.unitSystem = unitSelect;
+  localStorage.setItem('recovery_unit_system', unitSelect);
+  updateProfileUnitLabels();
+
+  // Converter para métrico (kg / cm) antes de guardar no backend
+  const weightKg = displayWeightToKg(weightInput);
+  const heightCm = heightRaw ? displayHeightToCm(parseFloat(heightRaw)) : null;
+
+  if (!weightKg || weightKg <= 0 || weightKg > 400) {
+    feedback.textContent = `Please enter a valid body weight (${getWeightUnitLabel()}).`;
     feedback.className = 'log-feedback error';
     return;
   }
@@ -646,16 +719,18 @@ async function handleProfileSubmit(event) {
   try {
     const res = await saveProfileApi({
       sex: sex,
-      body_weight_kg: weight,
-      height_cm: height,
+      body_weight_kg: weightKg,
+      height_cm: heightCm,
       activity_level: activity,
     });
     state.profile = res.profile;
-    updateHologramVisibility();
     updateProfileIndicator();
+    updateHologramVisibility();
     feedback.textContent = 'Profile saved.';
     feedback.className = 'log-feedback success';
+
     await refreshMuscles();
+    await refreshHistory(); // Atualiza os rótulos de peso no histórico para a unidade selecionada
     setTimeout(closeProfileModal, 600);
   } catch (err) {
     feedback.textContent = err.message;
@@ -775,6 +850,27 @@ function bindEvents() {
       closeExercisePicker();
       closeProfileModal();
     }
+  });
+
+  document.getElementById('profile-units').addEventListener('change', (e) => {
+    const newUnit = e.target.value;
+    const weightField = document.getElementById('profile-weight');
+    const heightField = document.getElementById('profile-height');
+
+    const currentWeight = parseFloat(weightField.value);
+    const currentHeight = parseFloat(heightField.value);
+
+    // Converte os valores que já estão digitados no modal
+    if (newUnit === 'imperial' && state.unitSystem === 'metric') {
+      if (currentWeight) weightField.value = Math.round(currentWeight * LBS_PER_KG * 10) / 10;
+      if (currentHeight) heightField.value = Math.round(currentHeight * IN_PER_CM * 10) / 10;
+    } else if (newUnit === 'metric' && state.unitSystem === 'imperial') {
+      if (currentWeight) weightField.value = Math.round((currentWeight / LBS_PER_KG) * 10) / 10;
+      if (currentHeight) heightField.value = Math.round((currentHeight / IN_PER_CM) * 10) / 10;
+    }
+
+    state.unitSystem = newUnit;
+    updateProfileUnitLabels();
   });
 }
 

@@ -264,6 +264,14 @@
     </div>
     <form id="profile-form" class="profile-form">
       <div class="profile-field">
+        <label for="profile-units">Unit System</label>
+        <select id="profile-units">
+          <option value="metric">Metric (kg, cm)</option>
+          <option value="imperial">Imperial (lbs, in)</option>
+        </select>
+      </div>
+
+      <div class="profile-field">
         <label for="profile-sex">Sex</label>
         <select id="profile-sex">
           <option value="unspecified">Unspecified</option>
@@ -273,13 +281,13 @@
       </div>
 
       <div class="profile-field">
-        <label for="profile-weight">Body Weight (kg) *</label>
-        <input type="number" id="profile-weight" placeholder="e.g. 75" min="20" max="400" step="0.5" required>
+        <label for="profile-weight" id="label-profile-weight">Body Weight (kg) *</label>
+        <input type="number" id="profile-weight" placeholder="e.g. 75" min="20" max="900" step="0.1" required>
       </div>
 
       <div class="profile-field">
-        <label for="profile-height">Height (cm) <span class="profile-optional">(optional)</span></label>
-        <input type="number" id="profile-height" placeholder="e.g. 178" min="50" max="250" step="1">
+        <label for="profile-height" id="label-profile-height">Height (cm) <span class="profile-optional">(optional)</span></label>
+        <input type="number" id="profile-height" placeholder="e.g. 178" min="20" max="300" step="0.5">
       </div>
 
       <div class="profile-field">
