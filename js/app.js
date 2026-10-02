@@ -8,6 +8,7 @@
 /* ---------- STATE ---------- */
 
 const state = {
+  user: null,
   muscles: [],       // latest readiness data from api_muscles.php
   exercises: [],      // exercise library from api_exercises.php
   profile: null,
@@ -66,6 +67,39 @@ function getWeightUnitLabel() {
 }
 
 /* ---------- API CALLS ---------- */
+
+async function fetchMe() {
+  const res = await fetch('pages/api_me.php');
+  if (!res.ok) throw new Error('Failed to load user info');
+  return res.json();
+}
+
+async function loginApi(payload) {
+  const res = await fetch('pages/api_login.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Login failed');
+  return data;
+}
+
+async function registerApi(payload) {
+  const res = await fetch('pages/api_register.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Registration failed');
+  return data;
+}
+
+async function logoutApi() {
+  const res = await fetch('pages/api_logout.php', { method: 'POST' });
+  return res.json();
+}
 
 async function fetchMuscles() {
   const res = await fetch('pages/api_muscles.php');
@@ -644,6 +678,114 @@ async function loadExercises() {
   state.exercises = data.exercises;
 }
 
+/* ---------- AUTHENTICATION & ONBOARDING ---------- */
+
+function updateAuthHeader() {
+  const loggedContainer = document.getElementById('auth-header-logged');
+  const loginOpenBtn = document.getElementById('login-open-btn');
+  const userNameEl = document.getElementById('auth-user-name');
+
+  if (state.user && state.user.authenticated) {
+    loggedContainer.style.display = 'flex';
+    loginOpenBtn.style.display = 'none';
+    userNameEl.textContent = state.user.name || 'USER';
+  } else {
+    loggedContainer.style.display = 'none';
+    loginOpenBtn.style.display = 'inline-flex';
+  }
+}
+
+function openAuthModal(defaultTab = 'login') {
+  switchAuthTab(defaultTab);
+  document.getElementById('login-feedback').textContent = '';
+  document.getElementById('register-feedback').textContent = '';
+  document.getElementById('auth-modal').style.display = 'flex';
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal').style.display = 'none';
+}
+
+function switchAuthTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('tab-login').classList.toggle('active', isLogin);
+  document.getElementById('tab-register').classList.toggle('active', !isLogin);
+  document.getElementById('login-form').style.display = isLogin ? 'flex' : 'none';
+  document.getElementById('register-form').style.display = isLogin ? 'none' : 'flex';
+}
+
+async function handleLoginSubmit(event) {
+  event.preventDefault();
+  const feedback = document.getElementById('login-feedback');
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+
+  try {
+    const res = await loginApi({ email, password });
+    state.user = { authenticated: true, ...res.user };
+    updateAuthHeader();
+    closeAuthModal();
+
+    await loadProfile();
+    await refreshMuscles();
+    await refreshHistory();
+  } catch (err) {
+    feedback.textContent = err.message;
+    feedback.className = 'log-feedback error';
+  }
+}
+
+async function handleRegisterSubmit(event) {
+  event.preventDefault();
+  const feedback = document.getElementById('register-feedback');
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+
+  try {
+    const res = await registerApi({ name, email, password });
+    state.user = { authenticated: true, ...res.user };
+    updateAuthHeader();
+    closeAuthModal();
+
+    await loadProfile();
+    await refreshMuscles();
+    await refreshHistory();
+
+    // Onboarding: se a conta for recém-criada, abre logo a calibração de perfil
+    openProfileModal();
+    const profileFeedback = document.getElementById('profile-feedback');
+    profileFeedback.textContent = 'Account created. Set your body weight and units to calibrate telemetry.';
+    profileFeedback.className = 'log-feedback';
+  } catch (err) {
+    feedback.textContent = err.message;
+    feedback.className = 'log-feedback error';
+  }
+}
+
+async function handleLogout() {
+  try {
+    await logoutApi();
+    window.location.reload();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function checkAuthSession() {
+  try {
+    const data = await fetchMe();
+    if (data.authenticated && data.user) {
+      state.user = { authenticated: true, ...data.user };
+    } else {
+      state.user = { authenticated: false, ...(data.user || { name: 'Demo' }) };
+    }
+    updateAuthHeader();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 /* ---------- PROFILE MODAL ---------- */
 
 function updateProfileUnitLabels() {
@@ -849,6 +991,7 @@ function bindEvents() {
       closeWeightHelp();
       closeExercisePicker();
       closeProfileModal();
+      closeAuthModal();
     }
   });
 
@@ -871,6 +1014,17 @@ function bindEvents() {
 
     state.unitSystem = newUnit;
     updateProfileUnitLabels();
+  });
+
+  document.getElementById('login-open-btn').addEventListener('click', () => openAuthModal('login'));
+  document.getElementById('close-auth-btn').addEventListener('click', closeAuthModal);
+  document.getElementById('tab-login').addEventListener('click', () => switchAuthTab('login'));
+  document.getElementById('tab-register').addEventListener('click', () => switchAuthTab('register'));
+  document.getElementById('login-form').addEventListener('submit', handleLoginSubmit);
+  document.getElementById('register-form').addEventListener('submit', handleRegisterSubmit);
+  document.getElementById('logout-btn').addEventListener('click', handleLogout);
+  document.getElementById('auth-modal').addEventListener('click', (event) => {
+    if (event.target.id === 'auth-modal') closeAuthModal();
   });
 }
 
@@ -965,6 +1119,7 @@ async function init() {
 
   const dataLoad = (async () => {
     try {
+      await checkAuthSession();
       await loadProfile();
       await loadExercises();
       addSetRow();
