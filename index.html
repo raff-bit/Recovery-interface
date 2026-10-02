@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recovery Interface</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="booting">
+
+  <div id="boot-screen" class="boot-screen">
+  <div class="boot-core">
+    <svg class="boot-ring" viewBox="0 0 200 200">
+      <circle class="boot-ring-track" cx="100" cy="100" r="70"/>
+      <circle class="boot-ring-track" cx="100" cy="100" r="90"/>
+      <circle id="boot-ring-progress" class="boot-ring-progress" cx="100" cy="100" r="90"/>
+    </svg>
+    <div class="boot-core-label" id="boot-percent">0%</div>
+  </div>
+  <div class="boot-title">RECOVERY INTERFACE</div>
+  <ul class="boot-log" id="boot-log"></ul>
+  <div class="boot-bar-track"><div class="boot-bar-fill" id="boot-bar-fill"></div></div>
+</div>
+
+<div class="hud-frame pre-reveal" id="hud-frame">
+
+  <div class="hud-header-actions">
+      <button type="button" id="profile-btn" class="hud-action-btn">
+        Profile
+        <span id="profile-indicator" class="profile-dot" style="display:none"></span>
+      </button>
+      <div class="hud-clock" id="clock">--:--:--</div>
+    </div>
+
+  <main class="hud-grid">
+
+    <!-- HOLOGRAM PANEL -->
+    <section class="panel hologram-panel">
+      <div class="panel-label">Muscle Scan</div>
+      <button type="button" id="toggle-view" class="ghost-btn">Show Back</button>
+
+      <div class="hologram-stage">
+
+        <svg id="body-front" class="hologram-svg" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg">
+          <g class="body-outline">
+            <circle cx="120" cy="35" r="24"/>
+            <path d="M100 58 L100 74 L140 74 L140 58 Z"/>
+            <path d="M70 80 Q120 68 170 80 L178 188 Q120 202 62 188 Z"/>
+            <path d="M62 188 Q60 225 66 258 L94 258 Q90 220 70 188 Z"/>
+            <path d="M178 188 Q180 225 174 258 L146 258 Q150 220 170 188 Z"/>
+          </g>
+
+          <ellipse class="muscle-shape" data-muscle="front_delts" cx="68" cy="92" rx="15" ry="17"><title>Front Delts</title></ellipse>
+          <ellipse class="muscle-shape" data-muscle="front_delts" cx="172" cy="92" rx="15" ry="17"><title>Front Delts</title></ellipse>
+          <ellipse class="muscle-shape" data-muscle="side_delts" cx="54" cy="95" rx="9" ry="15"><title>Side Delts</title></ellipse>
+          <ellipse class="muscle-shape" data-muscle="side_delts" cx="186" cy="95" rx="9" ry="15"><title>Side Delts</title></ellipse>
+
+          <path class="muscle-shape" data-muscle="upper_chest" d="M90 82 L118 82 L118 112 L92 108 Z"><title>Upper Chest</title></path>
+          <path class="muscle-shape" data-muscle="upper_chest" d="M150 82 L122 82 L122 112 L148 108 Z"><title>Upper Chest</title></path>
+          <path class="muscle-shape" data-muscle="lower_chest" d="M92 110 L118 114 L118 140 L96 136 Z"><title>Lower Chest</title></path>
+          <path class="muscle-shape" data-muscle="lower_chest" d="M148 110 L122 114 L122 140 L144 136 Z"><title>Lower Chest</title></path>
+
+          <ellipse class="muscle-shape" data-muscle="biceps" cx="52" cy="140" rx="13" ry="30"><title>Biceps</title></ellipse>
+          <ellipse class="muscle-shape" data-muscle="biceps" cx="188" cy="140" rx="13" ry="30"><title>Biceps</title></ellipse>
+          <ellipse class="muscle-shape" data-muscle="forearms" cx="46" cy="195" rx="11" ry="28"><title>Forearms</title></ellipse>
+          <ellipse class="muscle-shape" data-muscle="forearms" cx="194" cy="195" rx="11" ry="28"><title>Forearms</title></ellipse>
+
+          <rect class="muscle-shape" data-muscle="abs" x="108" y="112" width="24" height="18" rx="3"><title>Abs</title></rect>
+          <rect class="muscle-shape" data-muscle="abs" x="108" y="132" width="24" height="18" rx="3"><title>Abs</title></rect>
+          <rect class="muscle-shape" data-muscle="abs" x="108" y="152" width="24" height="18" rx="3"><title>Abs</title></rect>
+          <rect class="muscle-shape" data-muscle="obliques" x="90" y="115" width="14" height="55" rx="4"><title>Obliques</title></rect>
+          <rect class="muscle-shape" data-muscle="obliques" x="136" y="115" width="14" height="55" rx="4"><title>Obliques</title></rect>
+
+          <ellipse class="muscle-shape" data-muscle="quads" cx="98" cy="270" rx="21" ry="52"><title>Quads</title></ellipse>
+          <ellipse class="muscle-shape" data-muscle="quads" cx="142" cy="270" rx="21" ry="52"><title>Quads</title></ellipse>
+          <ellipse class="muscle-shape" data-muscle="calves" cx="98" cy="375" rx="15" ry="38"><title>Calves</title></ellipse>
+          <ellipse class="muscle-shape" data-muscle="calves" cx="142" cy="375" rx="15" ry="38"><title>Calves</title></ellipse>
+        </svg>
+
+        <svg id="body-back" class="hologram-svg" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg" style="display:none">
+          <g class="body-outline">
+            <circle cx="120" cy="35" r="24"/>
+            <path d="M100 58 L100 74 L140 74 L140 58 Z"/>
+            <path d="M70 80 Q120 68 170 80 L178 188 Q120 202 62 188 Z"/>
+            <path d="M62 188 Q60 225 66 258 L94 258 Q90 220 70 188 Z"/>
+            <path d="M178 188 Q180 225 174 258 L146 258 Q150 220 170 188 Z"/>
+          </g>
+
+          <g class="body-outline-muted">
+            <ellipse cx="52" cy="195" rx="10" ry="26"/>
+            <ellipse cx="188" cy="195" rx="10" ry="26"/>
+            <ellipse cx="98" cy="375" rx="14" ry="36"/>
+            <ellipse cx="142" cy="375" rx="14" ry="36"/>
+          </g>
+
+          <path class="muscle-shape" data-muscle="traps" d="M100 78 L140 78 L155 100 L120 112 L85 100 Z"><title>Traps</title></path>
+
+          <ellipse class="muscle-shape" data-muscle="rear_delts" cx="68" cy="92" rx="15" ry="17"><title>Rear Delts</title></ellipse>
+          <ellipse class="muscle-shape" data-muscle="rear_delts" cx="172" cy="92" rx="15" ry="17"><title>Rear Delts</title></ellipse>
+
+          <path class="muscle-shape" data-muscle="lats" d="M85 105 L118 112 L112 175 L78 165 Z"><title>Lats</title></path>
+          <path class="muscle-shape" data-muscle="lats" d="M155 105 L122 112 L128 175 L162 165 Z"><title>Lats</title></path>
+
+          <rect class="muscle-shape" data-muscle="lower_back" x="102" y="175" width="36" height="35" rx="6"><title>Lower Back</title></rect>
+
+          <ellipse class="muscle-shape" data-muscle="triceps" cx="52" cy="140" rx="13" ry="30"><title>Triceps</title></ellipse>
+          <ellipse class="muscle-shape" data-muscle="triceps" cx="188" cy="140" rx="13" ry="30"><title>Triceps</title></ellipse>
+
+          <ellipse class="muscle-shape" data-muscle="glutes" cx="98" cy="228" rx="23" ry="26"><title>Glutes</title></ellipse>
+          <ellipse class="muscle-shape" data-muscle="glutes" cx="142" cy="228" rx="23" ry="26"><title>Glutes</title></ellipse>
+
+          <ellipse class="muscle-shape" data-muscle="hamstrings" cx="98" cy="300" rx="19" ry="48"><title>Hamstrings</title></ellipse>
+          <ellipse class="muscle-shape" data-muscle="hamstrings" cx="142" cy="300" rx="19" ry="48"><title>Hamstrings</title></ellipse>
+        </svg>
+
+      </div>
+      <p class="hologram-footnote" id="last-updated"></p>
+    </section>
+
+    <!-- MUSCLE STATUS PANEL -->
+    <section class="panel readout-panel">
+      <div class="panel-label">Muscle Status</div>
+      <ul id="muscle-list" class="muscle-list"></ul>
+    </section>
+
+    <!-- LOG WORKOUT PANEL -->
+    <section class="panel log-panel">
+      <div class="panel-label" id="log-panel-label">Log Workout</div>
+      <form id="workout-form">
+        <input type="text" id="workout-label" placeholder="Session name (optional) — e.g. Push Day">
+        <div id="sets-container"></div>
+        <div class="log-actions">
+          <button type="button" id="add-set-btn" class="ghost-btn">+ Add Set</button>
+          <button type="button" id="cancel-edit-btn" class="ghost-btn" style="display:none">Cancel Edit</button>
+          <button type="submit" id="save-workout-btn" class="primary-btn">Save Workout</button>
+        </div>
+      </form>
+      <p id="log-feedback" class="log-feedback"></p>
+    </section>
+
+        <!-- SESSION PLANNER PANEL -->
+    <section class="panel planner-panel">
+      <div class="panel-label">Session Planner — Preview Future Readiness</div>
+      <div class="planner-controls">
+        <label for="planner-date" class="planner-date-label">Target Date</label>
+        <input type="date" id="planner-date">
+        <button type="button" id="planner-add-set-btn" class="ghost-btn">+ Add Exercise</button>
+      </div>
+      <p class="hologram-footnote">Only the exercise and RPE affect the projection — the model doesn't weigh reps or load yet.</p>
+            <div class="planner-columns-header">
+        <span>Exercise</span>
+        <span>Sets</span>
+        <span>RPE</span>
+        <span></span>
+      </div>
+      <div id="planner-sets-container"></div>
+      <div class="log-actions">
+        <button type="button" id="preview-btn" class="primary-btn">Preview Readiness</button>
+        <button type="button" id="clear-preview-btn" class="ghost-btn" style="display:none">Clear Preview</button>
+      </div>
+      <p id="planner-feedback" class="log-feedback"></p>
+      <ul id="planner-results" class="muscle-list planner-results"></ul>
+    </section>
+
+    <!-- HISTORY PANEL -->
+    <section class="panel history-panel">
+      <div class="panel-label">Recent Sessions</div>
+      <ul id="history-list" class="history-list"></ul>
+    </section>
+
+  </main>
+</div>
+
+<div id="weight-help-tooltip" class="weight-help-tooltip" style="display:none"></div>
+
+<div id="exercise-picker-modal" class="modal-overlay" style="display:none">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <span class="panel-label">Select Exercise</span>
+      <button type="button" id="close-picker-btn" class="modal-close">×</button>
+    </div>
+    <div class="picker-tabs" id="picker-tabs"></div>
+    <ul class="picker-list" id="picker-list"></ul>
+  </div>
+</div>
+
+<div id="profile-modal" class="modal-overlay" style="display:none">
+  <div class="modal-panel profile-modal-panel">
+    <div class="modal-header">
+      <span class="panel-label">User Profile</span>
+      <button type="button" id="close-profile-btn" class="modal-close">×</button>
+    </div>
+    <form id="profile-form" class="profile-form">
+      <div class="profile-field">
+        <label for="profile-sex">Sex</label>
+        <select id="profile-sex">
+          <option value="unspecified">Unspecified</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+      </div>
+
+      <div class="profile-field">
+        <label for="profile-weight">Body Weight (kg) *</label>
+        <input type="number" id="profile-weight" placeholder="e.g. 75" min="20" max="400" step="0.5" required>
+      </div>
+
+      <div class="profile-field">
+        <label for="profile-height">Height (cm) <span class="profile-optional">(optional)</span></label>
+        <input type="number" id="profile-height" placeholder="e.g. 178" min="50" max="250" step="1">
+      </div>
+
+      <div class="profile-field">
+        <label for="profile-activity">Activity Level</label>
+        <select id="profile-activity">
+          <option value="sedentary">Sedentary</option>
+          <option value="lightly_active">Lightly Active</option>
+          <option value="moderately_active">Moderately Active</option>
+          <option value="very_active">Very Active</option>
+          <option value="athlete">Athlete</option>
+        </select>
+      </div>
+
+      <p id="profile-feedback" class="log-feedback"></p>
+
+      <div class="modal-actions">
+        <button type="button" id="cancel-profile-btn" class="modal-cancel-btn">Cancel</button>
+        <button type="submit" id="save-profile-btn" class="primary-btn">Save Profile</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# Ficheiros do sistema operativo e editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Ficheiros comprimidos e dumps
+*.zip
+*.rar
+*.sql.gz
+
+# Logs locais
+*.log
