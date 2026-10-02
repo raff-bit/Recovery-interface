@@ -11,6 +11,7 @@ const state = {
   muscles: [],       // latest readiness data from api_muscles.php
   exercises: [],      // exercise library from api_exercises.php
   profile: null,
+  hologramView: 'front', // 'front' | 'back'
   activePickerRow: null,  // which set-row is currently choosing an exercise
   activePickerRegion: 'all',
   editingWorkoutId: null, // set when the Log Workout form is editing a past session instead of creating a new one
@@ -650,6 +651,7 @@ async function handleProfileSubmit(event) {
       activity_level: activity,
     });
     state.profile = res.profile;
+    updateHologramVisibility();
     updateProfileIndicator();
     feedback.textContent = 'Profile saved.';
     feedback.className = 'log-feedback success';
@@ -666,6 +668,7 @@ async function loadProfile() {
     const data = await fetchProfile();
     state.profile = data.profile;
     updateProfileIndicator();
+    updateHologramVisibility();
   } catch (err) {
     console.error(err);
   }
@@ -710,15 +713,29 @@ async function handleWorkoutSubmit(event) {
   }
 }
 
-function handleViewToggle() {
-  const front = document.getElementById('body-front');
-  const back = document.getElementById('body-back');
-  const btn = document.getElementById('toggle-view');
+function updateHologramVisibility() {
+  const isFemale = state.profile && state.profile.sex === 'female';
+  const isFront = state.hologramView === 'front';
 
-  const showingFront = front.style.display !== 'none';
-  front.style.display = showingFront ? 'none' : '';
-  back.style.display = showingFront ? '' : 'none';
-  btn.textContent = showingFront ? 'Show Front' : 'Show Back';
+  const maleFront = document.getElementById('body-front');
+  const maleBack = document.getElementById('body-back');
+  const femaleFront = document.getElementById('body-front-female');
+  const femaleBack = document.getElementById('body-back-female');
+
+  maleFront.style.display = (!isFemale && isFront) ? '' : 'none';
+  maleBack.style.display = (!isFemale && !isFront) ? '' : 'none';
+  femaleFront.style.display = (isFemale && isFront) ? '' : 'none';
+  femaleBack.style.display = (isFemale && !isFront) ? '' : 'none';
+
+  const btn = document.getElementById('toggle-view');
+  if (btn) {
+    btn.textContent = isFront ? 'Show Back' : 'Show Front';
+  }
+}
+
+function handleViewToggle() {
+  state.hologramView = state.hologramView === 'front' ? 'back' : 'front';
+  updateHologramVisibility();
 }
 
 function bindEvents() {
