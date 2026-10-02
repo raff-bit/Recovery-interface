@@ -1005,3 +1005,8 @@ body.booting {
   color: var(--accent-cyan);
   border-bottom-color: var(--accent-cyan);
 }
+
+#clear-preview-btn,
+#cancel-edit-btn {
+  position: static;
+}

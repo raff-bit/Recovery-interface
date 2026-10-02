@@ -633,14 +633,21 @@ function addSetRow() {
 }
 
 function collectSetsFromForm() {
-  const rows = document.querySelectorAll('.set-row');
+  const rows = document.querySelectorAll('#sets-container .set-row');
   const sets = [];
 
   rows.forEach(row => {
-    const exerciseId = row.querySelector('.set-exercise').value;
-    const reps = row.querySelector('.set-reps').value;
-    const weightRaw = row.querySelector('.set-weight').value;
-    const rpe = row.querySelector('.set-rpe').value;
+    const exerciseEl = row.querySelector('.set-exercise');
+    const repsEl = row.querySelector('.set-reps');
+    const weightEl = row.querySelector('.set-weight');
+    const rpeEl = row.querySelector('.set-rpe');
+
+    if (!exerciseEl || !repsEl) return;
+
+    const exerciseId = exerciseEl.value;
+    const reps = repsEl.value;
+    const weightRaw = weightEl ? weightEl.value : '';
+    const rpe = rpeEl ? rpeEl.value : '';
 
     if (exerciseId && reps) {
       const weightInKg = weightRaw ? displayWeightToKg(parseFloat(weightRaw)) : 0;
