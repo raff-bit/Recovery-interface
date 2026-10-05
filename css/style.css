@@ -758,7 +758,7 @@ body.booting {
 }
 
 .planner-set-row {
-  grid-template-columns: 2fr 1fr 1fr auto;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
 }
 
 .planner-results {
@@ -778,7 +778,7 @@ body.booting {
 
 .planner-columns-header {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr auto;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
   gap: 8px;
   font-family: var(--font-mono);
   font-size: 11px;
@@ -786,6 +786,12 @@ body.booting {
   letter-spacing: 1px;
   color: var(--text-dim);
   padding: 0 2px 4px;
+}
+
+@media screen and (max-width: 600px) {
+  .planner-columns-header {
+    display: none !important;
+  }
 }
 
 /* ============================================================

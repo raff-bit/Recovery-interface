@@ -497,11 +497,14 @@ function addPlannerSetRow() {
   const container = document.getElementById('planner-sets-container');
   const row = document.createElement('div');
   row.className = 'set-row planner-set-row';
+  const unit = getWeightUnitLabel();
   row.innerHTML = `
     <button type="button" class="exercise-picker-btn">Choose Exercise</button>
     <input type="hidden" class="set-exercise" value="">
     <input type="number" class="set-count" placeholder="Sets" min="1" value="1">
-    <input type="number" class="set-rpe" placeholder="RPE" min="1" max="10" step="0.5">
+    <input type="number" class="planner-set-reps" placeholder="Reps" min="1" value="10">
+    <input type="number" class="planner-set-weight" placeholder="${unit}" min="0" step="0.5">
+    <input type="number" class="set-rpe" placeholder="RPE" min="1" max="10" step="0.5" value="7.5">
     <button type="button" class="remove-set-btn" title="Remove">×</button>
   `;
   row.querySelector('.exercise-picker-btn').addEventListener('click', () => openExercisePicker(row));
@@ -516,13 +519,20 @@ function collectPlannerSets() {
   rows.forEach(row => {
     const exerciseId = row.querySelector('.set-exercise').value;
     const count = parseInt(row.querySelector('.set-count').value, 10) || 1;
+    const repsRaw = row.querySelector('.planner-set-reps').value;
+    const weightRaw = row.querySelector('.planner-set-weight').value;
     const rpe = row.querySelector('.set-rpe').value;
 
     if (!exerciseId) return;
 
+    const reps = repsRaw ? parseInt(repsRaw, 10) : 10;
+    const weightInKg = weightRaw ? displayWeightToKg(parseFloat(weightRaw)) : 0;
+
     for (let i = 0; i < count; i++) {
       sets.push({
         exercise_id: parseInt(exerciseId, 10),
+        reps: reps,
+        weight_kg: weightInKg,
         rpe: rpe ? parseFloat(rpe) : null,
       });
     }
@@ -797,6 +807,8 @@ async function checkAuthSession() {
 
 function updateProfileUnitLabels() {
   const isImperial = state.unitSystem === 'imperial';
+  const unit = getWeightUnitLabel();
+
   document.getElementById('label-profile-weight').innerHTML = isImperial
     ? 'Body Weight (lbs) *'
     : 'Body Weight (kg) *';
@@ -804,9 +816,18 @@ function updateProfileUnitLabels() {
     ? 'Height (in) <span class="profile-optional">(optional)</span>'
     : 'Height (cm) <span class="profile-optional">(optional)</span>';
 
-  // Atualiza também os placeholders dos inputs de peso existentes no formulário de treino
+  // Formulário de treino
   document.querySelectorAll('.set-row .set-weight').forEach(input => {
-    input.placeholder = getWeightUnitLabel();
+    input.placeholder = unit;
+  });
+
+  // Session planner
+  const plannerWeightHdr = document.getElementById('planner-weight-header');
+  if (plannerWeightHdr) {
+    plannerWeightHdr.textContent = `Weight (${unit})`;
+  }
+  document.querySelectorAll('#planner-sets-container .planner-set-weight').forEach(input => {
+    input.placeholder = unit;
   });
 }
 

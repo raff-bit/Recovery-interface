@@ -40,8 +40,9 @@ class ExerciseRepository
         }
         $placeholders = implode(',', array_fill(0, count($exerciseIds), '?'));
         $stmt = $this->db->prepare(
-            "SELECT em.exercise_id, em.muscle_id, em.activation_weight
+            "SELECT em.exercise_id, em.muscle_id, em.activation_weight, e.is_bodyweight
              FROM exercise_muscles em
+             JOIN exercises e ON e.id = em.exercise_id
              WHERE em.exercise_id IN ($placeholders)"
         );
         $stmt->execute($exerciseIds);

@@ -231,12 +231,17 @@ class RecoveryCalculator
         foreach ($hypotheticalSets as $set) {
             $exerciseId = (int) $set['exercise_id'];
             $rpe = isset($set['rpe']) && $set['rpe'] !== null ? (float) $set['rpe'] : null;
+            $weightKg = isset($set['weight_kg']) ? (float) $set['weight_kg'] : 0.0;
+            $reps = isset($set['reps']) ? (int) $set['reps'] : 10;
             $exerciseActivations = $activationsByExercise[$exerciseId] ?? [];
 
             foreach ($exerciseActivations as $act) {
                 $byMuscleHypothetical[$act['muscle_id']][] = [
                     'activation_weight' => $act['activation_weight'],
                     'rpe'               => $rpe,
+                    'reps'              => $reps,
+                    'weight_kg'         => $weightKg,
+                    'is_bodyweight'     => (bool) ($act['is_bodyweight'] ?? false),
                     'workout_date'      => $referenceDate->format('Y-m-d H:i:s'),
                 ];
             }

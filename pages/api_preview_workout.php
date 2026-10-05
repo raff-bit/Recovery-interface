@@ -38,6 +38,8 @@ foreach ($input['sets'] as $set) {
     }
     $hypotheticalSets[] = [
         'exercise_id' => (int) $set['exercise_id'],
+        'reps'        => isset($set['reps']) && $set['reps'] !== '' ? (int) $set['reps'] : 10,
+        'weight_kg'   => isset($set['weight_kg']) && $set['weight_kg'] !== '' ? (float) $set['weight_kg'] : 0.0,
         'rpe'         => isset($set['rpe']) && $set['rpe'] !== '' ? (float) $set['rpe'] : null,
     ];
 }
