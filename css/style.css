@@ -1010,3 +1010,162 @@ body.booting {
 #cancel-edit-btn {
   position: static;
 }
+
+/* ==========================================================================
+   HUD MOBILE ENGINE & ERGONOMIA RESPONSIVA (TAREFA 1 - ROADMAP)
+   ========================================================================== */
+
+/* Prevenção de auto-zoom indesejado em navegadores móveis (Safari iOS / Chrome) */
+@media screen and (max-width: 900px) {
+  input, select, textarea, button {
+    font-size: 16px !important;
+  }
+}
+
+/* Reestruturação da Grelha HUD e Fluxo Visual Vertical */
+@media screen and (max-width: 992px) {
+  .hud-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.25rem !important;
+    padding: 0.75rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Ordem de Leitura Biomecânica Estratégica:
+     1. Holograma e silhueta anatómica (inspeção visual imediata)
+     2. Telemetria e prontidão muscular
+     3. Workout Log (registo ativo de treino)
+     4. Session Planner (projeção e planeamento) */
+  .hologram-panel,
+  .hud-panel-hologram,
+  #hologram-panel {
+    order: 1 !important;
+    width: 100% !important;
+  }
+
+  .telemetry-panel,
+  .hud-panel-telemetry,
+  #muscle-list-panel,
+  #readiness-panel {
+    order: 2 !important;
+    width: 100% !important;
+  }
+
+  .workout-log-panel,
+  .hud-panel-workout,
+  #workout-panel {
+    order: 3 !important;
+    width: 100% !important;
+  }
+
+  .planner-panel,
+  .hud-panel-planner,
+  #planner-panel {
+    order: 4 !important;
+    width: 100% !important;
+  }
+
+  /* Calibração do SVG holográfico: restringe a altura máxima para evitar scroll vertical excessivo */
+  .hologram-stage,
+  .svg-viewport,
+  .hologram-wrapper {
+    max-height: 48vh !important;
+    min-height: 320px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+  }
+
+  .hologram-stage svg,
+  .svg-viewport svg {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 48vh !important;
+    object-fit: contain !important;
+  }
+}
+
+/* Touch Targets e Controlos Táteis (Mínimo de 44px de área de impacto) */
+@media screen and (max-width: 600px) {
+  .primary-btn,
+  .ghost-btn,
+  .btn,
+  button {
+    min-height: 44px !important;
+    padding: 0.65rem 1.2rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    touch-action: manipulation !important;
+  }
+
+  /* Controlos de alternância (Frontal/Dorsal, Masculino/Feminino, Metric/Imperial) */
+  .view-toggle-btn,
+  .gender-btn,
+  .unit-toggle-btn,
+  .tab-btn {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    padding: 0.5rem 0.8rem !important;
+  }
+
+  /* Botões de remoção de séries e ícones operacionais */
+  .remove-set-btn,
+  .btn-remove-set,
+  .delete-set-action,
+  .close-modal-btn {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.25rem !important;
+    cursor: pointer !important;
+  }
+
+  /* Inputs de repetições e peso empilhados ergonomicamente */
+  .set-row,
+  .exercise-set-item {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.5rem 0 !important;
+    border-bottom: 1px solid rgba(0, 217, 255, 0.15) !important;
+  }
+
+  .set-row input[type="number"],
+  .set-row input[type="text"],
+  .set-row select {
+    min-height: 44px !important;
+    flex: 1 1 80px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Modais com confinamento de viewport e scroll interno isolado */
+  .modal-overlay,
+  .modal-backdrop,
+  .modal {
+    padding: 1rem !important;
+    align-items: flex-start !important;
+    overflow-y: auto !important;
+  }
+
+  .modal-content,
+  .modal-dialog,
+  .hud-modal-body {
+    max-height: 88vh !important;
+    max-height: 88dvh !important;
+    width: 100% !important;
+    margin: auto 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 1.25rem !important;
+    box-sizing: border-box !important;
+  }
+}
