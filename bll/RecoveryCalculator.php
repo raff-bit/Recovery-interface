@@ -107,10 +107,25 @@ class RecoveryCalculator
         return $result;
     }
 
+    private function ageRecoveryMultiplier(?int $age): float
+    {
+        if ($age === null || $age <= 0) {
+            return 1.0;
+        }
+        if ($age < 30) {
+            return 1.00; // Baseline ótima de regeneração
+        }
+        if ($age < 40) {
+            return 1.05; // +5% de tempo necessário
+        }
+        if ($age < 50) {
+            return 1.12; // +12% de tempo necessário
+        }
+        return 1.22; // +22% de tempo necessário (50+)
+    }
+
     /**
-     * Scales recovery_hours by activity level and sex. Both default to a
-     * 1.0 multiplier (no change) when there's no profile or the value is
-     * unrecognized — this is what keeps unpersonalized behavior identical.
+     * Scales recovery_hours by activity level, sex and age.
      */
     private function effectiveRecoveryHours(int $baseHours, ?array $profile): int
     {
@@ -120,10 +135,11 @@ class RecoveryCalculator
 
         $activityMult = self::ACTIVITY_RECOVERY_MULTIPLIERS[$profile['activity_level']] ?? 1.0;
         $sexMult = self::SEX_RECOVERY_MULTIPLIERS[$profile['sex']] ?? 1.0;
+        $age = isset($profile['age']) && $profile['age'] !== null ? (int) $profile['age'] : null;
+        $ageMult = $this->ageRecoveryMultiplier($age);
 
-        return (int) round($baseHours * $activityMult * $sexMult);
+        return (int) round($baseHours * $activityMult * $sexMult * $ageMult);
     }
-
     /**
      * How heavy was this set relative to the person's own body weight?
      * 1.0 means "roughly your body weight" — no scaling up or down.

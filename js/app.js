@@ -828,6 +828,7 @@ function openProfileModal() {
 
   document.getElementById('profile-weight').value = displayedWeight;
   document.getElementById('profile-height').value = displayedHeight;
+  document.getElementById('profile-age').value = p && p.age ? p.age : '';
   document.getElementById('profile-activity').value = p ? p.activity_level : 'moderately_active';
 
   const feedback = document.getElementById('profile-feedback');
@@ -848,6 +849,7 @@ async function handleProfileSubmit(event) {
   const sex = document.getElementById('profile-sex').value;
   const weightInput = parseFloat(document.getElementById('profile-weight').value);
   const heightRaw = document.getElementById('profile-height').value;
+  const ageRaw = document.getElementById('profile-age').value;
   const activity = document.getElementById('profile-activity').value;
 
   // Atualizar preferência de unidades
@@ -858,9 +860,16 @@ async function handleProfileSubmit(event) {
   // Converter para métrico (kg / cm) antes de guardar no backend
   const weightKg = displayWeightToKg(weightInput);
   const heightCm = heightRaw ? displayHeightToCm(parseFloat(heightRaw)) : null;
+  const age = ageRaw ? parseInt(ageRaw, 10) : null;
 
   if (!weightKg || weightKg <= 0 || weightKg > 400) {
     feedback.textContent = `Please enter a valid body weight (${getWeightUnitLabel()}).`;
+    feedback.className = 'log-feedback error';
+    return;
+  }
+
+  if (age !== null && (age < 12 || age > 120)) {
+    feedback.textContent = 'Please enter a valid age between 12 and 120.';
     feedback.className = 'log-feedback error';
     return;
   }
@@ -870,6 +879,7 @@ async function handleProfileSubmit(event) {
       sex: sex,
       body_weight_kg: weightKg,
       height_cm: heightCm,
+      age: age,
       activity_level: activity,
     });
     state.profile = res.profile;

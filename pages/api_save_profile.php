@@ -18,6 +18,7 @@ $sex = in_array($input['sex'] ?? '', $allowedSex, true) ? $input['sex'] : 'unspe
 $activityLevel = in_array($input['activity_level'] ?? '', $allowedActivity, true) ? $input['activity_level'] : 'moderately_active';
 $heightCm = isset($input['height_cm']) && $input['height_cm'] !== '' ? (float) $input['height_cm'] : null;
 $bodyWeightKg = isset($input['body_weight_kg']) ? (float) $input['body_weight_kg'] : 0;
+$age = isset($input['age']) && $input['age'] !== '' ? (int) $input['age'] : null;
 
 if ($bodyWeightKg <= 0 || $bodyWeightKg > 400) {
     http_response_code(400);
@@ -25,8 +26,14 @@ if ($bodyWeightKg <= 0 || $bodyWeightKg > 400) {
     exit;
 }
 
+if ($age !== null && ($age < 12 || $age > 120)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Age must be between 12 and 120.']);
+    exit;
+}
+
 $userId = getCurrentUserId();
 $profileRepo = new ProfileRepository();
-$profileRepo->saveProfile($userId, $sex, $heightCm, $bodyWeightKg, $activityLevel);
+$profileRepo->saveProfile($userId, $sex, $heightCm, $bodyWeightKg, $age, $activityLevel);
 
 echo json_encode(['success' => true, 'profile' => $profileRepo->getProfile($userId)]);
