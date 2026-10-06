@@ -1,0 +1,208 @@
+/* ============================================================
+   RECOVERY INTERFACE — Layout, Grid & Frame Shell
+   ============================================================ */
+
+/* ---------- HEADER ---------- */
+
+.hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--border-dim);
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.hud-header h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--accent-cyan);
+  text-shadow: 0 0 18px rgba(0, 217, 255, 0.55);
+  animation: title-pulse 4s ease-in-out infinite;
+}
+
+@keyframes title-pulse {
+  0%, 100% { text-shadow: 0 0 18px rgba(0, 217, 255, 0.55); }
+  50%      { text-shadow: 0 0 28px rgba(0, 217, 255, 0.85); }
+}
+
+.hud-subtitle {
+  margin: 4px 0 0;
+  color: var(--text-dim);
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.hud-clock {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  color: var(--accent-cyan);
+  letter-spacing: 2px;
+}
+
+.hud-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hud-user-tag {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent-cyan);
+  background: rgba(0, 217, 255, 0.08);
+  border: 1px solid var(--border-dim);
+  padding: 4px 8px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.hud-action-btn {
+  position: relative;
+  background: transparent;
+  border: 1px solid var(--border-glow);
+  color: var(--accent-cyan);
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 1px;
+  padding: 6px 14px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-action-btn:hover {
+  background: rgba(0, 217, 255, 0.1);
+  box-shadow: 0 0 12px rgba(0, 217, 255, 0.3);
+}
+
+.hud-action-btn-subtle {
+  background: transparent;
+  border: 1px solid var(--border-dim);
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  padding: 5px 10px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hud-action-btn-subtle:hover {
+  border-color: rgba(255, 92, 92, 0.5);
+  color: #ff5c5c;
+}
+
+.profile-dot {
+  width: 7px;
+  height: 7px;
+  background-color: #ffb347;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #ffb347;
+  animation: critical-glow 1.6s ease-in-out infinite;
+}
+
+/* ---------- LAYOUT GRID ---------- */
+
+.hud-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  grid-template-areas:
+    "hologram readout"
+    "hologram log"
+    "planner  planner"
+    "analytics analytics"
+    "history  history";
+  gap: 20px;
+}
+
+.hologram-panel  { grid-area: hologram; }
+.readout-panel   { grid-area: readout; }
+.log-panel       { grid-area: log; }
+.planner-panel   { grid-area: planner; }
+.analytics-panel { grid-area: analytics; }
+.history-panel   { grid-area: history; }
+
+/* ---------- PANEL SHELL ---------- */
+
+.panel {
+  position: relative;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-dim);
+  border-radius: 2px;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.panel::before,
+.panel::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border-glow);
+  opacity: 0.8;
+}
+
+.panel::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+.panel::after  { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+.panel-label {
+  font-size: 12px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.primary-btn {
+  background: rgba(0, 217, 255, 0.15);
+  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 9px 20px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primary-btn:hover {
+  background: rgba(0, 217, 255, 0.28);
+  box-shadow: 0 0 14px rgba(0, 217, 255, 0.4);
+}
+
+.ghost-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: transparent;
+  border: 1px solid var(--border-glow);
+  color: var(--accent-cyan);
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 1px;
+  padding: 6px 14px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ghost-btn:hover {
+  background: rgba(0, 217, 255, 0.1);
+  box-shadow: 0 0 12px rgba(0, 217, 255, 0.3);
+}
+
+#clear-preview-btn,
+#cancel-edit-btn {
+  position: static;
+}

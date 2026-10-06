@@ -1,0 +1,31 @@
+/* ============================================================
+   RECOVERY INTERFACE — Variables & Global Base
+   ============================================================ */
+
+:root {
+  --bg-void:       #060a10;
+  --bg-panel:      rgba(12, 20, 30, 0.78);
+  --border-dim:    rgba(124, 232, 255, 0.18);
+  --border-glow:   rgba(0, 217, 255, 0.45);
+  --accent-cyan:   #00d9ff;
+  --text-primary:  #e8f4f8;
+  --text-dim:      #5f7d8c;
+  --font-display:  'Rajdhani', sans-serif;
+  --font-mono:     'JetBrains Mono', monospace;
+  color-scheme: dark;
+}
+
+* { 
+  box-sizing: border-box; 
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px),
+    radial-gradient(ellipse at top, #0c1620 0%, var(--bg-void) 65%);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  padding: 24px;
+}

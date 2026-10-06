@@ -1,0 +1,62 @@
+/* ============================================================
+   RECOVERY INTERFACE — Hologram & Anatomical Viewports
+   ============================================================ */
+
+.hologram-panel { 
+  text-align: center; 
+}
+
+.hologram-stage {
+  display: flex;
+  justify-content: center;
+}
+
+.hologram-svg {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+}
+
+.body-outline {
+  fill: none;
+  stroke: rgba(124, 232, 255, 0.28);
+  stroke-width: 1.4;
+}
+
+.body-outline-muted {
+  fill: none;
+  stroke: rgba(124, 232, 255, 0.12);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.muscle-shape {
+  fill: #16323d;
+  stroke: rgba(124, 232, 255, 0.35);
+  stroke-width: 1;
+  cursor: pointer;
+  transition: fill 0.4s ease, filter 0.4s ease, opacity 0.2s ease;
+}
+
+.muscle-shape:hover {
+  opacity: 0.85;
+  stroke: var(--accent-cyan);
+  stroke-width: 1.6;
+}
+
+.hologram-footnote {
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* Pulso telemétrico de fadiga crítica (<35% prontidão) */
+.critical-pulse {
+  animation: critical-glow 1.6s ease-in-out infinite;
+}
+
+@keyframes critical-glow {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}

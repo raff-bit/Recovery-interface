@@ -1,0 +1,155 @@
+/* ============================================================
+   RECOVERY INTERFACE — Responsive Layout & Mobile Engine
+   ============================================================ */
+
+/* Prevenção de auto-zoom em Safari iOS / Chrome Mobile */
+@media screen and (max-width: 900px) {
+  input, select, textarea, button {
+    font-size: 16px !important;
+  }
+}
+
+/* Tablet e Mobile Landscape: Grelha 1 Coluna */
+@media (max-width: 900px) {
+  .hud-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "hologram"
+      "readout"
+      "log"
+      "planner"
+      "analytics"
+      "history";
+  }
+}
+
+/* Reestruturação Vertical Estrita com Leitura Biomecânica */
+@media screen and (max-width: 992px) {
+  .hud-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.25rem !important;
+    padding: 0.75rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .hologram-panel,
+  #hologram-panel {
+    order: 1 !important;
+    width: 100% !important;
+  }
+
+  .readout-panel,
+  #readiness-panel {
+    order: 2 !important;
+    width: 100% !important;
+  }
+
+  .log-panel,
+  #workout-panel {
+    order: 3 !important;
+    width: 100% !important;
+  }
+
+  .planner-panel,
+  #planner-panel {
+    order: 4 !important;
+    width: 100% !important;
+  }
+
+  .analytics-panel,
+  #analytics-panel {
+    order: 5 !important;
+    width: 100% !important;
+  }
+
+  .history-panel,
+  #history-panel {
+    order: 6 !important;
+    width: 100% !important;
+  }
+
+  /* Calibração do SVG para evitar scrolling vertical excessivo */
+  .hologram-stage {
+    max-height: 48vh !important;
+    min-height: 320px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+  }
+
+  .hologram-stage svg {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 48vh !important;
+    object-fit: contain !important;
+  }
+}
+
+/* Touch Targets e Controlos Táteis (Mínimo de 44px de área de impacto) */
+@media screen and (max-width: 600px) {
+  .planner-columns-header {
+    display: none !important;
+  }
+
+  .primary-btn,
+  .ghost-btn,
+  .btn,
+  button {
+    min-height: 44px !important;
+    padding: 0.65rem 1.2rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    touch-action: manipulation !important;
+  }
+
+  .remove-set-btn,
+  .close-modal-btn {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.25rem !important;
+    cursor: pointer !important;
+  }
+
+  .set-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.5rem 0 !important;
+    border-bottom: 1px solid rgba(0, 217, 255, 0.15) !important;
+  }
+
+  .set-row input[type="number"],
+  .set-row input[type="text"],
+  .set-row select {
+    min-height: 44px !important;
+    flex: 1 1 80px !important;
+    box-sizing: border-box !important;
+  }
+
+  .modal-overlay {
+    padding: 1rem !important;
+    align-items: flex-start !important;
+    overflow-y: auto !important;
+  }
+
+  .modal-panel {
+    max-height: 88vh !important;
+    max-height: 88dvh !important;
+    width: 100% !important;
+    margin: auto 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 1.25rem !important;
+    box-sizing: border-box !important;
+  }
+}
