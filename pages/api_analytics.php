@@ -5,6 +5,17 @@ require_once __DIR__ . '/../dal/WorkoutRepository.php';
 require_once __DIR__ . '/../bll/AnalyticsService.php';
 
 $userId = getCurrentUserId();
+
+// Se não tiver login ativo, devolve métricas vazias sem dar erro
+if ($userId === null) {
+    echo json_encode([
+        'weekly_volume'        => [],
+        'muscle_group_balance' => [],
+        'top_exercises'        => [],
+    ]);
+    exit;
+}
+
 $workoutRepo = new WorkoutRepository();
 $analytics = new AnalyticsService($workoutRepo);
 

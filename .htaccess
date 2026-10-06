@@ -1,0 +1,15 @@
+# 1. Desativar listagem pública de diretórios
+Options -Indexes
+
+# 2. Bloquear ficheiros de ambiente e ocultos/dotfiles (.env, .git, etc.)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# 3. Bloquear dumps de base de dados e ficheiros de configuração/teste
+<FilesMatch "\.(sql|log|md|example)$">
+    Require all denied
+</FilesMatch>
+
+# 4. Proibir acesso direto HTTP a pastas de infraestrutura interna
+RedirectMatch 403 ^/(bll|dal|config|database|tests)/

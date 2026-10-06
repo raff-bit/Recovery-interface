@@ -50,6 +50,7 @@ try {
         'user'    => $userRepo->findById($userId),
     ]);
 } catch (Exception $e) {
+    error_log("api_register error: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to create account.', 'detail' => $e->getMessage()]);
+    echo json_encode(['error' => 'Failed to create account. Please try again.']);
 }

@@ -17,7 +17,7 @@ if (!$input || empty($input['workout_id']) || empty($input['sets']) || !is_array
     exit;
 }
 
-$userId      = getCurrentUserId();
+$userId      = requireAuth();
 $workoutId   = (int) $input['workout_id'];
 $workoutDate = $input['workout_date'] ?? null;
 $label       = trim($input['label'] ?? '') ?: null;
@@ -78,6 +78,7 @@ try {
     ]);
 } catch (Exception $e) {
     $workoutRepo->rollBack();
+    error_log("api_update_workout error: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to update workout.', 'detail' => $e->getMessage()]);
+    echo json_encode(['error' => 'Failed to update workout. Please try again.']);
 }

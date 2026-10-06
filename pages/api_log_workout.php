@@ -21,7 +21,7 @@ $workoutDate = $input['workout_date'] ?? date('Y-m-d H:i:s');
 $label       = trim($input['label'] ?? '') ?: null;
 $notes       = trim($input['notes'] ?? '') ?: null;
 
-$userId = getCurrentUserId();
+$userId = requireAuth();
 $workoutRepo = new WorkoutRepository();
 
 try {
@@ -51,6 +51,22 @@ try {
         $insertedSets++;
     }
 
+    $rpe = (float) $set['rpe'];
+$reps = (int) $set['reps'];
+$weight = (float) $set['weight_kg'];
+
+if ($rpe < 1 || $rpe > 10) {
+    throw new InvalidArgumentException('Invalid RPE.');
+}
+
+if ($reps < 1) {
+    throw new InvalidArgumentException('Invalid rep count.');
+}
+
+if ($weight < 0) {
+    throw new InvalidArgumentException('Invalid weight.');
+}
+
     if ($insertedSets === 0) {
         $workoutRepo->rollBack();
         http_response_code(400);
@@ -67,6 +83,7 @@ try {
     ]);
 } catch (Exception $e) {
     $workoutRepo->rollBack();
+    error_log("api_log_workout error: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to log workout.', 'detail' => $e->getMessage()]);
+    echo json_encode(['error' => 'Failed to log workout. Please try again.']);
 }

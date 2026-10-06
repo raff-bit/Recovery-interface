@@ -32,7 +32,7 @@ if ($age !== null && ($age < 12 || $age > 120)) {
     exit;
 }
 
-$userId = getCurrentUserId();
+$userId = requireAuth();
 $profileRepo = new ProfileRepository();
 $profileRepo->saveProfile($userId, $sex, $heightCm, $bodyWeightKg, $age, $activityLevel);
 

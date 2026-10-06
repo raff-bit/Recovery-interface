@@ -11,3 +11,15 @@ Thumbs.db
 
 # Logs locais
 *.log
+# Ficheiro de variáveis de ambiente locais (contém palavras-passe reais)
+.env
+
+# Dependências e caches PHP
+/vendor/
+.phpunit.result.cache
+composer.lock
+
+# Ficheiros temporários de editores
+*.swp
+*.swo
+*~

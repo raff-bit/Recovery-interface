@@ -73,8 +73,11 @@ export function renderHistory(workouts) {
   if (!list) return;
   list.innerHTML = '';
 
-  if (workouts.length === 0) {
-    list.innerHTML = '<p class="hologram-footnote">No sessions logged yet.</p>';
+  if (!workouts || workouts.length === 0) {
+    const emptyMsg = document.createElement('p');
+    emptyMsg.className = 'hologram-footnote';
+    emptyMsg.textContent = 'No sessions logged yet.';
+    list.appendChild(emptyMsg);
     return;
   }
 
@@ -87,26 +90,62 @@ export function renderHistory(workouts) {
       (bySets[s.exercise_name] = bySets[s.exercise_name] || []).push(line);
     });
 
-    const setsSummary = Object.entries(bySets)
-      .map(([name, lines]) => `<div><strong>${name}:</strong> ${lines.join(', ')}</div>`)
-      .join('');
-
     const date = new Date(w.workout_date.replace(' ', 'T'));
-    const dateStr = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const dateStr = date.toLocaleDateString(undefined, { 
+      month: 'short', 
+      day: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
 
     const li = document.createElement('li');
     li.className = 'history-card';
-    li.innerHTML = `
-      <div class="history-card-title">${w.label || 'Workout'}</div>
-      <div class="history-card-date">${dateStr}</div>
-      <div class="history-card-sets">${setsSummary}</div>
-      <div class="history-card-actions">
-        <button type="button" class="history-action-btn edit-workout-btn">Edit</button>
-        <button type="button" class="history-action-btn delete-workout-btn">Delete</button>
-      </div>
-    `;
-    li.querySelector('.edit-workout-btn').addEventListener('click', () => handleEditWorkout(w.id));
-    li.querySelector('.delete-workout-btn').addEventListener('click', () => handleDeleteWorkout(w.id));
+
+    // 1. Título do Treino (Atribuição segura imune a XSS)
+    const titleEl = document.createElement('div');
+    titleEl.className = 'history-card-title';
+    titleEl.textContent = w.label || 'Workout';
+    li.appendChild(titleEl);
+
+    // 2. Data da Sessão
+    const dateEl = document.createElement('div');
+    dateEl.className = 'history-card-date';
+    dateEl.textContent = dateStr;
+    li.appendChild(dateEl);
+
+    // 3. Resumo de Séries (Construção segura de nós DOM)
+    const setsEl = document.createElement('div');
+    setsEl.className = 'history-card-sets';
+    Object.entries(bySets).forEach(([name, lines]) => {
+      const row = document.createElement('div');
+      const strong = document.createElement('strong');
+      strong.textContent = name + ': ';
+      row.appendChild(strong);
+      row.appendChild(document.createTextNode(lines.join(', ')));
+      setsEl.appendChild(row);
+    });
+    li.appendChild(setsEl);
+
+    // 4. Ações
+    const actionsEl = document.createElement('div');
+    actionsEl.className = 'history-card-actions';
+
+    const editBtn = document.createElement('button');
+    editBtn.type = 'button';
+    editBtn.className = 'history-action-btn edit-workout-btn';
+    editBtn.textContent = 'Edit';
+    editBtn.addEventListener('click', () => handleEditWorkout(w.id));
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.type = 'button';
+    deleteBtn.className = 'history-action-btn delete-workout-btn';
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.addEventListener('click', () => handleDeleteWorkout(w.id));
+
+    actionsEl.appendChild(editBtn);
+    actionsEl.appendChild(deleteBtn);
+    li.appendChild(actionsEl);
+
     list.appendChild(li);
   });
 }

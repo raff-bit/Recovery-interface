@@ -17,7 +17,7 @@ if (!$input || empty($input['workout_id'])) {
     exit;
 }
 
-$userId = getCurrentUserId();
+$userId = requireAuth();
 $workoutRepo = new WorkoutRepository();
 $workoutId = (int) $input['workout_id'];
 

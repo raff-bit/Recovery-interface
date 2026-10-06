@@ -4,6 +4,13 @@ require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
 
 $userId = getCurrentUserId();
+
+// Se não tiver login ativo, devolve lista vazia limpa sem dar erro
+if ($userId === null) {
+    echo json_encode(['workouts' => []]);
+    exit;
+}
+
 $workoutRepo = new WorkoutRepository();
 
 $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 20;

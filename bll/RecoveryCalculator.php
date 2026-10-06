@@ -69,10 +69,35 @@ class RecoveryCalculator
         $this->profileRepo = $profileRepo;
     }
 
-    public function getAllMuscleReadiness(int $userId): array
+    public function getAllMuscleReadiness(?int $userId = null): array
     {
-        $profile = $this->profileRepo->getProfile($userId);
         $muscles = $this->muscleRepo->getAll();
+
+        // 1. Se for visitante sem login, devolve todos os músculos em estado ideal (100%)
+        if ($userId === null) {
+            $result = [];
+            foreach ($muscles as $m) {
+                [$status, $color] = $this->statusFor(100);
+                $result[] = [
+                    'id'                      => (int) $m['id'],
+                    'muscle_key'              => $m['muscle_key'],
+                    'display_name'            => $m['display_name'],
+                    'body_region'             => $m['body_region'],
+                    'view_side'               => $m['view_side'],
+                    'recovery_hours'          => (int) $m['recovery_hours'],
+                    'readiness'               => 100,
+                    'fatigue'                 => 0.0,
+                    'status'                  => $status,
+                    'status_color'            => $color,
+                    'hours_since_last_worked' => null,
+                    'personalized'            => false,
+                ];
+            }
+            return $result;
+        }
+
+        // 2. Se for utilizador autenticado, calcula a fadiga real com base no histórico
+        $profile = $this->profileRepo->getProfile($userId);
         $sets = $this->workoutRepo->getRecentSetsWithActivation($userId, self::LOOKBACK_DAYS);
 
         $byMuscle = [];
@@ -205,12 +230,12 @@ class RecoveryCalculator
      * is NOT applied here, since the planner doesn't currently collect a
      * planned weight for hypothetical sets.
      */
-    public function previewReadiness(array $hypotheticalSets, DateTime $referenceDate, int $userId): array
+    public function previewReadiness(array $hypotheticalSets, DateTime $referenceDate, ?int $userId = null): array
     {
-        $profile = $this->profileRepo->getProfile($userId);
+        $profile = $userId !== null ? $this->profileRepo->getProfile($userId) : null;
         $muscles = $this->muscleRepo->getAll();
 
-        $realSets = $this->workoutRepo->getRecentSetsWithActivation($userId, self::LOOKBACK_DAYS);
+        $realSets = $userId !== null ? $this->workoutRepo->getRecentSetsWithActivation($userId, self::LOOKBACK_DAYS) : [];
         $byMuscleReal = [];
         foreach ($realSets as $row) {
             $byMuscleReal[$row['muscle_id']][] = $row;

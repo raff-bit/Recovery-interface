@@ -9,7 +9,7 @@ if (empty($_GET['id'])) {
     exit;
 }
 
-$userId = getCurrentUserId();
+$userId = requireAuth();
 $workoutId = (int) $_GET['id'];
 $workoutRepo = new WorkoutRepository();
 

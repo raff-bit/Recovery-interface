@@ -4,13 +4,26 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 /**
- * Devolve o ID do utilizador autenticado.
- * Enquanto o frontend de login não estiver ativo, faz fallback para o ID 1
- * para manter os dados atuais funcionais.
+ * Devolve o ID do utilizador autenticado ou null se não houver sessão ativa.
  */
-function getCurrentUserId(): int
+function getCurrentUserId(): ?int
 {
-    return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : 1;
+    return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
+}
+
+/**
+ * Valida a existência de sessão ativa.
+ * Interrompe a execução com HTTP 401 se o utilizador for anónimo.
+ */
+function requireAuth(): int
+{
+    $userId = getCurrentUserId();
+    if ($userId === null) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Authentication required. Please sign in.']);
+        exit;
+    }
+    return $userId;
 }
 
 function isAuthenticated(): bool
@@ -20,6 +33,7 @@ function isAuthenticated(): bool
 
 function setAuthenticatedUser(int $userId): void
 {
+    session_regenerate_id(true);
     $_SESSION['user_id'] = $userId;
 }
 

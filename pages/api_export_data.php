@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
 
-$userId = getCurrentUserId();
+$userId = requireAuth();
 $format = strtolower($_GET['format'] ?? 'json');
 $workoutRepo = new WorkoutRepository();
 
