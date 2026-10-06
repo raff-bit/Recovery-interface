@@ -41,236 +41,265 @@
 
   <main class="hud-grid">
 
-    <!-- HOLOGRAM PANEL -->
-    <section class="panel hologram-panel">
-      <div class="panel-label">Muscle Scan</div>
-      <button type="button" id="toggle-view" class="ghost-btn">Show Back</button>
+    <!-- COLUNA ESQUERDA: ÂNCORA HOLOGRÁFICA PERMANENTE -->
+    <section class="panel hologram-panel" id="hologram-panel">
+      <div class="panel-label">Biometric Telemetry // 3D Scan</div>
+      
+      <!-- Contentor Centrado do Botão -->
+      <div class="hologram-controls">
+        <button type="button" id="toggle-view">⟲ Rotate View (180°)</button>
+      </div>
+      <div class="hologram-stage" id="hologram-stage">
+        <div class="hologram-rotator" id="hologram-rotator">
 
-      <div class="hologram-stage">
+          <!-- MALE FRONT VIEW -->
+          <svg id="body-front" class="hologram-svg hologram-face front" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg">
+            <g class="hud-marker">
+              <path d="M 12 12 L 26 12 M 12 12 L 12 26"/>
+              <path d="M 228 12 L 214 12 M 228 12 L 228 26"/>
+              <path d="M 12 420 L 26 420 M 12 420 L 12 406"/>
+              <path d="M 228 420 L 214 420 M 228 420 L 228 406"/>
+              <path d="M 22 140 L 30 140 M 26 136 L 26 144"/>
+              <path d="M 214 140 L 222 140 M 218 136 L 218 144"/>
+            </g>
+            <g class="body-outline">
+              <circle cx="120" cy="35" r="24"/>
+              <path d="M100 58 L100 74 L140 74 L140 58 Z"/>
+              <path d="M70 80 Q120 68 170 80 L178 188 Q120 202 62 188 Z"/>
+              <path d="M62 188 Q60 225 66 258 L94 258 Q90 220 70 188 Z"/>
+              <path d="M178 188 Q180 225 174 258 L146 258 Q150 220 170 188 Z"/>
+            </g>
+            <ellipse class="muscle-shape" data-muscle="front_delts" cx="68" cy="92" rx="15" ry="17"><title>Front Delts</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="front_delts" cx="172" cy="92" rx="15" ry="17"><title>Front Delts</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="side_delts" cx="54" cy="95" rx="9" ry="15"><title>Side Delts</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="side_delts" cx="186" cy="95" rx="9" ry="15"><title>Side Delts</title></ellipse>
+            <path class="muscle-shape" data-muscle="upper_chest" d="M90 82 L118 82 L118 112 L92 108 Z"><title>Upper Chest</title></path>
+            <path class="muscle-shape" data-muscle="upper_chest" d="M150 82 L122 82 L122 112 L148 108 Z"><title>Upper Chest</title></path>
+            <path class="muscle-shape" data-muscle="lower_chest" d="M92 110 L118 114 L118 140 L96 136 Z"><title>Lower Chest</title></path>
+            <path class="muscle-shape" data-muscle="lower_chest" d="M148 110 L122 114 L122 140 L144 136 Z"><title>Lower Chest</title></path>
+            <ellipse class="muscle-shape" data-muscle="biceps" cx="52" cy="140" rx="13" ry="30"><title>Biceps</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="biceps" cx="188" cy="140" rx="13" ry="30"><title>Biceps</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="forearms" cx="46" cy="195" rx="11" ry="28"><title>Forearms</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="forearms" cx="194" cy="195" rx="11" ry="28"><title>Forearms</title></ellipse>
+            <rect class="muscle-shape" data-muscle="abs" x="108" y="112" width="24" height="18" rx="3"><title>Abs</title></rect>
+            <rect class="muscle-shape" data-muscle="abs" x="108" y="132" width="24" height="18" rx="3"><title>Abs</title></rect>
+            <rect class="muscle-shape" data-muscle="abs" x="108" y="152" width="24" height="18" rx="3"><title>Abs</title></rect>
+            <rect class="muscle-shape" data-muscle="obliques" x="90" y="115" width="14" height="55" rx="4"><title>Obliques</title></rect>
+            <rect class="muscle-shape" data-muscle="obliques" x="136" y="115" width="14" height="55" rx="4"><title>Obliques</title></rect>
+            <ellipse class="muscle-shape" data-muscle="quads" cx="98" cy="270" rx="21" ry="52"><title>Quads</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="quads" cx="142" cy="270" rx="21" ry="52"><title>Quads</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="calves" cx="98" cy="375" rx="15" ry="38"><title>Calves</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="calves" cx="142" cy="375" rx="15" ry="38"><title>Calves</title></ellipse>
+          </svg>
 
-        <svg id="body-front" class="hologram-svg" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg">
-          <g class="body-outline">
-            <circle cx="120" cy="35" r="24"/>
-            <path d="M100 58 L100 74 L140 74 L140 58 Z"/>
-            <path d="M70 80 Q120 68 170 80 L178 188 Q120 202 62 188 Z"/>
-            <path d="M62 188 Q60 225 66 258 L94 258 Q90 220 70 188 Z"/>
-            <path d="M178 188 Q180 225 174 258 L146 258 Q150 220 170 188 Z"/>
-          </g>
+          <!-- MALE BACK VIEW -->
+          <svg id="body-back" class="hologram-svg hologram-face back" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg">
+            <g class="hud-marker">
+              <path d="M 12 12 L 26 12 M 12 12 L 12 26"/>
+              <path d="M 228 12 L 214 12 M 228 12 L 228 26"/>
+            </g>
+            <g class="body-outline">
+              <circle cx="120" cy="35" r="24"/>
+              <path d="M100 58 L100 74 L140 74 L140 58 Z"/>
+              <path d="M70 80 Q120 68 170 80 L178 188 Q120 202 62 188 Z"/>
+              <path d="M62 188 Q60 225 66 258 L94 258 Q90 220 70 188 Z"/>
+              <path d="M178 188 Q180 225 174 258 L146 258 Q150 220 170 188 Z"/>
+            </g>
+            <g class="body-outline-muted">
+              <ellipse cx="52" cy="195" rx="10" ry="26"/>
+              <ellipse cx="188" cy="195" rx="10" ry="26"/>
+              <ellipse cx="98" cy="375" rx="14" ry="36"/>
+              <ellipse cx="142" cy="375" rx="14" ry="36"/>
+            </g>
+            <path class="muscle-shape" data-muscle="traps" d="M100 78 L140 78 L155 100 L120 112 L85 100 Z"><title>Traps</title></path>
+            <ellipse class="muscle-shape" data-muscle="rear_delts" cx="68" cy="92" rx="15" ry="17"><title>Rear Delts</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="rear_delts" cx="172" cy="92" rx="15" ry="17"><title>Rear Delts</title></ellipse>
+            <path class="muscle-shape" data-muscle="lats" d="M85 105 L118 112 L112 175 L78 165 Z"><title>Lats</title></path>
+            <path class="muscle-shape" data-muscle="lats" d="M155 105 L122 112 L128 175 L162 165 Z"><title>Lats</title></path>
+            <rect class="muscle-shape" data-muscle="lower_back" x="102" y="175" width="36" height="35" rx="6"><title>Lower Back</title></rect>
+            <ellipse class="muscle-shape" data-muscle="triceps" cx="52" cy="140" rx="13" ry="30"><title>Triceps</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="triceps" cx="188" cy="140" rx="13" ry="30"><title>Triceps</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="glutes" cx="98" cy="228" rx="23" ry="26"><title>Glutes</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="glutes" cx="142" cy="228" rx="23" ry="26"><title>Glutes</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="hamstrings" cx="98" cy="300" rx="19" ry="48"><title>Hamstrings</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="hamstrings" cx="142" cy="300" rx="19" ry="48"><title>Hamstrings</title></ellipse>
+          </svg>
 
-          <ellipse class="muscle-shape" data-muscle="front_delts" cx="68" cy="92" rx="15" ry="17"><title>Front Delts</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="front_delts" cx="172" cy="92" rx="15" ry="17"><title>Front Delts</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="side_delts" cx="54" cy="95" rx="9" ry="15"><title>Side Delts</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="side_delts" cx="186" cy="95" rx="9" ry="15"><title>Side Delts</title></ellipse>
+          <!-- FEMALE FRONT VIEW -->
+          <svg id="body-front-female" class="hologram-svg hologram-face front" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg" style="display:none">
+            <g class="hud-marker">
+              <path d="M 12 12 L 26 12 M 12 12 L 12 26"/>
+              <path d="M 228 12 L 214 12 M 228 12 L 228 26"/>
+              <path d="M 12 420 L 26 420 M 12 420 L 12 406"/>
+              <path d="M 228 420 L 214 420 M 228 420 L 228 406"/>
+            </g>
+            <g class="body-outline">
+              <circle cx="120" cy="35" r="23"/>
+              <path d="M104 56 L104 74 L136 74 L136 56 Z"/>
+              <path d="M78 82 Q120 72 162 82 Q164 120 150 148 Q174 185 174 212 L144 245 Q150 205 160 178 Q140 162 120 162 Q100 162 80 178 Q90 205 96 245 L66 212 Q66 185 90 148 Q76 120 78 82 Z"/>
+            </g>
+            <ellipse class="muscle-shape" data-muscle="front_delts" cx="74" cy="94" rx="13" ry="15"><title>Front Delts</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="front_delts" cx="166" cy="94" rx="13" ry="15"><title>Front Delts</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="side_delts" cx="62" cy="96" rx="8" ry="14"><title>Side Delts</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="side_delts" cx="178" cy="96" rx="8" ry="14"><title>Side Delts</title></ellipse>
+            <path class="muscle-shape" data-muscle="upper_chest" d="M92 84 L118 84 L118 108 L94 105 Z"><title>Upper Chest</title></path>
+            <path class="muscle-shape" data-muscle="upper_chest" d="M148 84 L122 84 L122 108 L146 105 Z"><title>Upper Chest</title></path>
+            <path class="muscle-shape" data-muscle="lower_chest" d="M93 107 L118 110 L118 132 L95 128 Z"><title>Lower Chest</title></path>
+            <path class="muscle-shape" data-muscle="lower_chest" d="M147 107 L122 110 L122 132 L145 128 Z"><title>Lower Chest</title></path>
+            <ellipse class="muscle-shape" data-muscle="biceps" cx="60" cy="140" rx="11" ry="26"><title>Biceps</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="biceps" cx="180" cy="140" rx="11" ry="26"><title>Biceps</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="forearms" cx="54" cy="192" rx="9" ry="25"><title>Forearms</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="forearms" cx="186" cy="192" rx="9" ry="25"><title>Forearms</title></ellipse>
+            <rect class="muscle-shape" data-muscle="abs" x="110" y="112" width="20" height="16" rx="3"><title>Abs</title></rect>
+            <rect class="muscle-shape" data-muscle="abs" x="110" y="130" width="20" height="16" rx="3"><title>Abs</title></rect>
+            <rect class="muscle-shape" data-muscle="abs" x="110" y="148" width="20" height="16" rx="3"><title>Abs</title></rect>
+            <rect class="muscle-shape" data-muscle="obliques" x="94" y="115" width="12" height="48" rx="4"><title>Obliques</title></rect>
+            <rect class="muscle-shape" data-muscle="obliques" x="134" y="115" width="12" height="48" rx="4"><title>Obliques</title></rect>
+            <ellipse class="muscle-shape" data-muscle="quads" cx="98" cy="270" rx="19" ry="50"><title>Quads</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="quads" cx="142" cy="270" rx="19" ry="50"><title>Quads</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="calves" cx="98" cy="375" rx="14" ry="36"><title>Calves</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="calves" cx="142" cy="375" rx="14" ry="36"><title>Calves</title></ellipse>
+          </svg>
 
-          <path class="muscle-shape" data-muscle="upper_chest" d="M90 82 L118 82 L118 112 L92 108 Z"><title>Upper Chest</title></path>
-          <path class="muscle-shape" data-muscle="upper_chest" d="M150 82 L122 82 L122 112 L148 108 Z"><title>Upper Chest</title></path>
-          <path class="muscle-shape" data-muscle="lower_chest" d="M92 110 L118 114 L118 140 L96 136 Z"><title>Lower Chest</title></path>
-          <path class="muscle-shape" data-muscle="lower_chest" d="M148 110 L122 114 L122 140 L144 136 Z"><title>Lower Chest</title></path>
+          <!-- FEMALE BACK VIEW -->
+          <svg id="body-back-female" class="hologram-svg hologram-face back" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg" style="display:none">
+            <g class="hud-marker">
+              <path d="M 12 12 L 26 12 M 12 12 L 12 26"/>
+              <path d="M 228 12 L 214 12 M 228 12 L 228 26"/>
+            </g>
+            <g class="body-outline">
+              <circle cx="120" cy="35" r="23"/>
+              <path d="M104 56 L104 74 L136 74 L136 56 Z"/>
+              <path d="M78 82 Q120 72 162 82 Q164 120 150 148 Q174 185 174 212 L144 245 Q150 205 160 178 Q140 162 120 162 Q100 162 80 178 Q90 205 96 245 L66 212 Q66 185 90 148 Q76 120 78 82 Z"/>
+            </g>
+            <g class="body-outline-muted">
+              <ellipse cx="60" cy="192" rx="9" ry="24"/>
+              <ellipse cx="180" cy="192" rx="9" ry="24"/>
+              <ellipse cx="98" cy="375" rx="13" ry="34"/>
+              <ellipse cx="142" cy="375" rx="13" ry="34"/>
+            </g>
+            <path class="muscle-shape" data-muscle="traps" d="M102 78 L138 78 L150 98 L120 110 L90 98 Z"><title>Traps</title></path>
+            <ellipse class="muscle-shape" data-muscle="rear_delts" cx="74" cy="94" rx="13" ry="15"><title>Rear Delts</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="rear_delts" cx="166" cy="94" rx="13" ry="15"><title>Rear Delts</title></ellipse>
+            <path class="muscle-shape" data-muscle="lats" d="M88 102 L118 110 L112 160 L82 152 Z"><title>Lats</title></path>
+            <path class="muscle-shape" data-muscle="lats" d="M152 102 L122 110 L128 160 L158 152 Z"><title>Lats</title></path>
+            <rect class="muscle-shape" data-muscle="lower_back" x="104" y="160" width="32" height="32" rx="5"><title>Lower Back</title></rect>
+            <ellipse class="muscle-shape" data-muscle="triceps" cx="60" cy="140" rx="11" ry="26"><title>Triceps</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="triceps" cx="180" cy="140" rx="11" ry="26"><title>Triceps</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="glutes" cx="96" cy="216" rx="22" ry="26"><title>Glutes</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="glutes" cx="144" cy="216" rx="22" ry="26"><title>Glutes</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="hamstrings" cx="98" cy="295" rx="18" ry="46"><title>Hamstrings</title></ellipse>
+            <ellipse class="muscle-shape" data-muscle="hamstrings" cx="142" cy="295" rx="18" ry="46"><title>Hamstrings</title></ellipse>
+          </svg>
 
-          <ellipse class="muscle-shape" data-muscle="biceps" cx="52" cy="140" rx="13" ry="30"><title>Biceps</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="biceps" cx="188" cy="140" rx="13" ry="30"><title>Biceps</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="forearms" cx="46" cy="195" rx="11" ry="28"><title>Forearms</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="forearms" cx="194" cy="195" rx="11" ry="28"><title>Forearms</title></ellipse>
-
-          <rect class="muscle-shape" data-muscle="abs" x="108" y="112" width="24" height="18" rx="3"><title>Abs</title></rect>
-          <rect class="muscle-shape" data-muscle="abs" x="108" y="132" width="24" height="18" rx="3"><title>Abs</title></rect>
-          <rect class="muscle-shape" data-muscle="abs" x="108" y="152" width="24" height="18" rx="3"><title>Abs</title></rect>
-          <rect class="muscle-shape" data-muscle="obliques" x="90" y="115" width="14" height="55" rx="4"><title>Obliques</title></rect>
-          <rect class="muscle-shape" data-muscle="obliques" x="136" y="115" width="14" height="55" rx="4"><title>Obliques</title></rect>
-
-          <ellipse class="muscle-shape" data-muscle="quads" cx="98" cy="270" rx="21" ry="52"><title>Quads</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="quads" cx="142" cy="270" rx="21" ry="52"><title>Quads</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="calves" cx="98" cy="375" rx="15" ry="38"><title>Calves</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="calves" cx="142" cy="375" rx="15" ry="38"><title>Calves</title></ellipse>
-        </svg>
-
-        <svg id="body-back" class="hologram-svg" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg" style="display:none">
-          <g class="body-outline">
-            <circle cx="120" cy="35" r="24"/>
-            <path d="M100 58 L100 74 L140 74 L140 58 Z"/>
-            <path d="M70 80 Q120 68 170 80 L178 188 Q120 202 62 188 Z"/>
-            <path d="M62 188 Q60 225 66 258 L94 258 Q90 220 70 188 Z"/>
-            <path d="M178 188 Q180 225 174 258 L146 258 Q150 220 170 188 Z"/>
-          </g>
-
-          <g class="body-outline-muted">
-            <ellipse cx="52" cy="195" rx="10" ry="26"/>
-            <ellipse cx="188" cy="195" rx="10" ry="26"/>
-            <ellipse cx="98" cy="375" rx="14" ry="36"/>
-            <ellipse cx="142" cy="375" rx="14" ry="36"/>
-          </g>
-
-          <path class="muscle-shape" data-muscle="traps" d="M100 78 L140 78 L155 100 L120 112 L85 100 Z"><title>Traps</title></path>
-
-          <ellipse class="muscle-shape" data-muscle="rear_delts" cx="68" cy="92" rx="15" ry="17"><title>Rear Delts</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="rear_delts" cx="172" cy="92" rx="15" ry="17"><title>Rear Delts</title></ellipse>
-
-          <path class="muscle-shape" data-muscle="lats" d="M85 105 L118 112 L112 175 L78 165 Z"><title>Lats</title></path>
-          <path class="muscle-shape" data-muscle="lats" d="M155 105 L122 112 L128 175 L162 165 Z"><title>Lats</title></path>
-
-          <rect class="muscle-shape" data-muscle="lower_back" x="102" y="175" width="36" height="35" rx="6"><title>Lower Back</title></rect>
-
-          <ellipse class="muscle-shape" data-muscle="triceps" cx="52" cy="140" rx="13" ry="30"><title>Triceps</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="triceps" cx="188" cy="140" rx="13" ry="30"><title>Triceps</title></ellipse>
-
-          <ellipse class="muscle-shape" data-muscle="glutes" cx="98" cy="228" rx="23" ry="26"><title>Glutes</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="glutes" cx="142" cy="228" rx="23" ry="26"><title>Glutes</title></ellipse>
-
-          <ellipse class="muscle-shape" data-muscle="hamstrings" cx="98" cy="300" rx="19" ry="48"><title>Hamstrings</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="hamstrings" cx="142" cy="300" rx="19" ry="48"><title>Hamstrings</title></ellipse>
-        </svg>
-
-        <!-- FEMALE FRONT VIEW -->
-        <svg id="body-front-female" class="hologram-svg" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg" style="display:none">
-          <g class="body-outline">
-            <circle cx="120" cy="35" r="23"/>
-            <path d="M104 56 L104 74 L136 74 L136 56 Z"/>
-            <path d="M78 82 Q120 72 162 82 Q164 120 150 148 Q174 185 174 212 L144 245 Q150 205 160 178 Q140 162 120 162 Q100 162 80 178 Q90 205 96 245 L66 212 Q66 185 90 148 Q76 120 78 82 Z"/>
-          </g>
-
-          <ellipse class="muscle-shape" data-muscle="front_delts" cx="74" cy="94" rx="13" ry="15"><title>Front Delts</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="front_delts" cx="166" cy="94" rx="13" ry="15"><title>Front Delts</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="side_delts" cx="62" cy="96" rx="8" ry="14"><title>Side Delts</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="side_delts" cx="178" cy="96" rx="8" ry="14"><title>Side Delts</title></ellipse>
-
-          <path class="muscle-shape" data-muscle="upper_chest" d="M92 84 L118 84 L118 108 L94 105 Z"><title>Upper Chest</title></path>
-          <path class="muscle-shape" data-muscle="upper_chest" d="M148 84 L122 84 L122 108 L146 105 Z"><title>Upper Chest</title></path>
-          <path class="muscle-shape" data-muscle="lower_chest" d="M93 107 L118 110 L118 132 L95 128 Z"><title>Lower Chest</title></path>
-          <path class="muscle-shape" data-muscle="lower_chest" d="M147 107 L122 110 L122 132 L145 128 Z"><title>Lower Chest</title></path>
-
-          <ellipse class="muscle-shape" data-muscle="biceps" cx="60" cy="140" rx="11" ry="26"><title>Biceps</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="biceps" cx="180" cy="140" rx="11" ry="26"><title>Biceps</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="forearms" cx="54" cy="192" rx="9" ry="25"><title>Forearms</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="forearms" cx="186" cy="192" rx="9" ry="25"><title>Forearms</title></ellipse>
-
-          <rect class="muscle-shape" data-muscle="abs" x="110" y="112" width="20" height="16" rx="3"><title>Abs</title></rect>
-          <rect class="muscle-shape" data-muscle="abs" x="110" y="130" width="20" height="16" rx="3"><title>Abs</title></rect>
-          <rect class="muscle-shape" data-muscle="abs" x="110" y="148" width="20" height="16" rx="3"><title>Abs</title></rect>
-          <rect class="muscle-shape" data-muscle="obliques" x="94" y="115" width="12" height="48" rx="4"><title>Obliques</title></rect>
-          <rect class="muscle-shape" data-muscle="obliques" x="134" y="115" width="12" height="48" rx="4"><title>Obliques</title></rect>
-
-          <ellipse class="muscle-shape" data-muscle="quads" cx="98" cy="270" rx="19" ry="50"><title>Quads</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="quads" cx="142" cy="270" rx="19" ry="50"><title>Quads</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="calves" cx="98" cy="375" rx="14" ry="36"><title>Calves</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="calves" cx="142" cy="375" rx="14" ry="36"><title>Calves</title></ellipse>
-        </svg>
-
-        <!-- FEMALE BACK VIEW -->
-        <svg id="body-back-female" class="hologram-svg" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg" style="display:none">
-          <g class="body-outline">
-            <circle cx="120" cy="35" r="23"/>
-            <path d="M104 56 L104 74 L136 74 L136 56 Z"/>
-            <path d="M78 82 Q120 72 162 82 Q164 120 150 148 Q174 185 174 212 L144 245 Q150 205 160 178 Q140 162 120 162 Q100 162 80 178 Q90 205 96 245 L66 212 Q66 185 90 148 Q76 120 78 82 Z"/>
-          </g>
-
-          <g class="body-outline-muted">
-            <ellipse cx="60" cy="192" rx="9" ry="24"/>
-            <ellipse cx="180" cy="192" rx="9" ry="24"/>
-            <ellipse cx="98" cy="375" rx="13" ry="34"/>
-            <ellipse cx="142" cy="375" rx="13" ry="34"/>
-          </g>
-
-          <path class="muscle-shape" data-muscle="traps" d="M102 78 L138 78 L150 98 L120 110 L90 98 Z"><title>Traps</title></path>
-
-          <ellipse class="muscle-shape" data-muscle="rear_delts" cx="74" cy="94" rx="13" ry="15"><title>Rear Delts</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="rear_delts" cx="166" cy="94" rx="13" ry="15"><title>Rear Delts</title></ellipse>
-
-          <path class="muscle-shape" data-muscle="lats" d="M88 102 L118 110 L112 160 L82 152 Z"><title>Lats</title></path>
-          <path class="muscle-shape" data-muscle="lats" d="M152 102 L122 110 L128 160 L158 152 Z"><title>Lats</title></path>
-
-          <rect class="muscle-shape" data-muscle="lower_back" x="104" y="160" width="32" height="32" rx="5"><title>Lower Back</title></rect>
-
-          <ellipse class="muscle-shape" data-muscle="triceps" cx="60" cy="140" rx="11" ry="26"><title>Triceps</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="triceps" cx="180" cy="140" rx="11" ry="26"><title>Triceps</title></ellipse>
-
-          <ellipse class="muscle-shape" data-muscle="glutes" cx="96" cy="216" rx="22" ry="26"><title>Glutes</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="glutes" cx="144" cy="216" rx="22" ry="26"><title>Glutes</title></ellipse>
-
-          <ellipse class="muscle-shape" data-muscle="hamstrings" cx="98" cy="295" rx="18" ry="46"><title>Hamstrings</title></ellipse>
-          <ellipse class="muscle-shape" data-muscle="hamstrings" cx="142" cy="295" rx="18" ry="46"><title>Hamstrings</title></ellipse>
-        </svg>
-
+        </div>
       </div>
       <p class="hologram-footnote" id="last-updated"></p>
     </section>
 
-    <!-- MUSCLE STATUS PANEL -->
-    <section class="panel readout-panel">
-      <div class="panel-label">Muscle Status</div>
-      <ul id="muscle-list" class="muscle-list"></ul>
-    </section>
+    <!-- COLUNA DIREITA: CONSOLA OPERACIONAL MODULAR -->
+    <div class="hud-console">
 
-    <!-- LOG WORKOUT PANEL -->
-    <section class="panel log-panel">
-      <div class="panel-label" id="log-panel-label">Log Workout</div>
-      <form id="workout-form">
-        <input type="text" id="workout-label" placeholder="Session name (optional) — e.g. Push Day">
-        <div id="sets-container"></div>
-        <div class="log-actions">
-          <button type="button" id="add-set-btn" class="ghost-btn">+ Add Set</button>
-          <button type="button" id="cancel-edit-btn" class="ghost-btn" style="display:none">Cancel Edit</button>
-          <button type="submit" id="save-workout-btn" class="primary-btn">Save Workout</button>
+      <!-- Barra de Navegação Tática Superior -->
+      <nav class="hud-dock" id="hud-dock">
+        <button type="button" class="hud-dock-btn active" data-tab="tab-status">
+          <span class="dock-num">01</span>
+          <span class="dock-label">STATUS</span>
+        </button>
+        <button type="button" class="hud-dock-btn" data-tab="tab-workout">
+          <span class="dock-num">02</span>
+          <span class="dock-label">WORKOUT</span>
+        </button>
+        <button type="button" class="hud-dock-btn" data-tab="tab-simulator">
+          <span class="dock-num">03</span>
+          <span class="dock-label">SIMULATOR</span>
+        </button>
+        <button type="button" class="hud-dock-btn" data-tab="tab-archive">
+          <span class="dock-num">04</span>
+          <span class="dock-label">ARCHIVE</span>
+        </button>
+      </nav>
+
+      <!-- Contentores de Módulos (Apenas 1 visível de cada vez) -->
+      <div class="hud-deck">
+
+        <!-- TAB 1: MUSCLE STATUS READOUT -->
+        <section class="panel hud-tab-panel active" id="tab-status">
+          <div class="panel-label">Telemetry // Muscle Group Readiness</div>
+          <ul id="muscle-list" class="muscle-list"></ul>
+        </section>
+
+        <!-- TAB 2: LOG WORKOUT FORM -->
+        <section class="panel hud-tab-panel" id="tab-workout">
+          <div class="panel-label" id="log-panel-label">Log Workout // Session Input</div>
+          <form id="workout-form">
+            <input type="text" id="workout-label" placeholder="Session name (optional) — e.g. Push Day">
+            <div id="sets-container"></div>
+            <div class="log-actions">
+              <button type="button" id="add-set-btn" class="ghost-btn">+ Add Set</button>
+              <button type="button" id="cancel-edit-btn" class="ghost-btn" style="display:none">Cancel Edit</button>
+              <button type="submit" id="save-workout-btn" class="primary-btn">Save Workout</button>
+            </div>
+          </form>
+          <p id="log-feedback" class="log-feedback"></p>
+        </section>
+
+        <!-- TAB 3: SESSION PLANNER / SIMULATOR -->
+        <section class="panel hud-tab-panel" id="tab-simulator">
+          <div class="panel-label">Predictive Engine // Future Simulation</div>
+          <div class="planner-controls">
+            <label for="planner-date" class="planner-date-label">Target Date</label>
+            <input type="date" id="planner-date">
+            <button type="button" id="planner-add-set-btn" class="ghost-btn">+ Add Exercise</button>
+          </div>
+          <p class="hologram-footnote">Simulate future sessions: fatigue scales with planned load, reps, RPE and biometrics.</p>
+          <div class="planner-columns-header">
+            <span>Exercise</span>
+            <span>Sets</span>
+            <span>Reps</span>
+            <span id="planner-weight-header">Weight (kg)</span>
+            <span>RPE</span>
+            <span></span>
+          </div>
+          <div id="planner-sets-container"></div>
+          <div class="log-actions">
+            <button type="button" id="preview-btn" class="primary-btn">Preview Readiness</button>
+            <button type="button" id="clear-preview-btn" class="ghost-btn" style="display:none">Clear Preview</button>
+          </div>
+          <p id="planner-feedback" class="log-feedback"></p>
+          <ul id="planner-results" class="muscle-list planner-results"></ul>
+        </section>
+
+        <!-- TAB 4: INTEL & ARCHIVE (ANALYTICS + RECENT SESSIONS) -->
+        <div class="hud-tab-panel" id="tab-archive">
+          <!-- Bloco Analytics -->
+          <section class="panel analytics-panel" id="analytics-panel" style="margin-bottom: 20px;">
+            <div class="panel-label">Telemetry & Training Analytics</div>
+            <div class="analytics-grid">
+              <div class="analytics-card">
+                <div class="analytics-card-title">Weekly Set Volume (8 Wks)</div>
+                <div id="weekly-volume-chart" class="volume-chart"></div>
+              </div>
+              <div class="analytics-card">
+                <div class="analytics-card-title">Muscle Balance (30 Days)</div>
+                <div id="muscle-balance-list" class="balance-list"></div>
+              </div>
+              <div class="analytics-card">
+                <div class="analytics-card-title">Top Exercises (30 Days)</div>
+                <ul id="top-exercises-list" class="top-exercises-list"></ul>
+              </div>
+            </div>
+          </section>
+
+          <!-- Bloco Histórico Recente -->
+          <section class="panel history-panel" id="history-panel">
+            <div class="panel-label">Session Logs // Recent History</div>
+            <ul id="history-list" class="history-list"></ul>
+          </section>
         </div>
-      </form>
-      <p id="log-feedback" class="log-feedback"></p>
-    </section>
 
-        <!-- SESSION PLANNER PANEL -->
-    <section class="panel planner-panel">
-      <div class="panel-label">Session Planner — Preview Future Readiness</div>
-      <div class="planner-controls">
-        <label for="planner-date" class="planner-date-label">Target Date</label>
-        <input type="date" id="planner-date">
-        <button type="button" id="planner-add-set-btn" class="ghost-btn">+ Add Exercise</button>
       </div>
-      <p class="hologram-footnote">Simulate future sessions: fatigue scales with planned load, reps, RPE and personal biometrics.</p>
-      <div class="planner-columns-header">
-        <span>Exercise</span>
-        <span>Sets</span>
-        <span>Reps</span>
-        <span id="planner-weight-header">Weight (kg)</span>
-        <span>RPE</span>
-        <span></span>
-      </div>
-      <div id="planner-sets-container"></div>
-      <div class="log-actions">
-        <button type="button" id="preview-btn" class="primary-btn">Preview Readiness</button>
-        <button type="button" id="clear-preview-btn" class="ghost-btn" style="display:none">Clear Preview</button>
-      </div>
-      <p id="planner-feedback" class="log-feedback"></p>
-      <ul id="planner-results" class="muscle-list planner-results"></ul>
-    </section>
-
-    <!-- ANALYTICS PANEL -->
-    <section class="panel analytics-panel" id="analytics-panel">
-      <div class="panel-label">Telemetry & Training Analytics</div>
-      
-      <div class="analytics-grid">
-        <!-- Card 1: Volume Semanal -->
-        <div class="analytics-card">
-          <div class="analytics-card-title">Weekly Set Volume (8 Wks)</div>
-          <div id="weekly-volume-chart" class="volume-chart"></div>
-        </div>
-
-        <!-- Card 2: Equilíbrio Muscular -->
-        <div class="analytics-card">
-          <div class="analytics-card-title">Muscle Balance (30 Days)</div>
-          <div id="muscle-balance-list" class="balance-list"></div>
-        </div>
-
-        <!-- Card 3: Top 5 Exercícios -->
-        <div class="analytics-card">
-          <div class="analytics-card-title">Top Exercises (30 Days)</div>
-          <ul id="top-exercises-list" class="top-exercises-list"></ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- HISTORY PANEL -->
-    <section class="panel history-panel">
-      <div class="panel-label">Recent Sessions</div>
-      <ul id="history-list" class="history-list"></ul>
-    </section>
+    </div>
 
   </main>
 </div>

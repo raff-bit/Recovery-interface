@@ -4,12 +4,12 @@
 
 import { state, LBS_PER_KG, IN_PER_CM } from './state.js';
 import { fetchExercises } from './api.js';
-import { handleViewToggle, refreshMuscles } from './hologram.js';
 import { refreshAnalytics } from './analytics.js';
 import { closeExercisePicker, closeWeightHelp } from './picker.js';
 import { addSetRow, handleWorkoutSubmit, exitEditMode, refreshHistory, showFeedback } from './workout.js';
 import { addPlannerSetRow, handlePreviewClick, handleClearPreview } from './planner.js';
 import { openProfileModal, closeProfileModal, handleProfileSubmit, loadProfile, updateProfileUnitLabels } from './profile.js';
+import { handleViewToggle, refreshMuscles, initHologram3DInteractions } from './hologram.js';
 import {
   checkAuthSession,
   openAuthModal,
@@ -110,6 +110,32 @@ async function completeBoot() {
   if (bootScreen) bootScreen.style.display = 'none';
 }
 
+/* ---------- TACTICAL CONSOLE NAVIGATION ---------- */
+
+export function switchConsoleTab(tabId) {
+  const dockBtns = document.querySelectorAll('.hud-dock-btn');
+  const panels = document.querySelectorAll('.hud-tab-panel');
+
+  dockBtns.forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabId);
+  });
+
+  panels.forEach(panel => {
+    panel.classList.toggle('active', panel.id === tabId);
+  });
+}
+
+function initDockNavigation() {
+  const dock = document.getElementById('hud-dock');
+  if (!dock) return;
+
+  dock.addEventListener('click', (e) => {
+    const btn = e.target.closest('.hud-dock-btn');
+    if (!btn) return;
+    switchConsoleTab(btn.dataset.tab);
+  });
+}
+
 function bindEvents() {
   document.getElementById('toggle-view').addEventListener('click', handleViewToggle);
   document.getElementById('add-set-btn').addEventListener('click', addSetRow);
@@ -185,6 +211,8 @@ function bindEvents() {
 async function init() {
   startClock();
   bindEvents();
+  initDockNavigation();
+  initHologram3DInteractions();
 
   const bootAnimation = runBootAnimation();
 

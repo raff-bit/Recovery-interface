@@ -23,22 +23,29 @@
   }
 }
 
-/* Reestruturação Vertical Estrita com Leitura Biomecânica */
+
 @media screen and (max-width: 992px) {
   .hud-grid {
     display: flex !important;
     flex-direction: column !important;
-    gap: 1.25rem !important;
-    padding: 0.75rem !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
+    gap: 16px !important;
   }
 
-  .hologram-panel,
-  #hologram-panel {
-    order: 1 !important;
+  .hologram-panel {
+    position: static !important;
     width: 100% !important;
   }
+
+  .hud-console {
+    width: 100% !important;
+  }
+
+  .hud-dock {
+    position: sticky;
+    top: 10px;
+    z-index: 100;
+  }
+}
 
   .readout-panel,
   #readiness-panel {
@@ -88,7 +95,7 @@
     max-height: 48vh !important;
     object-fit: contain !important;
   }
-}
+
 
 /* Touch Targets e Controlos Táteis (Mínimo de 44px de área de impacto) */
 @media screen and (max-width: 600px) {

@@ -41,27 +41,88 @@ export function applyHologramColors(muscles) {
 
 export function updateHologramVisibility() {
   const isFemale = state.profile && state.profile.sex === 'female';
-  const isFront = state.hologramView === 'front';
+  const rotator = document.getElementById('hologram-rotator');
 
   const maleFront = document.getElementById('body-front');
   const maleBack = document.getElementById('body-back');
   const femaleFront = document.getElementById('body-front-female');
   const femaleBack = document.getElementById('body-back-female');
 
-  if (maleFront) maleFront.style.display = (!isFemale && isFront) ? '' : 'none';
-  if (maleBack) maleBack.style.display = (!isFemale && !isFront) ? '' : 'none';
-  if (femaleFront) femaleFront.style.display = (isFemale && isFront) ? '' : 'none';
-  if (femaleBack) femaleBack.style.display = (isFemale && !isFront) ? '' : 'none';
+  // Alterna silhueta masculina / feminina
+  if (maleFront) maleFront.style.display = isFemale ? 'none' : 'block';
+  if (maleBack) maleBack.style.display = isFemale ? 'none' : 'block';
+  if (femaleFront) femaleFront.style.display = isFemale ? 'block' : 'none';
+  if (femaleBack) femaleBack.style.display = isFemale ? 'block' : 'none';
+
+  // Roda tridimensionalmente no eixo Y
+  if (rotator) {
+    rotator.style.transform = state.hologramView === 'back' ? 'rotateY(180deg)' : 'rotateY(0deg)';
+  }
 
   const btn = document.getElementById('toggle-view');
   if (btn) {
-    btn.textContent = isFront ? 'Show Back' : 'Show Front';
+    btn.textContent = state.hologramView === 'front' ? '⟲ Rotate (180°)' : '⟲ Face Front';
   }
 }
 
 export function handleViewToggle() {
   state.hologramView = state.hologramView === 'front' ? 'back' : 'front';
   updateHologramVisibility();
+}
+
+/**
+ * Ativa o controlo tátil/rato para girar o holograma no ar livremente (Drag to Spin)
+ */
+export function initHologram3DInteractions() {
+  const stage = document.getElementById('hologram-stage');
+  const rotator = document.getElementById('hologram-rotator');
+  if (!stage || !rotator) return;
+
+  let isDragging = false;
+  let startX = 0;
+  let currentDelta = 0;
+
+  const startDrag = (clientX) => {
+    isDragging = true;
+    startX = clientX;
+    rotator.style.transition = 'none'; // Resposta instantânea ao arrasto
+  };
+
+  const moveDrag = (clientX) => {
+    if (!isDragging) return;
+    currentDelta = clientX - startX;
+    const baseAngle = state.hologramView === 'back' ? 180 : 0;
+    // Rotação proporcional ao movimento em píxeis
+    const liveAngle = baseAngle + (currentDelta * 0.8);
+    rotator.style.transform = `rotateY(${liveAngle}deg)`;
+  };
+
+  const endDrag = () => {
+    if (!isDragging) return;
+    isDragging = false;
+    rotator.style.transition = 'transform 0.65s cubic-bezier(0.2, 0.85, 0.32, 1.2)';
+
+    // Se arrastou mais de 45px para qualquer lado, inverte a vista
+    if (Math.abs(currentDelta) > 45) {
+      state.hologramView = state.hologramView === 'front' ? 'back' : 'front';
+    }
+    updateHologramVisibility();
+    currentDelta = 0;
+  };
+
+  // Eventos de Rato (PC)
+  stage.addEventListener('mousedown', (e) => startDrag(e.clientX));
+  window.addEventListener('mousemove', (e) => moveDrag(e.clientX));
+  window.addEventListener('mouseup', endDrag);
+
+  // Eventos de Toque (Mobile / Tablets)
+  stage.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) startDrag(e.touches[0].clientX);
+  }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 1) moveDrag(e.touches[0].clientX);
+  }, { passive: true });
+  window.addEventListener('touchend', endDrag);
 }
 
 export async function refreshMuscles() {

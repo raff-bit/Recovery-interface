@@ -7,6 +7,7 @@ import { fetchHistory, postWorkout, updateWorkout, fetchWorkoutById, deleteWorko
 import { openExercisePicker, toggleWeightHelp } from './picker.js';
 import { refreshMuscles } from './hologram.js';
 import { refreshAnalytics } from './analytics.js';
+import { switchConsoleTab } from './main.js';
 
 export function addSetRow() {
   const container = document.getElementById('sets-container');
@@ -148,7 +149,8 @@ export function enterEditMode(workout) {
     row.querySelector('.set-rpe').value = s.rpe ?? '';
   });
 
-  document.querySelector('.log-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Comuta automaticamente para o ecrã de Workout
+  switchConsoleTab('tab-workout');
 }
 
 export function exitEditMode() {
