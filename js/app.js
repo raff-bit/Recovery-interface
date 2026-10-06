@@ -68,6 +68,12 @@ function getWeightUnitLabel() {
 
 /* ---------- API CALLS ---------- */
 
+async function fetchAnalytics() {
+  const res = await fetch('pages/api_analytics.php');
+  if (!res.ok) throw new Error('Failed to load analytics data');
+  return res.json();
+}
+
 async function fetchMe() {
   const res = await fetch('pages/api_me.php');
   if (!res.ok) throw new Error('Failed to load user info');
@@ -338,6 +344,9 @@ async function handleDeleteWorkout(workoutId) {
     }
     await refreshHistory();
     await refreshMuscles();
+    await refreshHistory();
+    await refreshMuscles();
+    await refreshAnalytics();
   } catch (err) {
     console.error(err);
     alert(err.message);
@@ -673,6 +682,100 @@ function collectSetsFromForm() {
   return sets;
 }
 
+/* ---------- RENDERING: ANALYTICS HUD ---------- */
+
+function renderWeeklyVolume(weeklyData) {
+  const container = document.getElementById('weekly-volume-chart');
+  container.innerHTML = '';
+
+  if (!weeklyData || weeklyData.length === 0) {
+    container.innerHTML = '<p class="hologram-footnote">No volume data available.</p>';
+    return;
+  }
+
+  // Descobre o teto de séries para calcular a escala relativa (mínimo 1 para evitar divisões por zero)
+  const maxSets = Math.max(...weeklyData.map(w => w.total_sets), 1);
+
+  weeklyData.forEach(w => {
+    const col = document.createElement('div');
+    col.className = 'volume-bar-col';
+
+    const pct = w.total_sets > 0 ? Math.round((w.total_sets / maxSets) * 100) : 0;
+    
+    // Formata YYYY-MM-DD para DD/MM
+    const dateParts = w.week_start.split('-');
+    const labelDate = dateParts.length === 3 ? `${dateParts[2]}/${dateParts[1]}` : w.week_start;
+
+    col.innerHTML = `
+      <span class="volume-bar-val">${w.total_sets > 0 ? w.total_sets : ''}</span>
+      <div class="volume-bar-track">
+        <div class="volume-bar-fill" style="height: ${pct}%"></div>
+      </div>
+      <span class="volume-bar-label">${labelDate}</span>
+    `;
+    container.appendChild(col);
+  });
+}
+
+function renderMuscleBalance(balanceData) {
+  const container = document.getElementById('muscle-balance-list');
+  container.innerHTML = '';
+
+  if (!balanceData || balanceData.length === 0) {
+    container.innerHTML = '<p class="hologram-footnote">No workout activity in the last 30 days.</p>';
+    return;
+  }
+
+  balanceData.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'balance-item';
+    row.innerHTML = `
+      <div class="balance-item-header">
+        <span class="balance-region-name">${item.body_region}</span>
+        <span class="balance-region-meta">${item.total_sets} sets (${item.percentage}%)</span>
+      </div>
+      <div class="balance-bar-track">
+        <div class="balance-bar-fill" style="width: ${item.percentage}%"></div>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function renderTopExercises(topData) {
+  const container = document.getElementById('top-exercises-list');
+  container.innerHTML = '';
+
+  if (!topData || topData.length === 0) {
+    container.innerHTML = '<p class="hologram-footnote">No exercises logged in the last 30 days.</p>';
+    return;
+  }
+
+  topData.forEach((item, index) => {
+    const li = document.createElement('li');
+    li.className = 'top-exercise-item';
+    li.innerHTML = `
+      <div class="top-exercise-left">
+        <span class="top-exercise-rank">#${index + 1}</span>
+        <span class="top-exercise-name">${item.exercise_name}</span>
+      </div>
+      <span class="top-exercise-sets">${item.total_sets} sets</span>
+    `;
+    container.appendChild(li);
+  });
+}
+
+async function refreshAnalytics() {
+  try {
+    const data = await fetchAnalytics();
+    renderWeeklyVolume(data.weekly_volume);
+    renderMuscleBalance(data.muscle_group_balance);
+    renderTopExercises(data.top_exercises);
+  } catch (err) {
+    console.error('Failed to refresh analytics:', err);
+  }
+}
+
 /* ---------- REFRESH HELPERS ---------- */
 
 async function refreshMuscles() {
@@ -746,6 +849,10 @@ async function handleLoginSubmit(event) {
     await loadProfile();
     await refreshMuscles();
     await refreshHistory();
+    await loadProfile();
+    await refreshMuscles();
+    await refreshHistory();
+    await refreshAnalytics();
   } catch (err) {
     feedback.textContent = err.message;
     feedback.className = 'log-feedback error';
@@ -768,6 +875,10 @@ async function handleRegisterSubmit(event) {
     await loadProfile();
     await refreshMuscles();
     await refreshHistory();
+    await loadProfile();
+    await refreshMuscles();
+    await refreshHistory();
+    await refreshAnalytics();
 
     // Onboarding: se a conta for recém-criada, abre logo a calibração de perfil
     openProfileModal();
@@ -963,6 +1074,9 @@ async function handleWorkoutSubmit(event) {
 
     await refreshMuscles();
     await refreshHistory();
+    await refreshMuscles();
+    await refreshHistory();
+    await refreshAnalytics();
   } catch (err) {
     showFeedback(err.message, true);
   }
@@ -1170,6 +1284,9 @@ async function init() {
 
       await refreshMuscles();
       await refreshHistory();
+      await refreshMuscles();
+      await refreshHistory();
+      await refreshAnalytics();
     } catch (err) {
       console.error (err);
       showFeedback('Could not reach the backend — check XAMPP is running.', true);

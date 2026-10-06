@@ -82,15 +82,17 @@ body {
     "hologram readout"
     "hologram log"
     "planner  planner"
+    "analytics analytics"
     "history  history";
   gap: 20px;
 }
 
-.hologram-panel  { grid-area: hologram; }
-.readout-panel   { grid-area: readout; }
-.log-panel       { grid-area: log; }
-.planner-panel   { grid-area: planner; }
-.history-panel   { grid-area: history; }
+.hologram-panel   { grid-area: hologram; }
+.readout-panel    { grid-area: readout; }
+.log-panel        { grid-area: log; }
+.planner-panel    { grid-area: planner; }
+.analytics-panel  { grid-area: analytics; }
+.history-panel    { grid-area: history; }
 
 @media (max-width: 900px) {
   .hud-grid {
@@ -100,6 +102,7 @@ body {
       "readout"
       "log"
       "planner"
+      "analytics"
       "history";
   }
 }
@@ -1073,6 +1076,18 @@ body.booting {
     width: 100% !important;
   }
 
+  .analytics-panel,
+  #analytics-panel {
+    order: 5 !important;
+    width: 100% !important;
+  }
+
+  .history-panel,
+  #history-panel {
+    order: 6 !important;
+    width: 100% !important;
+  }
+
   /* Calibração do SVG holográfico: restringe a altura máxima para evitar scroll vertical excessivo */
   .hologram-stage,
   .svg-viewport,
@@ -1174,4 +1189,185 @@ body.booting {
     padding: 1.25rem !important;
     box-sizing: border-box !important;
   }
+}
+
+/* ============================================================
+   ANALYTICS PANEL
+   ============================================================ */
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.analytics-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-dim);
+  border-radius: 2px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.analytics-card-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(0, 217, 255, 0.15);
+  padding-bottom: 6px;
+}
+
+/* Gráfico Vertical de Volume Semanal */
+.volume-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  height: 140px;
+  padding-top: 15px;
+  box-sizing: border-box;
+}
+
+.volume-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.volume-bar-val {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.volume-bar-track {
+  width: 100%;
+  max-width: 20px;
+  background: rgba(124, 232, 255, 0.08);
+  height: 90px;
+  border-radius: 2px 2px 0 0;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.volume-bar-fill {
+  width: 100%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px rgba(0, 217, 255, 0.4);
+  border-radius: 2px 2px 0 0;
+  transition: height 0.6s ease;
+  min-height: 2px;
+}
+
+.volume-bar-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 6px;
+  white-space: nowrap;
+}
+
+/* Lista de Equilíbrio Muscular */
+.balance-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.balance-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.balance-item-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.balance-region-name {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.balance-region-meta {
+  font-family: var(--font-mono);
+  color: var(--accent-cyan);
+  font-size: 11px;
+}
+
+.balance-bar-track {
+  height: 5px;
+  background: rgba(124, 232, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.balance-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00d9ff, #39ff88);
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* Top 5 Exercícios */
+.top-exercises-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.top-exercise-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(124, 232, 255, 0.1);
+  border-radius: 2px;
+}
+
+.top-exercise-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top-exercise-rank {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-cyan);
+  background: rgba(0, 217, 255, 0.1);
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+.top-exercise-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.top-exercise-sets {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
 }
