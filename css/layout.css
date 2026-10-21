@@ -1,283 +1,453 @@
 /* ============================================================
-   GLOBAL HUD BUTTON OVERHAUL (ELIMINA BOTÕES BÁSICOS/BRANCOS)
+   RECOVERY — Layout, Frame Shell & Core Components
    ============================================================ */
 
-button,
-input[type="button"],
-input[type="submit"],
-input[type="reset"] {
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  background: rgba(0, 217, 255, 0.06) !important;
-  border: 1px solid rgba(0, 217, 255, 0.35) !important;
-  color: var(--accent-cyan) !important;
-  font-family: var(--font-display) !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  letter-spacing: 1px !important;
-  text-transform: uppercase !important;
-  padding: 8px 16px !important;
-  border-radius: 2px !important;
-  cursor: pointer !important;
-  outline: none !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 8px !important;
-  box-shadow: 0 0 8px rgba(0, 217, 255, 0.12) !important;
-  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+/* ---------- BUTTONS ---------- */
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: manipulation;
 }
 
-button:hover,
-input[type="button"]:hover,
-input[type="submit"]:hover {
-  background: rgba(0, 217, 255, 0.2) !important;
-  border-color: var(--accent-cyan) !important;
-  box-shadow: 0 0 16px rgba(0, 217, 255, 0.45) !important;
-  color: #ffffff !important;
-  transform: translateY(-1px) !important;
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
-button:active,
-input[type="button"]:active,
-input[type="submit"]:active {
-  transform: scale(0.98) !important;
-  background: rgba(0, 217, 255, 0.3) !important;
+.primary-btn,
+.ghost-btn,
+.hud-action-btn,
+.hud-action-btn-subtle,
+.hud-chip-btn,
+.modal-cancel-btn,
+.history-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+  white-space: nowrap;
+  color: var(--ink);
+  background: var(--surface-2);
+  transition:
+    background 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    color 0.2s var(--ease),
+    box-shadow 0.25s var(--ease),
+    transform 0.2s var(--ease-spring);
 }
 
-/* Botões Primários de Ação (Destaque Forte) */
+.primary-btn:active,
+.ghost-btn:active,
+.hud-action-btn:active,
+.hud-action-btn-subtle:active,
+.hud-chip-btn:active,
+.modal-cancel-btn:active,
+.history-action-btn:active {
+  transform: scale(0.96);
+}
+
 .primary-btn {
-  background: rgba(0, 217, 255, 0.22) !important;
-  border-color: var(--accent-cyan) !important;
-  color: #ffffff !important;
-  box-shadow: 0 0 14px rgba(0, 217, 255, 0.4) !important;
+  color: var(--volt-ink);
+  background: var(--volt);
+  box-shadow: 0 6px 24px -8px rgba(215, 255, 58, 0.55);
 }
 
-.primary-btn:hover {
-  background: rgba(0, 217, 255, 0.38) !important;
-  box-shadow: 0 0 20px rgba(0, 217, 255, 0.7) !important;
+.ghost-btn,
+.hud-chip-btn {
+  border-color: var(--line-strong);
+  background: transparent;
 }
 
-/* Botões de Alerta / Remoção (Vermelho Tático) */
-.remove-set-btn,
+.hud-action-btn {
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+
+.hud-chip-btn {
+  min-height: 34px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.hud-action-btn-subtle,
+.modal-cancel-btn,
+.history-action-btn {
+  color: var(--ink-2);
+  background: transparent;
+  border-color: var(--line);
+}
+
+.history-action-btn {
+  min-height: 34px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
 .delete-workout-btn {
-  background: rgba(255, 92, 92, 0.08) !important;
-  border-color: rgba(255, 92, 92, 0.4) !important;
-  color: #ff5c5c !important;
-  box-shadow: 0 0 8px rgba(255, 92, 92, 0.15) !important;
+  color: var(--danger);
 }
 
-.remove-set-btn:hover,
-.delete-workout-btn:hover {
-  background: rgba(255, 92, 92, 0.25) !important;
-  border-color: #ff5c5c !important;
-  box-shadow: 0 0 14px rgba(255, 92, 92, 0.5) !important;
-  color: #ffffff !important;
+.remove-set-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-sm);
+  color: var(--ink-3);
+  font-size: 20px;
+  line-height: 1;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
 }
 
-/* Botão Redondo de Ajuda (?) */
-.weight-help-btn {
-  width: 24px !important;
-  height: 24px !important;
-  min-width: 24px !important;
-  min-height: 24px !important;
-  padding: 0 !important;
-  border-radius: 50% !important;
-  font-family: var(--font-mono) !important;
-  font-size: 11px !important;
+@media (hover: hover) {
+  .primary-btn:hover {
+    background: #e3ff6e;
+    box-shadow: 0 10px 30px -8px rgba(215, 255, 58, 0.7);
+    transform: translateY(-1px);
+  }
+
+  .ghost-btn:hover,
+  .hud-chip-btn:hover,
+  .hud-action-btn:hover {
+    background: var(--surface-3);
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
+
+  .modal-cancel-btn:hover,
+  .history-action-btn:hover,
+  .hud-action-btn-subtle:hover {
+    color: var(--ink);
+    border-color: var(--line-strong);
+  }
+
+  .delete-workout-btn:hover {
+    color: var(--danger);
+    background: var(--danger-a12);
+    border-color: transparent;
+  }
+
+  .remove-set-btn:hover {
+    color: var(--danger);
+    background: var(--danger-a12);
+  }
 }
 
+/* ---------- FORM CONTROLS ---------- */
 
-/* ============================================================
-   RECOVERY INTERFACE — Layout, Grid & Frame Shell
-   ============================================================ */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  background: var(--surface-2);
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+input::placeholder {
+  color: var(--ink-3);
+  font-weight: 500;
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  input:hover,
+  select:hover {
+    background: var(--surface-3);
+  }
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  background: var(--surface-2);
+  border-color: var(--volt);
+  box-shadow: 0 0 0 4px var(--volt-a16);
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  cursor: pointer;
+}
+
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23a6a39c' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  cursor: pointer;
+}
+
+select option {
+  background-color: var(--surface-solid);
+  color: var(--ink);
+}
+
+/* ---------- FRAME ---------- */
+
+.hud-frame {
+  max-width: 1320px;
+  margin: 0 auto;
+}
 
 /* ---------- HEADER ---------- */
 
 .hud-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  border-bottom: 1px solid var(--border-dim);
-  padding-bottom: 16px;
-  margin-bottom: 24px;
+  align-items: center;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-6);
 }
 
-.hud-header h1 {
-  margin: 0;
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: var(--accent-cyan);
-  text-shadow: 0 0 18px rgba(0, 217, 255, 0.55);
-  animation: title-pulse 4s ease-in-out infinite;
+.hud-brand {
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.3px;
+  text-transform: lowercase;
+  color: var(--ink);
 }
 
-@keyframes title-pulse {
-  0%, 100% { text-shadow: 0 0 18px rgba(0, 217, 255, 0.55); }
-  50%      { text-shadow: 0 0 28px rgba(0, 217, 255, 0.85); }
-}
-
-.hud-subtitle {
-  margin: 4px 0 0;
-  color: var(--text-dim);
-  font-size: 14px;
-  letter-spacing: 1px;
-}
-
-.hud-clock {
-  font-family: var(--font-mono);
-  font-size: 20px;
-  color: var(--accent-cyan);
-  letter-spacing: 2px;
+.hud-brand-dot {
+  color: var(--volt);
 }
 
 .hud-header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--sp-2);
+}
+
+.hud-clock {
+  margin-right: var(--sp-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
 }
 
 .hud-user-tag {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--accent-cyan);
-  background: rgba(0, 217, 255, 0.08);
-  border: 1px solid var(--border-dim);
-  padding: 4px 8px;
-  border-radius: 2px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-2);
+  padding: 0 var(--sp-2);
 }
 
 .hud-action-btn {
   position: relative;
-  background: transparent;
-  border: 1px solid var(--border-glow);
-  color: var(--accent-cyan);
-  font-family: var(--font-display);
-  font-size: 13px;
-  letter-spacing: 1px;
-  padding: 6px 14px;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-avatar {
+  width: 22px;
+  height: 22px;
+  margin-left: -8px;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  background: var(--surface-3);
+  color: var(--ink-2);
 }
 
-.hud-action-btn:hover {
-  background: rgba(0, 217, 255, 0.1);
-  box-shadow: 0 0 12px rgba(0, 217, 255, 0.3);
-}
-
-.hud-action-btn-subtle {
-  background: transparent;
-  border: 1px solid var(--border-dim);
-  color: var(--text-dim);
-  font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.5px;
-  padding: 5px 10px;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.hud-action-btn-subtle:hover {
-  border-color: rgba(255, 92, 92, 0.5);
-  color: #ff5c5c;
+.profile-avatar svg {
+  width: 13px;
+  height: 13px;
 }
 
 .profile-dot {
-  width: 7px;
-  height: 7px;
-  background-color: #ffb347;
+  position: absolute;
+  top: 6px;
+  left: 24px;
+  width: 8px;
+  height: 8px;
+  background-color: var(--heat-mid);
+  border: 2px solid var(--surface-2);
   border-radius: 50%;
-  box-shadow: 0 0 8px #ffb347;
-  animation: critical-glow 1.6s ease-in-out infinite;
+  box-sizing: content-box;
 }
 
-/* ---------- LAYOUT COCKPIT (Holograma Fixo + Consola Tática) ---------- */
+/* ---------- CARDS ---------- */
+
+.panel {
+  position: relative;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: clamp(16px, 2.4vw, 26px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.panel-label {
+  margin: 0 0 var(--sp-4);
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.panel-head .panel-label {
+  margin: 0;
+}
+
+.panel-meta {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+/* ---------- COCKPIT GRID ---------- */
 
 .hud-grid {
   display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 22px;
+  grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
+  gap: var(--sp-5);
   align-items: start;
 }
 
 .hologram-panel {
   position: sticky;
-  top: 24px;
+  top: var(--sp-5);
 }
 
-/* Consola Operacional */
 .hud-console {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--sp-4);
   min-width: 0;
 }
 
-/* Tactical Dock (Barra de Abas Superior) */
+/* ---------- TAB DOCK ---------- */
+
 .hud-dock {
-  display: flex;
-  gap: 8px;
-  background: rgba(12, 20, 30, 0.6);
-  border: 1px solid var(--border-dim);
-  padding: 6px 8px;
-  border-radius: 2px;
-  backdrop-filter: blur(6px);
-  overflow-x: auto;
+  --tab-index: 0;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 5px;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+}
+
+.dock-indicator {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 5px;
+  width: calc((100% - 10px) / 4);
+  border-radius: var(--r-pill);
+  background: var(--volt);
+  box-shadow: 0 6px 22px -8px rgba(215, 255, 58, 0.6);
+  transform: translateX(calc(var(--tab-index) * 100%));
+  transition: transform 0.45s var(--ease);
 }
 
 .hud-dock-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-dim);
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  padding: 8px 16px;
-  border-radius: 2px;
-  cursor: pointer;
-  display: inline-flex;
+  position: relative;
+  z-index: 1;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  transition: all 0.2s ease;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: 42px;
+  padding: 0 var(--sp-2);
+  border-radius: var(--r-pill);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
   white-space: nowrap;
+  transition: color 0.3s var(--ease);
 }
 
-.dock-num {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--accent-cyan);
-  opacity: 0.6;
-}
-
-.hud-dock-btn:hover {
-  color: var(--text-primary);
-  border-color: rgba(0, 217, 255, 0.2);
-  background: rgba(0, 217, 255, 0.05);
+.dock-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .hud-dock-btn.active {
-  background: rgba(0, 217, 255, 0.12);
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
-  box-shadow: 0 0 14px rgba(0, 217, 255, 0.25);
+  color: var(--volt-ink);
 }
 
-.hud-dock-btn.active .dock-num {
-  opacity: 1;
+@media (hover: hover) {
+  .hud-dock-btn:not(.active):hover {
+    color: var(--ink);
+  }
 }
 
-/* Painéis de Conteúdo da Consola */
+/* ---------- TAB DECK ---------- */
+
 .hud-deck {
   position: relative;
+  min-width: 0;
 }
 
 .hud-tab-panel {
@@ -286,18 +456,14 @@ input[type="submit"]:active {
 
 .hud-tab-panel.active {
   display: block;
-  animation: hud-tab-reveal 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+  animation: rise 0.45s var(--ease) both;
 }
 
-@keyframes hud-tab-reveal {
-  0% {
-    opacity: 0;
-    transform: translateY(6px);
-    filter: blur(2px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
+.hud-tab-stack {
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.hud-tab-stack.active {
+  display: flex;
 }

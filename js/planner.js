@@ -6,6 +6,7 @@ import { state, getWeightUnitLabel, displayWeightToKg } from './state.js';
 import { postPreview } from './api.js';
 import { openExercisePicker } from './picker.js';
 import { refreshMuscles } from './hologram.js';
+import { readinessColor } from './ui.js';
 
 export function addPlannerSetRow() {
   const container = document.getElementById('planner-sets-container');
@@ -16,10 +17,22 @@ export function addPlannerSetRow() {
   row.innerHTML = `
     <button type="button" class="exercise-picker-btn">Choose Exercise</button>
     <input type="hidden" class="set-exercise" value="">
-    <input type="number" class="set-count" placeholder="Sets" min="1" value="1">
-    <input type="number" class="planner-set-reps" placeholder="Reps" min="1" value="10">
-    <input type="number" class="planner-set-weight" placeholder="${unit}" min="0" step="0.5">
-    <input type="number" class="set-rpe" placeholder="RPE" min="1" max="10" step="0.5" value="7.5">
+    <label class="set-field" data-field="sets">
+      <span class="set-field-label">Sets</span>
+      <input type="number" class="set-count" placeholder="Sets" min="1" value="1" inputmode="numeric">
+    </label>
+    <label class="set-field" data-field="reps">
+      <span class="set-field-label">Reps</span>
+      <input type="number" class="planner-set-reps" placeholder="Reps" min="1" value="10" inputmode="numeric">
+    </label>
+    <label class="set-field" data-field="weight">
+      <span class="set-field-label">${unit}</span>
+      <input type="number" class="planner-set-weight" placeholder="${unit}" min="0" step="0.5" inputmode="decimal">
+    </label>
+    <label class="set-field" data-field="rpe">
+      <span class="set-field-label">RPE</span>
+      <input type="number" class="set-rpe" placeholder="RPE" min="1" max="10" step="0.5" value="7.5" inputmode="decimal">
+    </label>
     <button type="button" class="remove-set-btn" title="Remove">×</button>
   `;
   row.querySelector('.exercise-picker-btn').addEventListener('click', () => openExercisePicker(row));
@@ -84,15 +97,16 @@ export function renderPlannerResults(muscles, targetDateIso) {
   heading.textContent = `Projected for ${dateLabel}:`;
   list.appendChild(heading);
 
-  affected.forEach(m => {
+  affected.forEach((m, index) => {
     const li = document.createElement('li');
     li.className = 'muscle-row planner-result-row';
+    li.style.setProperty('--i', index);
     li.innerHTML = `
       <span class="muscle-row-name">${m.display_name}</span>
       <span class="planner-result-values">
-        <span style="color:${m.status_color_before}">${m.readiness_before}%</span>
-        →
-        <span style="color:${m.status_color_after}">${m.readiness_after}%</span>
+        <span class="before" style="color:${readinessColor(m.readiness_before)}">${m.readiness_before}%</span>
+        <span class="arrow">→</span>
+        <span style="color:${readinessColor(m.readiness_after)}">${m.readiness_after}%</span>
       </span>
     `;
     list.appendChild(li);
@@ -102,9 +116,11 @@ export function renderPlannerResults(muscles, targetDateIso) {
 export function applyPreviewColors(muscles) {
   muscles.filter(m => m.affected).forEach(m => {
     const shapes = document.querySelectorAll(`.muscle-shape[data-muscle="${m.muscle_key}"]`);
+    const color = readinessColor(m.readiness_after);
     shapes.forEach(shape => {
-      shape.style.fill = m.status_color_after;
-      shape.style.filter = `drop-shadow(0 0 10px ${m.status_color_after})`;
+      shape.style.fill = color;
+      shape.style.fillOpacity = '1';
+      shape.style.filter = `drop-shadow(0 0 8px ${color})`;
     });
   });
 }
@@ -122,7 +138,7 @@ export async function handlePreviewClick() {
     const data = await postPreview({ target_date: targetDate, sets });
     renderPlannerResults(data.muscles, data.target_date);
     applyPreviewColors(data.muscles);
-    document.getElementById('clear-preview-btn').style.display = 'inline-block';
+    document.getElementById('clear-preview-btn').style.display = 'inline-flex';
     showPlannerFeedback('', false);
   } catch (err) {
     showPlannerFeedback(err.message, true);

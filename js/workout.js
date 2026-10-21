@@ -18,10 +18,19 @@ export function addSetRow() {
   row.innerHTML = `
     <button type="button" class="exercise-picker-btn">Choose Exercise</button>
     <input type="hidden" class="set-exercise" value="">
-    <input type="number" class="set-reps" placeholder="Reps" min="1" required>
-    <input type="number" class="set-weight" placeholder="${unit}" min="0" step="0.5">
+    <label class="set-field" data-field="reps">
+      <span class="set-field-label">Reps</span>
+      <input type="number" class="set-reps" placeholder="Reps" min="1" inputmode="numeric" required>
+    </label>
+    <label class="set-field" data-field="weight">
+      <span class="set-field-label">${unit}</span>
+      <input type="number" class="set-weight" placeholder="${unit}" min="0" step="0.5" inputmode="decimal">
+    </label>
     <button type="button" class="weight-help-btn" title="Weight logging help">?</button>
-    <input type="number" class="set-rpe" placeholder="RPE" min="1" max="10" step="0.5">
+    <label class="set-field" data-field="rpe">
+      <span class="set-field-label">RPE</span>
+      <input type="number" class="set-rpe" placeholder="RPE" min="1" max="10" step="0.5" inputmode="decimal">
+    </label>
     <button type="button" class="remove-set-btn" title="Remove set">×</button>
   `;
   row.querySelector('.exercise-picker-btn').addEventListener('click', () => openExercisePicker(row));
@@ -158,9 +167,9 @@ export async function refreshHistory() {
 export function enterEditMode(workout) {
   state.editingWorkoutId = workout.id;
 
-  document.getElementById('log-panel-label').textContent = 'Edit Workout';
-  document.getElementById('save-workout-btn').textContent = 'Update Workout';
-  document.getElementById('cancel-edit-btn').style.display = 'inline-block';
+  document.getElementById('log-panel-label').textContent = 'Edit session';
+  document.getElementById('save-workout-btn').textContent = 'Update workout';
+  document.getElementById('cancel-edit-btn').style.display = 'inline-flex';
   document.getElementById('workout-label').value = workout.label || '';
 
   const container = document.getElementById('sets-container');
@@ -194,8 +203,8 @@ export function enterEditMode(workout) {
 
 export function exitEditMode() {
   state.editingWorkoutId = null;
-  document.getElementById('log-panel-label').textContent = 'Log Workout';
-  document.getElementById('save-workout-btn').textContent = 'Save Workout';
+  document.getElementById('log-panel-label').textContent = 'Log a session';
+  document.getElementById('save-workout-btn').textContent = 'Save workout';
   document.getElementById('cancel-edit-btn').style.display = 'none';
   document.getElementById('workout-form').reset();
   document.getElementById('sets-container').innerHTML = '';

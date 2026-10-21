@@ -42,6 +42,9 @@ export function updateProfileUnitLabels() {
   document.querySelectorAll('#planner-sets-container .planner-set-weight').forEach(input => {
     input.placeholder = unit;
   });
+  document.querySelectorAll('.set-field[data-field="weight"] .set-field-label').forEach(label => {
+    label.textContent = unit;
+  });
 }
 
 export function updateProfileIndicator() {

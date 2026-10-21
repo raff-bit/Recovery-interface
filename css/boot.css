@@ -1,5 +1,5 @@
 /* ============================================================
-   RECOVERY INTERFACE — Boot Sequence & System Reveal
+   RECOVERY — Splash Screen & Entrance Choreography
    ============================================================ */
 
 body.booting {
@@ -9,146 +9,75 @@ body.booting {
 .boot-screen {
   position: fixed;
   inset: 0;
-  z-index: 999;
+  z-index: var(--z-boot);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 22px;
-  background: radial-gradient(ellipse at center, #0c1620 0%, var(--bg-void) 70%);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-
-.boot-screen::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 217, 255, 0.03) 0px,
-    rgba(0, 217, 255, 0.03) 1px,
-    transparent 1px,
-    transparent 4px
-  );
-  animation: scan-drift 6s linear infinite;
-  pointer-events: none;
-}
-
-@keyframes scan-drift {
-  0%   { background-position-y: 0; }
-  100% { background-position-y: 200px; }
+  gap: var(--sp-5);
+  padding: var(--sp-6);
+  background: var(--bg);
+  transition: opacity 0.6s var(--ease), visibility 0s linear 0.6s;
 }
 
 .boot-screen.boot-complete {
   opacity: 0;
-  transform: scale(1.04);
+  visibility: hidden;
   pointer-events: none;
 }
 
-.boot-core {
-  position: relative;
-  width: 200px;
-  height: 200px;
-}
-
-.boot-ring {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-
-.boot-ring-track {
-  fill: none;
-  stroke: rgba(124, 232, 255, 0.15);
-  stroke-width: 2.5;
-}
-
-.boot-ring-progress {
-  fill: none;
-  stroke: var(--accent-cyan);
-  stroke-width: 3;
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 8px rgba(0, 217, 255, 0.7));
-  transition: stroke-dashoffset 0.25s ease;
-}
-
-.boot-core-label {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 26px;
-  color: var(--accent-cyan);
-  text-shadow: 0 0 12px rgba(0, 217, 255, 0.6);
-}
-
-.boot-title {
+.boot-mark {
   font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 6px;
-  color: var(--accent-cyan);
-  text-shadow: 0 0 16px rgba(0, 217, 255, 0.55);
-  animation: boot-flicker 3s ease-in-out infinite;
+  font-size: clamp(44px, 12vw, 72px);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.5px;
+  text-transform: lowercase;
+  color: var(--ink);
+  animation: rise 0.7s var(--ease) both;
 }
 
-@keyframes boot-flicker {
-  0%, 92%, 100% { opacity: 1; }
-  94% { opacity: 0.4; }
-  96% { opacity: 0.9; }
-}
-
-.boot-log {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  width: 340px;
-  min-height: 140px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text-dim);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.boot-log-line {
-  white-space: nowrap;
-  overflow: hidden;
-  border-left: 2px solid rgba(0, 217, 255, 0.35);
-  padding-left: 8px;
-}
-
-.boot-log-line.done {
-  color: var(--accent-cyan);
+.boot-mark span {
+  color: var(--volt);
 }
 
 .boot-bar-track {
-  width: 340px;
+  width: min(220px, 60vw);
   height: 3px;
-  background: rgba(124, 232, 255, 0.12);
-  border-radius: 2px;
+  border-radius: var(--r-pill);
+  background: var(--surface-3);
   overflow: hidden;
+  animation: fade 0.6s 0.15s var(--ease) both;
 }
 
 .boot-bar-fill {
+  width: 100%;
   height: 100%;
-  width: 0%;
-  background: var(--accent-cyan);
-  box-shadow: 0 0 10px rgba(0, 217, 255, 0.6);
-  transition: width 0.25s ease;
+  border-radius: inherit;
+  background: var(--volt);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease);
 }
 
-.hud-frame {
-  max-width: 1280px;
-  margin: 0 auto;
-  transition: opacity 0.8s ease, transform 0.8s ease;
+.boot-status {
+  min-height: 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-3);
+  animation: fade 0.6s 0.25s var(--ease) both;
 }
 
-.hud-frame.pre-reveal {
+/* ---------- ENTRANCE (depois do splash) ---------- */
+
+.hud-frame.pre-reveal > *,
+.hud-frame.pre-reveal .hud-dock,
+.hud-frame.pre-reveal .hud-deck {
   opacity: 0;
-  transform: translateY(16px);
-  pointer-events: none;
 }
+
+/* Anima-se cada bloco em separado: nunca o contentor da dock, para não quebrar o position:fixed */
+.hud-frame:not(.pre-reveal) .hud-header    { animation: rise 0.7s var(--ease) both; }
+.hud-frame:not(.pre-reveal) .hologram-panel { animation: rise 0.8s 0.08s var(--ease) both; }
+.hud-frame:not(.pre-reveal) .hud-dock      { animation: rise 0.8s 0.16s var(--ease) both; }
+.hud-frame:not(.pre-reveal) .hud-deck      { animation: rise 0.8s 0.24s var(--ease) both; }
