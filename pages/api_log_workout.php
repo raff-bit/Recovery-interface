@@ -39,16 +39,7 @@ try {
     $workoutRepo->beginTransaction();
 
     $workoutId = $workoutRepo->createWorkout($userId, $workoutDate, $label, $notes);
-    foreach ($sets as $set) {
-        $workoutRepo->addSet(
-            $workoutId,
-            $set['exercise_id'],
-            $set['set_number'],
-            $set['reps'],
-            $set['weight_kg'],
-            $set['rpe']
-        );
-    }
+        $workoutRepo->addSets($workoutId, $sets);
 
     $workoutRepo->commit();
 

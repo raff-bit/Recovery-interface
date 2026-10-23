@@ -24,20 +24,28 @@ class WorkoutRepository
         return (int) $this->db->lastInsertId();
     }
 
-    public function addSet(int $workoutId, int $exerciseId, int $setNumber, int $reps, float $weightKg, ?float $rpe): void
+        /**
+     * Inserts ALL sets of a workout in ONE statement:
+     *   INSERT ... VALUES (?,?,?,?,?,?), (?,?,?,?,?,?), ...
+     * A 20-set workout used to be 20 round-trips to MySQL; now it's 1.
+     * Expects sets already cleaned by WorkoutValidator.
+     */
+    public function addSets(int $workoutId, array $sets): void
     {
-        $stmt = $this->db->prepare(
-            'INSERT INTO workout_sets (workout_id, exercise_id, set_number, reps, weight_kg, rpe)
-             VALUES (:workout_id, :exercise_id, :set_number, :reps, :weight_kg, :rpe)'
-        );
-        $stmt->execute([
-            ':workout_id'  => $workoutId,
-            ':exercise_id' => $exerciseId,
-            ':set_number'  => $setNumber,
-            ':reps'        => $reps,
-            ':weight_kg'   => $weightKg,
-            ':rpe'         => $rpe,
-        ]);
+        if ($sets === []) {
+            return;
+        }
+
+        $rowPlaceholder = '(?, ?, ?, ?, ?, ?)';
+        $sql = 'INSERT INTO workout_sets (workout_id, exercise_id, set_number, reps, weight_kg, rpe) VALUES '
+             . implode(', ', array_fill(0, count($sets), $rowPlaceholder));
+
+        $params = [];
+        foreach ($sets as $set) {
+            array_push($params, $workoutId, $set['exercise_id'], $set['set_number'], $set['reps'], $set['weight_kg'], $set['rpe']);
+        }
+
+        $this->db->prepare($sql)->execute($params);
     }
 
     public function beginTransaction(): void

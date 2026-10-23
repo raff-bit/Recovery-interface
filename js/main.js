@@ -20,6 +20,15 @@ import {
   handleLogout
 } from './auth.js';
 
+/**
+ * "YYYY-MM-DD" in the user's LOCAL time zone.
+ * (toISOString() is UTC: between 00:00 and 01:00 in Lisbon it returned YESTERDAY.)
+ */
+function localDateIso(date) {
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
 export async function loadExercises() {
   const data = await fetchExercises();
   state.exercises = data.exercises;
@@ -196,23 +205,26 @@ async function init() {
   const bootAnimation = runBootAnimation();
 
   const dataLoad = (async () => {
-    try {
+        try {
+      // Requests that don't depend on each other run in PARALLEL.
+      // Before: 6 requests one after another → load time = sum of all 6.
+      // Now: 3 "waves" → load time ≈ the slowest request of each wave.
+      //   wave 1: session (sets the cookie + CSRF token everything else relies on)
+      //   wave 2: profile + exercise library (the hologram needs the profile's sex)
+      //   wave 3: readiness + history + analytics
       await checkAuthSession();
-      await loadProfile();
-      await loadExercises();
-      addSetRow();
+      await Promise.all([loadProfile(), loadExercises()]);
 
+      addSetRow();
       const plannerDateInput = document.getElementById('planner-date');
       if (plannerDateInput) {
-        const today = new Date().toISOString().slice(0, 10);
+        const today = localDateIso(new Date());
         plannerDateInput.value = today;
         plannerDateInput.min = today;
       }
       addPlannerSetRow();
 
-      await refreshMuscles();
-      await refreshHistory();
-      await refreshAnalytics();
+      await Promise.all([refreshMuscles(), refreshHistory(), refreshAnalytics()]);
     } catch (err) {
       console.error(err);
       showFeedback('Could not reach the backend — check XAMPP is running.', true);
