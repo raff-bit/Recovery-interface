@@ -1,7 +1,6 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Bootstrap first: hardened session, error handling, headers, CSRF
+require_once __DIR__ . '/bootstrap.php';
 
 /**
  * Devolve o ID do utilizador autenticado ou null se não houver sessão ativa.
@@ -19,9 +18,7 @@ function requireAuth(): int
 {
     $userId = getCurrentUserId();
     if ($userId === null) {
-        http_response_code(401);
-        echo json_encode(['error' => 'Authentication required. Please sign in.']);
-        exit;
+        jsonResponse(['error' => 'Authentication required. Please sign in.'], 401);
     }
     return $userId;
 }
@@ -33,6 +30,7 @@ function isAuthenticated(): bool
 
 function setAuthenticatedUser(int $userId): void
 {
+    // New session ID on privilege change → a pre-planted session ID becomes useless
     session_regenerate_id(true);
     $_SESSION['user_id'] = $userId;
 }
@@ -42,15 +40,14 @@ function logoutUser(): void
     $_SESSION = [];
     if (ini_get('session.use_cookies')) {
         $params = session_get_cookie_params();
-        setcookie(
-            session_name(),
-            '',
-            time() - 42000,
-            $params['path'],
-            $params['domain'],
-            $params['secure'],
-            $params['httponly']
-        );
+        setcookie(session_name(), '', [
+            'expires'  => time() - 42000,
+            'path'     => $params['path'],
+            'domain'   => $params['domain'],
+            'secure'   => $params['secure'],
+            'httponly' => $params['httponly'],
+            'samesite' => $params['samesite'],
+        ]);
     }
     session_destroy();
 }

@@ -1,56 +1,60 @@
 <?php
-header('Content-Type: application/json');
 require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/UserRepository.php';
+require_once __DIR__ . '/../bll/AuthThrottle.php';
+require_once __DIR__ . '/../bll/PasswordPolicy.php';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Only POST is supported.']);
-    exit;
+requireMethod('POST');
+$input = readJsonBody();
+
+$name     = is_string($input['name'] ?? null) ? trim($input['name']) : '';
+$email    = is_string($input['email'] ?? null) ? trim($input['email']) : '';
+$password = is_string($input['password'] ?? null) ? $input['password'] : '';
+
+$nameLength = mb_strlen($name);
+if ($nameLength < 2 || $nameLength > 100) {
+    jsonResponse(['error' => 'Name must be between 2 and 100 characters.'], 400);
 }
 
-$input = json_decode(file_get_contents('php://input'), true);
-
-$name     = trim($input['name'] ?? '');
-$email    = trim($input['email'] ?? '');
-$password = $input['password'] ?? '';
-
-if (strlen($name) < 2) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Name must be at least 2 characters long.']);
-    exit;
+if (strlen($email) > 191 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    jsonResponse(['error' => 'Please enter a valid email address.'], 400);
 }
 
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Please enter a valid email address.']);
-    exit;
+$passwordProblem = PasswordPolicy::check($password, $email, $name);
+if ($passwordProblem !== null) {
+    jsonResponse(['error' => $passwordProblem], 400);
 }
 
-if (strlen($password) < 6) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Password must be at least 6 characters long.']);
-    exit;
+$ip       = clientIp();
+$throttle = new AuthThrottle(new AuthAttemptRepository());
+
+$retryAfter = $throttle->registerBlockedFor($ip);
+if ($retryAfter > 0) {
+    header('Retry-After: ' . $retryAfter);
+    jsonResponse(['error' => 'Too many accounts created from this network. Please try again later.'], 429);
 }
 
 $userRepo = new UserRepository();
 
 if ($userRepo->findByEmail($email)) {
-    http_response_code(409);
-    echo json_encode(['error' => 'An account with this email already exists.']);
-    exit;
+    jsonResponse(['error' => 'An account with this email already exists.'], 409);
 }
 
 try {
     $userId = $userRepo->createUser($name, $email, $password);
-    setAuthenticatedUser($userId);
-
-    echo json_encode([
-        'success' => true,
-        'user'    => $userRepo->findById($userId),
-    ]);
-} catch (Exception $e) {
-    error_log("api_register error: " . $e->getMessage());
-    http_response_code(500);
-    echo json_encode(['error' => 'Failed to create account. Please try again.']);
+} catch (PDOException $e) {
+    // 23000 = integrity violation: two sign-ups with the same email raced past findByEmail()
+    if ($e->getCode() === '23000') {
+        jsonResponse(['error' => 'An account with this email already exists.'], 409);
+    }
+    throw $e; // anything else → global handler → generic 500
 }
+
+$throttle->recordRegistration($ip);
+setAuthenticatedUser($userId);
+
+jsonResponse([
+    'success'    => true,
+    'user'       => $userRepo->findById($userId),
+    'csrf_token' => csrfToken(),
+]);
