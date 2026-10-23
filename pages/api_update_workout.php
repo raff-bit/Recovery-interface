@@ -2,6 +2,7 @@
 header('Content-Type: application/json');
 require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
+require_once __DIR__ . '/../bll/WorkoutValidator.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -9,22 +10,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$input = json_decode(file_get_contents('php://input'), true);
+$userId = requireAuth();
 
-if (!$input || empty($input['workout_id']) || empty($input['sets']) || !is_array($input['sets'])) {
+$input = json_decode(file_get_contents('php://input'), true);
+if (!is_array($input)) {
     http_response_code(400);
-    echo json_encode(['error' => 'Request must include workout_id and a non-empty "sets" array.']);
+    echo json_encode(['error' => 'Request body must be valid JSON.']);
     exit;
 }
 
-$userId      = requireAuth();
-$workoutId   = (int) $input['workout_id'];
-$workoutDate = $input['workout_date'] ?? null;
-$label       = trim($input['label'] ?? '') ?: null;
-$notes       = trim($input['notes'] ?? '') ?: null;
+$workoutId = filter_var($input['workout_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+if ($workoutId === false) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Request must include a valid workout_id.']);
+    exit;
+}
 
 $workoutRepo = new WorkoutRepository();
 
+// Ownership check: a user can only edit their own workouts (returns 404, not 403,
+// so we don't reveal that someone else's workout with this ID exists)
 $existing = $workoutRepo->getWorkoutById($workoutId, $userId);
 if (!$existing) {
     http_response_code(404);
@@ -32,41 +37,31 @@ if (!$existing) {
     exit;
 }
 
-$workoutDate = $workoutDate ?: $existing['workout_date'];
+try {
+    $sets        = WorkoutValidator::validateSets($input['sets'] ?? null);
+    $workoutDate = WorkoutValidator::validateDate($input['workout_date'] ?? null, $existing['workout_date']);
+    $label       = WorkoutValidator::optionalText($input['label'] ?? null, WorkoutValidator::MAX_LABEL_LENGTH, 'label');
+    $notes       = WorkoutValidator::optionalText($input['notes'] ?? null, WorkoutValidator::MAX_NOTES_LENGTH, 'notes');
+} catch (ValidationException $e) {
+    http_response_code(400);
+    echo json_encode(['error' => $e->getMessage()]);
+    exit;
+}
 
 try {
     $workoutRepo->beginTransaction();
 
     $workoutRepo->updateWorkoutMeta($workoutId, $userId, $workoutDate, $label, $notes);
     $workoutRepo->deleteSetsForWorkout($workoutId);
-
-    $setNumberByExercise = [];
-    $insertedSets = 0;
-
-    foreach ($input['sets'] as $set) {
-        if (empty($set['exercise_id']) || !isset($set['reps'])) {
-            continue;
-        }
-
-        $exerciseId = (int) $set['exercise_id'];
-        $setNumberByExercise[$exerciseId] = ($setNumberByExercise[$exerciseId] ?? 0) + 1;
-
+    foreach ($sets as $set) {
         $workoutRepo->addSet(
             $workoutId,
-            $exerciseId,
-            $set['set_number'] ?? $setNumberByExercise[$exerciseId],
-            (int) $set['reps'],
-            isset($set['weight_kg']) ? (float) $set['weight_kg'] : 0,
-            isset($set['rpe']) && $set['rpe'] !== '' ? (float) $set['rpe'] : null
+            $set['exercise_id'],
+            $set['set_number'],
+            $set['reps'],
+            $set['weight_kg'],
+            $set['rpe']
         );
-        $insertedSets++;
-    }
-
-    if ($insertedSets === 0) {
-        $workoutRepo->rollBack();
-        http_response_code(400);
-        echo json_encode(['error' => 'No valid sets were provided.']);
-        exit;
     }
 
     $workoutRepo->commit();
@@ -74,11 +69,11 @@ try {
     echo json_encode([
         'success'     => true,
         'workout_id'  => $workoutId,
-        'sets_logged' => $insertedSets,
+        'sets_logged' => count($sets),
     ]);
-} catch (Exception $e) {
+} catch (Throwable $e) {
     $workoutRepo->rollBack();
-    error_log("api_update_workout error: " . $e->getMessage());
+    error_log('api_update_workout error: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode(['error' => 'Failed to update workout. Please try again.']);
 }

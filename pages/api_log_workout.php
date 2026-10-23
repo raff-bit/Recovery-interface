@@ -2,6 +2,7 @@
 header('Content-Type: application/json');
 require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
+require_once __DIR__ . '/../bll/WorkoutValidator.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -9,69 +10,44 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$input = json_decode(file_get_contents('php://input'), true);
+// Auth first: anonymous callers learn nothing about our validation rules
+$userId = requireAuth();
 
-if (!$input || empty($input['sets']) || !is_array($input['sets'])) {
+$input = json_decode(file_get_contents('php://input'), true);
+if (!is_array($input)) {
     http_response_code(400);
-    echo json_encode(['error' => 'Request must include a non-empty "sets" array.']);
+    echo json_encode(['error' => 'Request body must be valid JSON.']);
     exit;
 }
 
-$workoutDate = $input['workout_date'] ?? date('Y-m-d H:i:s');
-$label       = trim($input['label'] ?? '') ?: null;
-$notes       = trim($input['notes'] ?? '') ?: null;
+// 1. Validate EVERYTHING before touching the database
+try {
+    $sets        = WorkoutValidator::validateSets($input['sets'] ?? null);
+    $workoutDate = WorkoutValidator::validateDate($input['workout_date'] ?? null, date('Y-m-d H:i:s'));
+    $label       = WorkoutValidator::optionalText($input['label'] ?? null, WorkoutValidator::MAX_LABEL_LENGTH, 'label');
+    $notes       = WorkoutValidator::optionalText($input['notes'] ?? null, WorkoutValidator::MAX_NOTES_LENGTH, 'notes');
+} catch (ValidationException $e) {
+    http_response_code(400);
+    echo json_encode(['error' => $e->getMessage()]);
+    exit;
+}
 
-$userId = requireAuth();
+// 2. Persist atomically — either the whole workout is saved, or nothing is
 $workoutRepo = new WorkoutRepository();
 
 try {
     $workoutRepo->beginTransaction();
 
     $workoutId = $workoutRepo->createWorkout($userId, $workoutDate, $label, $notes);
-
-    $setNumberByExercise = [];
-    $insertedSets = 0;
-
-    foreach ($input['sets'] as $set) {
-        if (empty($set['exercise_id']) || !isset($set['reps'])) {
-            continue;
-        }
-
-        $exerciseId = (int) $set['exercise_id'];
-        $setNumberByExercise[$exerciseId] = ($setNumberByExercise[$exerciseId] ?? 0) + 1;
-
+    foreach ($sets as $set) {
         $workoutRepo->addSet(
             $workoutId,
-            $exerciseId,
-            $set['set_number'] ?? $setNumberByExercise[$exerciseId],
-            (int) $set['reps'],
-            isset($set['weight_kg']) ? (float) $set['weight_kg'] : 0,
-            isset($set['rpe']) && $set['rpe'] !== '' ? (float) $set['rpe'] : null
+            $set['exercise_id'],
+            $set['set_number'],
+            $set['reps'],
+            $set['weight_kg'],
+            $set['rpe']
         );
-        $insertedSets++;
-    }
-
-    $rpe = (float) $set['rpe'];
-$reps = (int) $set['reps'];
-$weight = (float) $set['weight_kg'];
-
-if ($rpe < 1 || $rpe > 10) {
-    throw new InvalidArgumentException('Invalid RPE.');
-}
-
-if ($reps < 1) {
-    throw new InvalidArgumentException('Invalid rep count.');
-}
-
-if ($weight < 0) {
-    throw new InvalidArgumentException('Invalid weight.');
-}
-
-    if ($insertedSets === 0) {
-        $workoutRepo->rollBack();
-        http_response_code(400);
-        echo json_encode(['error' => 'No valid sets were provided.']);
-        exit;
     }
 
     $workoutRepo->commit();
@@ -79,11 +55,12 @@ if ($weight < 0) {
     echo json_encode([
         'success'     => true,
         'workout_id'  => $workoutId,
-        'sets_logged' => $insertedSets,
+        'sets_logged' => count($sets),
     ]);
-} catch (Exception $e) {
+} catch (Throwable $e) {
+    // Throwable (not Exception) also catches TypeErrors — nothing escapes as a raw stack trace
     $workoutRepo->rollBack();
-    error_log("api_log_workout error: " . $e->getMessage());
+    error_log('api_log_workout error: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode(['error' => 'Failed to log workout. Please try again.']);
 }

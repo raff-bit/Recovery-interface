@@ -40,9 +40,21 @@ class WorkoutRepository
         ]);
     }
 
-    public function beginTransaction(): void { $this->db->beginTransaction(); }
-    public function commit(): void { $this->db->commit(); }
-    public function rollBack(): void { $this->db->rollBack(); }
+    public function beginTransaction(): void
+    {
+        $this->db->beginTransaction();
+    }
+    public function commit(): void
+    {
+        $this->db->commit();
+    }
+    public function rollBack(): void
+    {
+        // Safe to call from any catch block: PDO throws if no transaction is open
+        if ($this->db->inTransaction()) {
+            $this->db->rollBack();
+        }
+    }
 
     public function getRecentSetsWithActivation(int $userId, int $days): array
     {
