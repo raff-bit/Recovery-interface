@@ -4,17 +4,19 @@
 
 import { state } from './state.js';
 import { fetchMuscles } from './api.js';
-import { readinessColor, countUp, summarizeReadiness } from './ui.js';
+import { readinessColor, thermalFill, countUp, summarizeReadiness, prefersReducedMotion } from './ui.js';
+import { buildBodyMap } from './bodymap.js';
 
-const SCORE_CIRCUMFERENCE = 2 * Math.PI * 52;
+const SCAN_MS = 1700;
 let lastScore = 0;
+let scanTimer = null;
 
 export function renderMuscleList(muscles) {
   const list = document.getElementById('muscle-list');
   if (!list) return;
   list.innerHTML = '';
 
-  // Mais fatigados primeiro: é o que interessa ver ao abrir a app
+  // Most fatigued first: that's what you want to see when you open the app
   const sorted = muscles.slice().sort((a, b) => a.readiness - b.readiness);
 
   sorted.forEach((m, index) => {
@@ -23,15 +25,16 @@ export function renderMuscleList(muscles) {
     li.className = 'muscle-row';
     li.dataset.muscle = m.muscle_key;
     li.style.setProperty('--i', index);
+    li.style.setProperty('--heat', color);
 
     li.innerHTML = `
       <div class="muscle-row-main">
         <span class="muscle-row-name">${m.display_name}</span>
         <span class="muscle-row-status">${m.status}</span>
       </div>
-      <span class="muscle-row-value" style="color:${m.readiness >= 90 ? 'var(--ink)' : color}"><span class="num">0</span><small>%</small></span>
+      <span class="muscle-row-value"><span class="num">0</span><small>%</small></span>
       <div class="muscle-row-bar-track">
-        <div class="muscle-row-bar-fill" style="width:${m.readiness}%; background:${color}"></div>
+        <div class="muscle-row-bar-fill" style="width:${m.readiness}%"></div>
       </div>
     `;
     li.addEventListener('mouseenter', () => setMuscleFocus(m.muscle_key));
@@ -42,50 +45,70 @@ export function renderMuscleList(muscles) {
   });
 }
 
+/**
+ * Paints every muscle with its thermal colour.
+ * Hot (fatigued) muscles also get a soft glow, like heat bloom on a thermal camera.
+ */
 export function applyHologramColors(muscles) {
   muscles.forEach(m => {
     const shapes = document.querySelectorAll(`.muscle-shape[data-muscle="${m.muscle_key}"]`);
-    const color = readinessColor(m.readiness);
-    // Só os músculos em recuperação brilham: quanto mais fatigado, mais forte
-    const glow = m.readiness < 70 ? 2 + ((70 - m.readiness) / 70) * 10 : 0;
-    // Músculos recuperados recuam visualmente para os pontos quentes sobressaírem
-    const opacity = m.readiness >= 70 ? 1 - ((m.readiness - 70) / 30) * 0.5 : 1;
+    const color = thermalFill(m.readiness);
+    const glow = m.readiness < 70 ? 2 + ((70 - m.readiness) / 70) * 9 : 0;
 
     shapes.forEach(shape => {
       shape.style.fill = color;
-      shape.style.fillOpacity = opacity.toFixed(2);
       shape.style.filter = glow ? `drop-shadow(0 0 ${glow.toFixed(1)}px ${color})` : 'none';
       shape.classList.toggle('critical-pulse', m.readiness < 35);
     });
   });
 }
 
+/**
+ * The scan: a beam sweeps down the body and each muscle changes colour
+ * as the beam passes it. Runs on load and every time the data refreshes.
+ */
+function scanBody(muscles) {
+  const stage = document.getElementById('hologram-stage');
+  if (!stage || prefersReducedMotion()) {
+    applyHologramColors(muscles);
+    return;
+  }
+
+  // How far down the body each visible muscle sits (0 = head, 1 = feet)
+  stage.querySelectorAll('.hologram-svg').forEach(svg => {
+    if (svg.style.display === 'none') return;
+    svg.querySelectorAll('.muscle-shape').forEach(shape => {
+      const box = shape.getBBox();
+      shape.style.setProperty('--y', ((box.y + box.height / 2) / 480).toFixed(3));
+    });
+  });
+
+  clearTimeout(scanTimer);
+  stage.classList.remove('is-scanning');
+  void stage.offsetWidth; // restart the CSS animation
+  stage.classList.add('is-scanning');
+  applyHologramColors(muscles);
+  scanTimer = setTimeout(() => stage.classList.remove('is-scanning'), SCAN_MS + 900);
+}
+
 export function updateReadinessHero(muscles) {
   const { score, title, sub } = summarizeReadiness(muscles);
 
-  const ring = document.getElementById('score-progress');
-  if (ring) {
-    ring.style.strokeDashoffset = SCORE_CIRCUMFERENCE * (1 - score / 100);
-    ring.style.stroke = readinessColor(score);
+  const scoreEl = document.getElementById('score-value');
+  if (scoreEl && scoreEl.parentElement) {
+    scoreEl.parentElement.style.color = muscles.length ? readinessColor(score) : '';
   }
-
-  countUp(document.getElementById('score-value'), score, { from: lastScore, duration: 1400 });
+  countUp(scoreEl, score, { from: lastScore, duration: 1400 });
   lastScore = score;
 
   const titleEl = document.getElementById('readiness-title');
   const subEl = document.getElementById('readiness-sub');
-  const kickerEl = document.getElementById('readiness-kicker');
   if (titleEl) titleEl.textContent = title;
   if (subEl) subEl.textContent = sub;
-  if (kickerEl) {
-    kickerEl.textContent = 'Today · ' + new Date().toLocaleDateString(undefined, {
-      weekday: 'short', day: 'numeric', month: 'short',
-    });
-  }
 }
 
 /**
- * Destaca um músculo no corpo e na lista em simultâneo (null limpa o destaque)
+ * Highlights one muscle on the body and in the list at the same time (null clears it)
  */
 export function setMuscleFocus(muscleKey) {
   const stage = document.getElementById('hologram-stage');
@@ -103,25 +126,23 @@ export function updateHologramVisibility() {
   const isFemale = state.profile && state.profile.sex === 'female';
   const rotator = document.getElementById('hologram-rotator');
 
-  const maleFront = document.getElementById('body-front');
-  const maleBack = document.getElementById('body-back');
-  const femaleFront = document.getElementById('body-front-female');
-  const femaleBack = document.getElementById('body-back-female');
+  const show = (id, visible) => {
+    const svg = document.getElementById(id);
+    if (svg) svg.style.display = visible ? 'block' : 'none';
+  };
+  show('body-front', !isFemale);
+  show('body-back', !isFemale);
+  show('body-front-female', isFemale);
+  show('body-back-female', isFemale);
 
-  // Alterna silhueta masculina / feminina
-  if (maleFront) maleFront.style.display = isFemale ? 'none' : 'block';
-  if (maleBack) maleBack.style.display = isFemale ? 'none' : 'block';
-  if (femaleFront) femaleFront.style.display = isFemale ? 'block' : 'none';
-  if (femaleBack) femaleBack.style.display = isFemale ? 'block' : 'none';
-
-  // Roda tridimensionalmente no eixo Y
+  // Spin around the vertical axis
   if (rotator) {
     rotator.style.transform = state.hologramView === 'back' ? 'rotateY(180deg)' : 'rotateY(0deg)';
   }
 
   const btn = document.getElementById('toggle-view');
   if (btn) {
-    btn.textContent = state.hologramView === 'front' ? 'Back view' : 'Front view';
+    btn.textContent = state.hologramView === 'front' ? 'Show back' : 'Show front';
   }
 }
 
@@ -131,7 +152,7 @@ export function handleViewToggle() {
 }
 
 /**
- * Recolhe/expande o mapa corporal (só visível no layout de telemóvel)
+ * Collapses / expands the body map (only on the phone layout)
  */
 export function toggleHologramCollapse() {
   const panel = document.getElementById('hologram-panel');
@@ -144,18 +165,12 @@ export function toggleHologramCollapse() {
 }
 
 /**
- * Etiqueta flutuante com o nome e a prontidão do músculo (rato e toque)
+ * Floating label with the muscle's name and readiness (mouse and touch)
  */
 function initBodyTip(stage) {
   const tip = document.getElementById('body-tip');
   if (!tip) return;
   let hideTimer = null;
-
-  // Troca os <title> nativos (tooltip duplicado e lento) por aria-label
-  stage.querySelectorAll('.muscle-shape title').forEach(title => {
-    title.parentElement.setAttribute('aria-label', title.textContent);
-    title.remove();
-  });
 
   const show = (shape, clientX, clientY) => {
     const key = shape.dataset.muscle;
@@ -163,7 +178,15 @@ function initBodyTip(stage) {
     if (!muscle) return;
 
     const rect = stage.getBoundingClientRect();
-    tip.innerHTML = `<span>${muscle.display_name}</span><span class="body-tip-value" style="color:${readinessColor(muscle.readiness)}">${muscle.readiness}%</span>`;
+    tip.innerHTML = '';
+    const name = document.createElement('span');
+    name.textContent = muscle.display_name;
+    const value = document.createElement('span');
+    value.className = 'body-tip-value';
+    value.style.color = readinessColor(muscle.readiness);
+    value.textContent = `${muscle.readiness}%`;
+    tip.append(name, value);
+
     tip.style.left = (clientX - rect.left) + 'px';
     tip.style.top = (clientY - rect.top) + 'px';
     tip.classList.add('visible');
@@ -185,7 +208,7 @@ function initBodyTip(stage) {
     if (e.pointerType === 'mouse') hide();
   });
 
-  // Toque: mostra durante uns segundos
+  // Touch: show for a couple of seconds
   stage.addEventListener('click', (e) => {
     const shape = e.target.closest('.muscle-shape');
     if (!shape || e.pointerType === 'mouse') return;
@@ -196,13 +219,15 @@ function initBodyTip(stage) {
 }
 
 /**
- * Ativa o controlo tátil/rato para girar o corpo (drag to spin)
+ * Builds the bodies, then enables drag-to-spin with mouse or finger
  */
 export function initHologram3DInteractions() {
   const stage = document.getElementById('hologram-stage');
   const rotator = document.getElementById('hologram-rotator');
   if (!stage || !rotator) return;
 
+  buildBodyMap(rotator);
+  updateHologramVisibility();
   initBodyTip(stage);
 
   let isDragging = false;
@@ -212,16 +237,14 @@ export function initHologram3DInteractions() {
   const startDrag = (clientX) => {
     isDragging = true;
     startX = clientX;
-    rotator.style.transition = 'none'; // Resposta instantânea ao arrasto
+    rotator.style.transition = 'none'; // follow the pointer instantly
   };
 
   const moveDrag = (clientX) => {
     if (!isDragging) return;
     currentDelta = clientX - startX;
     const baseAngle = state.hologramView === 'back' ? 180 : 0;
-    // Rotação proporcional ao movimento em píxeis
-    const liveAngle = baseAngle + (currentDelta * 0.8);
-    rotator.style.transform = `rotateY(${liveAngle}deg)`;
+    rotator.style.transform = `rotateY(${baseAngle + currentDelta * 0.8}deg)`;
   };
 
   const endDrag = () => {
@@ -229,7 +252,7 @@ export function initHologram3DInteractions() {
     isDragging = false;
     rotator.style.transition = '';
 
-    // Se arrastou mais de 45px para qualquer lado, inverte a vista
+    // Dragged more than 45px either way: flip to the other side
     if (Math.abs(currentDelta) > 45) {
       state.hologramView = state.hologramView === 'front' ? 'back' : 'front';
     }
@@ -237,12 +260,10 @@ export function initHologram3DInteractions() {
     currentDelta = 0;
   };
 
-  // Eventos de Rato (PC)
   stage.addEventListener('mousedown', (e) => startDrag(e.clientX));
   window.addEventListener('mousemove', (e) => moveDrag(e.clientX));
   window.addEventListener('mouseup', endDrag);
 
-  // Eventos de Toque (Mobile / Tablets)
   stage.addEventListener('touchstart', (e) => {
     if (e.touches.length === 1) startDrag(e.touches[0].clientX);
   }, { passive: true });
@@ -252,15 +273,39 @@ export function initHologram3DInteractions() {
   window.addEventListener('touchend', endDrag);
 }
 
+/**
+ * Resolves once the boot screen is gone, so the scan plays where you can see it
+ */
+function whenRevealed() {
+  return new Promise(resolve => {
+    if (!document.body.classList.contains('booting')) return resolve(false);
+    const observer = new MutationObserver(() => {
+      if (!document.body.classList.contains('booting')) {
+        observer.disconnect();
+        resolve(true);
+      }
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  });
+}
+
 export async function refreshMuscles() {
   const data = await fetchMuscles();
   state.muscles = data.muscles;
-  renderMuscleList(state.muscles);
-  applyHologramColors(state.muscles);
-  updateReadinessHero(state.muscles);
+  updateHologramVisibility();
+
+  // Not awaited on purpose: the app keeps loading while we wait for the reveal
+  whenRevealed().then((justRevealed) => {
+    const delay = justRevealed ? 450 : 0;
+    setTimeout(() => {
+      renderMuscleList(state.muscles);
+      updateReadinessHero(state.muscles);
+      scanBody(state.muscles);
+    }, delay);
+  });
 
   const updated = document.getElementById('last-updated');
   if (updated) {
-    updated.textContent = 'Updated ' + new Date(data.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    updated.textContent = 'Scanned at ' + new Date(data.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 }

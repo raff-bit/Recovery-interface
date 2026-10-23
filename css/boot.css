@@ -1,5 +1,6 @@
 /* ============================================================
-   RECOVERY — Splash Screen & Entrance Choreography
+   RECOVERY — Splash Screen & Reveal
+   The loading bar warms up through the thermal scale as it fills.
    ============================================================ */
 
 body.booting {
@@ -16,8 +17,8 @@ body.booting {
   justify-content: center;
   gap: var(--sp-5);
   padding: var(--sp-6);
-  background: var(--bg);
-  transition: opacity 0.6s var(--ease), visibility 0s linear 0.6s;
+  background: var(--night);
+  transition: opacity 0.55s var(--ease), visibility 0s linear 0.55s;
 }
 
 .boot-screen.boot-complete {
@@ -27,57 +28,46 @@ body.booting {
 }
 
 .boot-mark {
-  font-family: var(--font-display);
-  font-size: clamp(44px, 12vw, 72px);
-  font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -0.5px;
-  text-transform: lowercase;
-  color: var(--ink);
-  animation: rise 0.7s var(--ease) both;
-}
-
-.boot-mark span {
-  color: var(--volt);
+  font-size: clamp(40px, 10vw, 64px);
+  font-stretch: 125%;
+  font-weight: 640;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ice);
+  animation: fade 0.6s var(--ease) both;
 }
 
 .boot-bar-track {
-  width: min(220px, 60vw);
-  height: 3px;
-  border-radius: var(--r-pill);
-  background: var(--surface-3);
+  width: min(240px, 60vw);
+  height: 2px;
+  background: var(--raised);
   overflow: hidden;
-  animation: fade 0.6s 0.15s var(--ease) both;
+  animation: fade 0.6s 0.1s var(--ease) both;
 }
 
 .boot-bar-fill {
   width: 100%;
   height: 100%;
-  border-radius: inherit;
-  background: var(--volt);
+  background: var(--thermal);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.35s var(--ease);
 }
 
 .boot-status {
-  min-height: 18px;
+  min-height: 20px;
   font-size: 13px;
-  font-weight: 500;
-  color: var(--ink-3);
-  animation: fade 0.6s 0.25s var(--ease) both;
+  color: var(--ice-3);
+  animation: fade 0.6s 0.2s var(--ease) both;
 }
 
-/* ---------- ENTRANCE (depois do splash) ---------- */
+/* ---------- REVEAL ----------
+   One quiet fade for the chrome; the body scan is the real entrance. */
 
-.hud-frame.pre-reveal > *,
-.hud-frame.pre-reveal .hud-dock,
-.hud-frame.pre-reveal .hud-deck {
+.hud-frame {
+  transition: opacity 0.6s var(--ease);
+}
+
+.hud-frame.pre-reveal {
   opacity: 0;
 }
-
-/* Anima-se cada bloco em separado: nunca o contentor da dock, para não quebrar o position:fixed */
-.hud-frame:not(.pre-reveal) .hud-header    { animation: rise 0.7s var(--ease) both; }
-.hud-frame:not(.pre-reveal) .hologram-panel { animation: rise 0.8s 0.08s var(--ease) both; }
-.hud-frame:not(.pre-reveal) .hud-dock      { animation: rise 0.8s 0.16s var(--ease) both; }
-.hud-frame:not(.pre-reveal) .hud-deck      { animation: rise 0.8s 0.24s var(--ease) both; }

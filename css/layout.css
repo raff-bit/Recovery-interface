@@ -1,5 +1,6 @@
 /* ============================================================
-   RECOVERY — Layout, Frame Shell & Core Components
+   RECOVERY — Layout, Frame & Core Components
+   Rule of thumb: ice = selected, flare (amber) = commit an action.
    ============================================================ */
 
 /* ---------- BUTTONS ---------- */
@@ -34,22 +35,18 @@ button:disabled {
   justify-content: center;
   gap: var(--sp-2);
   min-height: 40px;
-  padding: 0 18px;
+  padding: 0 16px;
   border: 1px solid transparent;
-  border-radius: var(--r-pill);
-  font-family: var(--font-ui);
+  border-radius: var(--r-ctl);
   font-size: 14px;
-  font-weight: 700;
-  letter-spacing: -0.1px;
+  font-weight: 560;
   white-space: nowrap;
-  color: var(--ink);
-  background: var(--surface-2);
+  color: var(--ice);
   transition:
-    background 0.2s var(--ease),
+    background-color 0.2s var(--ease),
     border-color 0.2s var(--ease),
     color 0.2s var(--ease),
-    box-shadow 0.25s var(--ease),
-    transform 0.2s var(--ease-spring);
+    transform 0.15s var(--ease);
 }
 
 .primary-btn:active,
@@ -59,50 +56,42 @@ button:disabled {
 .hud-chip-btn:active,
 .modal-cancel-btn:active,
 .history-action-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .primary-btn {
-  color: var(--volt-ink);
-  background: var(--volt);
-  box-shadow: 0 6px 24px -8px rgba(215, 255, 58, 0.55);
+  color: var(--flare-ink);
+  background: var(--flare);
+  font-weight: 650;
 }
 
 .ghost-btn,
-.hud-chip-btn {
-  border-color: var(--line-strong);
-  background: transparent;
-}
-
+.hud-chip-btn,
 .hud-action-btn {
-  background: var(--surface-2);
-  border-color: var(--line);
+  border-color: var(--line-strong);
 }
 
 .hud-chip-btn {
   min-height: 34px;
-  padding: 0 14px;
+  padding: 0 12px;
   font-size: 13px;
-  font-weight: 600;
-  color: var(--ink-2);
+  color: var(--ice-2);
 }
 
 .hud-action-btn-subtle,
 .modal-cancel-btn,
 .history-action-btn {
-  color: var(--ink-2);
-  background: transparent;
-  border-color: var(--line);
+  color: var(--ice-2);
 }
 
 .history-action-btn {
-  min-height: 34px;
-  padding: 0 14px;
+  min-height: 32px;
+  padding: 0 10px;
   font-size: 13px;
 }
 
 .delete-workout-btn {
-  color: var(--danger);
+  color: var(--ember-ink);
 }
 
 .remove-set-btn {
@@ -111,44 +100,36 @@ button:disabled {
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: var(--r-sm);
-  color: var(--ink-3);
+  border-radius: var(--r-ctl);
+  color: var(--ice-3);
   font-size: 20px;
   line-height: 1;
-  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
 }
 
 @media (hover: hover) {
   .primary-btn:hover {
-    background: #e3ff6e;
-    box-shadow: 0 10px 30px -8px rgba(215, 255, 58, 0.7);
-    transform: translateY(-1px);
+    background: var(--flare-hover);
   }
 
   .ghost-btn:hover,
   .hud-chip-btn:hover,
   .hud-action-btn:hover {
-    background: var(--surface-3);
-    border-color: var(--line-strong);
-    color: var(--ink);
+    background: var(--raised);
+    color: var(--ice);
   }
 
   .modal-cancel-btn:hover,
   .history-action-btn:hover,
   .hud-action-btn-subtle:hover {
-    color: var(--ink);
-    border-color: var(--line-strong);
+    color: var(--ice);
+    background: var(--raised);
   }
 
-  .delete-workout-btn:hover {
-    color: var(--danger);
-    background: var(--danger-a12);
-    border-color: transparent;
-  }
-
+  .delete-workout-btn:hover,
   .remove-set-btn:hover {
-    color: var(--danger);
-    background: var(--danger-a12);
+    color: var(--ember-ink);
+    background: var(--ember-a14);
   }
 }
 
@@ -162,36 +143,35 @@ input[type="date"],
 select {
   width: 100%;
   min-height: 44px;
-  padding: 0 14px;
-  background: var(--surface-2);
+  padding: 0 12px;
+  background: var(--raised);
   border: 1px solid transparent;
-  border-radius: var(--r-sm);
-  color: var(--ink);
-  font-family: var(--font-ui);
-  font-size: 14px;
-  font-weight: 600;
-  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s var(--ease);
+  border-radius: var(--r-ctl);
+  color: var(--ice);
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 500;
+  transition: border-color 0.2s var(--ease), background-color 0.2s var(--ease);
 }
 
 input::placeholder {
-  color: var(--ink-3);
-  font-weight: 500;
+  color: var(--ice-3);
+  font-weight: 450;
   opacity: 1;
 }
 
 @media (hover: hover) {
   input:hover,
   select:hover {
-    background: var(--surface-3);
+    background: var(--raised-2);
   }
 }
 
 input:focus,
 select:focus {
   outline: none;
-  background: var(--surface-2);
-  border-color: var(--volt);
-  box-shadow: 0 0 0 4px var(--volt-a16);
+  background: var(--raised);
+  border-color: var(--flare);
 }
 
 input[type="number"] {
@@ -206,29 +186,29 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.7);
+  filter: invert(0.75) sepia(0.3) hue-rotate(190deg);
   cursor: pointer;
 }
 
 select {
   -webkit-appearance: none;
   appearance: none;
-  padding-right: 38px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23a6a39c' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23a3aad8' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 14px center;
+  background-position: right 13px center;
   cursor: pointer;
 }
 
 select option {
-  background-color: var(--surface-solid);
-  color: var(--ink);
+  background-color: var(--deep);
+  color: var(--ice);
 }
 
 /* ---------- FRAME ---------- */
 
 .hud-frame {
-  max-width: 1320px;
+  max-width: 1360px;
   margin: 0 auto;
 }
 
@@ -239,24 +219,19 @@ select option {
   justify-content: space-between;
   align-items: center;
   gap: var(--sp-4);
+  padding-bottom: var(--sp-5);
   margin-bottom: var(--sp-6);
+  border-bottom: 1px solid var(--line);
 }
 
 .hud-brand {
-  display: flex;
-  align-items: baseline;
   min-width: 0;
-  font-family: var(--font-display);
-  font-size: 34px;
-  font-weight: 800;
+  font-size: 26px;
+  font-stretch: 125%;
+  font-weight: 640;
   line-height: 1;
-  letter-spacing: -0.3px;
-  text-transform: lowercase;
-  color: var(--ink);
-}
-
-.hud-brand-dot {
-  color: var(--volt);
+  letter-spacing: -0.02em;
+  color: var(--ice);
 }
 
 .hud-header-actions {
@@ -266,10 +241,9 @@ select option {
 }
 
 .hud-clock {
-  margin-right: var(--sp-2);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ink-3);
+  margin-right: var(--sp-3);
+  font-size: 14px;
+  color: var(--ice-3);
   white-space: nowrap;
 }
 
@@ -278,10 +252,10 @@ select option {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ink-2);
-  padding: 0 var(--sp-2);
+  font-size: 14px;
+  font-weight: 560;
+  color: var(--ice);
+  padding: 0 var(--sp-1);
 }
 
 .hud-action-btn {
@@ -291,13 +265,13 @@ select option {
 .profile-avatar {
   width: 22px;
   height: 22px;
-  margin-left: -8px;
+  margin-left: -6px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface-3);
-  color: var(--ink-2);
+  background: var(--raised-2);
+  color: var(--ice-2);
 }
 
 .profile-avatar svg {
@@ -305,38 +279,36 @@ select option {
   height: 13px;
 }
 
+/* Profile not filled in yet: a small warm dot asks for attention */
 .profile-dot {
   position: absolute;
-  top: 6px;
-  left: 24px;
-  width: 8px;
-  height: 8px;
-  background-color: var(--heat-mid);
-  border: 2px solid var(--surface-2);
+  top: 7px;
+  left: 25px;
+  width: 7px;
+  height: 7px;
+  background-color: var(--flare);
   border-radius: 50%;
-  box-sizing: content-box;
+  box-shadow: 0 0 0 2px var(--night);
 }
 
 /* ---------- CARDS ---------- */
 
 .panel {
   position: relative;
-  background: var(--surface-1);
+  background: var(--deep);
   border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  padding: clamp(16px, 2.4vw, 26px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  border-radius: var(--r-card);
+  padding: clamp(18px, 2.4vw, 28px);
 }
 
 .panel-label {
-  margin: 0 0 var(--sp-4);
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: 0.2px;
-  text-transform: uppercase;
-  color: var(--ink);
+  margin: 0 0 var(--sp-5);
+  font-size: 21px;
+  font-stretch: var(--wide);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--ice);
 }
 
 .panel-head {
@@ -344,7 +316,7 @@ select option {
   align-items: baseline;
   justify-content: space-between;
   gap: var(--sp-3);
-  margin-bottom: var(--sp-4);
+  margin-bottom: var(--sp-5);
 }
 
 .panel-head .panel-label {
@@ -353,97 +325,90 @@ select option {
 
 .panel-meta {
   font-size: 13px;
-  font-weight: 600;
-  color: var(--ink-3);
+  color: var(--ice-3);
   white-space: nowrap;
 }
 
-/* ---------- COCKPIT GRID ---------- */
+/* ---------- MAIN GRID ---------- */
 
 .hud-grid {
   display: grid;
-  grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
-  gap: var(--sp-5);
+  grid-template-columns: minmax(320px, 430px) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 56px);
   align-items: start;
-}
-
-.hologram-panel {
-  position: sticky;
-  top: var(--sp-5);
 }
 
 .hud-console {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
   min-width: 0;
 }
 
-/* ---------- TAB DOCK ---------- */
+/* ---------- TABS ----------
+   Plain text tabs on a rule; a short ice bar slides under the active one. */
 
 .hud-dock {
   --tab-index: 0;
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  padding: 5px;
-  background: var(--surface-1);
-  border: 1px solid var(--line);
-  border-radius: var(--r-pill);
+  max-width: 600px;
+  margin-bottom: var(--sp-5);
+  box-shadow: inset 0 -1px 0 var(--line);
 }
 
 .dock-indicator {
   position: absolute;
-  top: 5px;
-  bottom: 5px;
-  left: 5px;
-  width: calc((100% - 10px) / 4);
-  border-radius: var(--r-pill);
-  background: var(--volt);
-  box-shadow: 0 6px 22px -8px rgba(215, 255, 58, 0.6);
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 25%;
+  background: var(--ice);
   transform: translateX(calc(var(--tab-index) * 100%));
   transition: transform 0.45s var(--ease);
 }
 
 .hud-dock-btn {
   position: relative;
-  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--sp-2);
-  min-height: 42px;
-  padding: 0 var(--sp-2);
-  border-radius: var(--r-pill);
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--ink-2);
+  min-height: 46px;
+  font-size: 15px;
+  font-stretch: 108%;
+  font-weight: 560;
+  color: var(--ice-3);
   white-space: nowrap;
-  transition: color 0.3s var(--ease);
+  transition: color 0.25s var(--ease);
+}
+
+.dock-icon-wrap {
+  display: inline-flex;
 }
 
 .dock-icon {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   flex-shrink: 0;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2;
+  stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .hud-dock-btn.active {
-  color: var(--volt-ink);
+  color: var(--ice);
 }
 
 @media (hover: hover) {
   .hud-dock-btn:not(.active):hover {
-    color: var(--ink);
+    color: var(--ice-2);
   }
 }
 
-/* ---------- TAB DECK ---------- */
+/* ---------- TAB CONTENT ---------- */
 
 .hud-deck {
   position: relative;
@@ -456,7 +421,7 @@ select option {
 
 .hud-tab-panel.active {
   display: block;
-  animation: rise 0.45s var(--ease) both;
+  animation: settle 0.35s var(--ease-out) both;
 }
 
 .hud-tab-stack {

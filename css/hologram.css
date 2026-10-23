@@ -1,111 +1,82 @@
 /* ============================================================
-   RECOVERY — Body Card: Readiness Score & Heat Map
+   RECOVERY — Body Scan: readiness verdict + thermal body map
+   This column has no card around it on purpose: the body is
+   the instrument, so it sits straight on the page.
    ============================================================ */
 
 .hologram-panel {
-  overflow: hidden;
+  position: sticky;
+  top: var(--sp-5);
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
 }
 
-/* ---------- READINESS HERO ---------- */
+/* ---------- VERDICT ---------- */
 
 .readiness-hero {
   display: flex;
   align-items: center;
-  gap: var(--sp-4);
-}
-
-.score-ring {
-  position: relative;
-  flex-shrink: 0;
-  width: 92px;
-  height: 92px;
-}
-
-.score-ring svg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-
-.score-track {
-  fill: none;
-  stroke: var(--surface-3);
-  stroke-width: 8;
-}
-
-.score-progress {
-  fill: none;
-  stroke: var(--volt);
-  stroke-width: 8;
-  stroke-linecap: round;
-  stroke-dasharray: 326.73;
-  stroke-dashoffset: 326.73;
-  transition: stroke-dashoffset 1.6s var(--ease), stroke 0.6s var(--ease);
+  gap: var(--sp-5);
 }
 
 .score-value {
-  position: absolute;
-  inset: 0;
+  flex-shrink: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-size: 36px;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.5px;
+  align-items: flex-start;
+  font-size: 76px;
+  font-stretch: var(--narrow);
+  font-weight: 700;
+  line-height: 0.82;
+  letter-spacing: -0.02em;
+  color: var(--ice);
+  transition: color 0.8s var(--ease);
 }
 
 .score-value small {
-  align-self: center;
-  margin: 8px 0 0 1px;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--ink-3);
+  margin: 4px 0 0 2px;
+  font-size: 24px;
+  font-weight: 600;
+  opacity: 0.7;
 }
 
 .readiness-copy {
   flex: 1;
   min-width: 0;
-}
-
-.readiness-kicker {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: var(--ink-3);
+  padding-left: var(--sp-5);
+  border-left: 1px solid var(--line-strong);
 }
 
 .readiness-title {
-  margin: 3px 0 4px;
-  font-family: var(--font-display);
-  font-size: 32px;
-  font-weight: 800;
-  line-height: 0.95;
-  text-transform: uppercase;
-  color: var(--ink);
+  font-size: 22px;
+  font-stretch: var(--wide);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--ice);
 }
 
 .readiness-sub {
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.35;
-  color: var(--ink-2);
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ice-2);
+  max-width: 34ch;
 }
 
-/* Botão de recolher: só no layout de telemóvel */
+/* Collapse button: phone layout only */
 #hologram-collapse-btn {
   display: none;
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-ctl);
   align-items: center;
   justify-content: center;
-  background: var(--surface-2);
-  color: var(--ink-2);
-  transition: transform 0.35s var(--ease), background 0.2s var(--ease);
+  border: 1px solid var(--line-strong);
+  color: var(--ice-2);
+  transition: transform 0.35s var(--ease);
 }
 
 #hologram-collapse-btn svg {
@@ -113,7 +84,7 @@
   height: 16px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.2;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -129,9 +100,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: var(--sp-4);
-  padding: var(--sp-4) 0 var(--sp-2);
-  perspective: 1200px;
+  margin-top: var(--sp-6);
+  padding: var(--sp-2) 0;
+  perspective: 1400px;
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
@@ -142,36 +113,16 @@
   cursor: grabbing;
 }
 
-/* Foco de luz atrás do corpo e sombra no chão */
-.hologram-stage::before {
-  content: "";
-  position: absolute;
-  inset: 0 8%;
-  background: radial-gradient(closest-side at 50% 42%, rgba(255, 255, 255, 0.045), transparent);
-  pointer-events: none;
-}
-
-.hologram-stage::after {
-  content: "";
-  position: absolute;
-  left: 26%;
-  right: 26%;
-  bottom: 2%;
-  height: 22px;
-  background: radial-gradient(closest-side, rgba(215, 255, 58, 0.14), transparent);
-  pointer-events: none;
-}
-
 .hologram-rotator {
   position: relative;
   display: inline-block;
   transform-style: preserve-3d;
-  transition: transform 0.7s var(--ease-spring);
+  transition: transform 0.8s var(--ease);
 }
 
 .hologram-svg {
   display: block;
-  height: clamp(320px, 56vh, 520px);
+  height: clamp(400px, calc(100vh - 340px), 680px);
   width: auto;
   max-width: 100%;
   overflow: visible;
@@ -194,52 +145,96 @@
   transform: rotateY(180deg);
 }
 
-.hud-marker {
-  display: none;
+/* ---------- BODY LAYERS (built by js/bodymap.js) ---------- */
+
+.body-pad ellipse {
+  fill: none;
+  stroke: rgba(150, 165, 255, 0.22);
+  stroke-width: 1;
 }
 
-.body-outline {
-  fill: rgba(255, 255, 255, 0.025);
-  stroke: rgba(255, 255, 255, 0.14);
-  stroke-width: 1.2;
+.body-pad ellipse:last-child {
+  stroke: rgba(150, 165, 255, 0.12);
+}
+
+.body-tissue path {
+  fill: #19204d;
+  stroke: var(--night);
+  stroke-width: 1.3;
   stroke-linejoin: round;
 }
 
-.body-outline-muted {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.09);
-  stroke-width: 1;
-  stroke-dasharray: 3 3;
-}
-
-/* Heat map muscular: o traço da cor do cartão cria separação limpa entre músculos */
 .muscle-shape {
-  fill: #2a2a2e;
-  stroke: var(--surface-1);
-  stroke-width: 2;
+  fill: #232a5c;
+  stroke: var(--night);
+  stroke-width: 1.3;
+  stroke-linejoin: round;
   cursor: pointer;
-  transition: fill 0.7s var(--ease), opacity 0.3s var(--ease), filter 0.5s var(--ease), stroke 0.2s var(--ease);
+  transition:
+    fill 0.9s var(--ease),
+    filter 0.9s var(--ease),
+    opacity 0.25s var(--ease),
+    stroke 0.2s var(--ease);
 }
 
+.body-overlay {
+  pointer-events: none;
+}
+
+/* Linking body and list: hovering one dims everything else */
 .hologram-stage.has-focus .muscle-shape:not(.is-focus) {
-  opacity: 0.3;
+  opacity: 0.32;
 }
 
 .muscle-shape.is-focus {
-  stroke: var(--ink);
+  stroke: var(--ice);
+  stroke-width: 1.4;
 }
 
-/* Músculos muito fatigados (<35%) respiram */
+/* Very fatigued muscles (<35%) shimmer slowly, like heat haze */
 .critical-pulse {
-  animation: fatigue-breathe 2.2s ease-in-out infinite;
+  animation: heat-haze 2.6s ease-in-out infinite;
 }
 
-@keyframes fatigue-breathe {
+@keyframes heat-haze {
   0%, 100% { opacity: 1; }
-  50%      { opacity: 0.55; }
+  50%      { opacity: 0.72; }
 }
 
-/* ---------- TAP / HOVER TOOLTIP ---------- */
+/* ---------- THE SCAN ----------
+   A beam travels head to feet; each muscle takes its colour as the beam
+   passes (js sets --y per muscle: 0 at the head, 1 at the feet). */
+
+.scan-beam {
+  opacity: 0;
+}
+
+.hologram-stage.is-scanning .scan-beam {
+  animation: scan-sweep 1.7s var(--ease-scan) both;
+}
+
+.hologram-stage.is-scanning .muscle-shape {
+  transition-delay: calc(60ms + var(--y, 0) * 1150ms);
+}
+
+.hologram-stage.is-scanning .body-pad ellipse:first-child {
+  animation: pad-ping 1.7s var(--ease-scan) both;
+}
+
+@keyframes scan-sweep {
+  0%   { opacity: 0; transform: translateY(0); }
+  8%   { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(570px); }
+}
+
+@keyframes pad-ping {
+  0%, 80% { stroke: rgba(150, 165, 255, 0.22); }
+  90%     { stroke: rgba(200, 210, 255, 0.7); }
+  100%    { stroke: rgba(150, 165, 255, 0.22); }
+}
+
+/* ---------- HOVER / TAP LABEL ---------- */
 
 .body-tip {
   position: absolute;
@@ -248,30 +243,30 @@
   top: 0;
   display: flex;
   align-items: baseline;
-  gap: var(--sp-2);
-  padding: 7px 12px;
-  border-radius: var(--r-sm);
-  background: rgba(13, 13, 14, 0.92);
+  gap: var(--sp-3);
+  padding: 7px 12px 8px;
+  border-radius: var(--r-ctl);
+  background: rgba(11, 14, 36, 0.94);
   border: 1px solid var(--line-strong);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 560;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transform: translate(-50%, calc(-100% - 12px)) scale(0.96);
+  transform: translate(-50%, calc(-100% - 14px)) scale(0.97);
   transition: opacity 0.15s var(--ease), transform 0.2s var(--ease);
 }
 
 .body-tip.visible {
   opacity: 1;
-  transform: translate(-50%, calc(-100% - 12px));
+  transform: translate(-50%, calc(-100% - 14px));
 }
 
 .body-tip-value {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 20px;
+  font-stretch: var(--narrow);
+  font-weight: 700;
+  line-height: 1;
 }
 
 /* ---------- FOOTER ---------- */
@@ -281,39 +276,39 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-3);
-  margin-top: var(--sp-3);
+  margin-top: var(--sp-4);
 }
 
 .heat-legend {
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--ink-3);
+  font-size: 12px;
+  color: var(--ice-3);
 }
 
 .heat-legend-bar {
-  width: 64px;
-  height: 6px;
-  border-radius: var(--r-pill);
-  background: var(--heat-gradient);
+  width: 84px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--thermal);
 }
 
 #toggle-view::before {
-  content: "↻";
-  font-size: 15px;
-  line-height: 1;
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 0 1 15.5-6.2L21 8'/%3E%3Cpath d='M21 3v5h-5'/%3E%3Cpath d='M21 12a9 9 0 0 1-15.5 6.2L3 16'/%3E%3Cpath d='M3 21v-5h5'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 0 1 15.5-6.2L21 8'/%3E%3Cpath d='M21 3v5h-5'/%3E%3Cpath d='M21 12a9 9 0 0 1-15.5 6.2L3 16'/%3E%3Cpath d='M3 21v-5h5'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
 .hologram-footnote {
-  margin: var(--sp-3) 0 0;
   font-size: 13px;
-  font-weight: 500;
-  color: var(--ink-3);
+  color: var(--ice-3);
 }
 
 #last-updated {
-  text-align: center;
+  margin-top: var(--sp-3);
   font-size: 12px;
 }

@@ -1,22 +1,78 @@
 /* ============================================================
-   RECOVERY — Shared UI Helpers (heat scale, counters, copy)
+   RECOVERY — Shared UI Helpers (thermal scale, counters, copy)
+
+   The app uses one colour scale, borrowed from thermal cameras:
+   recovered muscles read "cold" (indigo), freshly trained ones
+   read "hot" (magenta -> ember -> amber -> white-hot).
    ============================================================ */
 
+// Muscle paint on the body map. The cold end is deliberately dark
+// so recovered muscles recede and the hot spots stand out.
+const FILL_STOPS = [
+  [0.00, '#232a5c'],
+  [0.15, '#33307a'],
+  [0.35, '#6e2a9a'],
+  [0.55, '#b8287c'],
+  [0.72, '#ee4e2e'],
+  [0.87, '#ff9d1e'],
+  [1.00, '#ffe8a3'],
+];
+
+// The same scale, lightened so it stays readable as text on the dark UI.
+const INK_STOPS = [
+  [0.00, '#9ba5dd'],
+  [0.30, '#b49af2'],
+  [0.50, '#f07cc8'],
+  [0.70, '#ff7a4d'],
+  [0.86, '#ffa83a'],
+  [1.00, '#ffd77a'],
+];
+
+function hexToRgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function sampleStops(stops, t) {
+  const x = Math.max(0, Math.min(1, t));
+  for (let i = 1; i < stops.length; i++) {
+    const [t1, c1] = stops[i];
+    if (x <= t1) {
+      const [t0, c0] = stops[i - 1];
+      const k = (x - t0) / (t1 - t0);
+      const a = hexToRgb(c0);
+      const b = hexToRgb(c1);
+      const mix = a.map((v, j) => Math.round(v + (b[j] - v) * k));
+      return `rgb(${mix[0]} ${mix[1]} ${mix[2]})`;
+    }
+  }
+  return stops[stops.length - 1][1];
+}
+
+// 0 = fully fatigued (hot), 100 = fully recovered (cold)
+const fatigueOf = (readiness) => 1 - Math.max(0, Math.min(100, Number(readiness) || 0)) / 100;
+
 /**
- * Converte prontidão (0–100) numa cor contínua: coral → âmbar → volt
+ * Readable colour for numbers, bars and labels.
  */
 export function readinessColor(readiness) {
-  const r = Math.max(0, Math.min(100, Number(readiness) || 0));
-  const hue = 4 + (r / 100) * 70;
-  const light = 60 + (r / 100) * 1.5;
-  return `hsl(${hue.toFixed(1)} 100% ${light.toFixed(1)}%)`;
+  return sampleStops(INK_STOPS, fatigueOf(readiness));
+}
+
+/**
+ * Deep thermal colour used to paint muscles on the body map.
+ */
+export function thermalFill(readiness) {
+  return sampleStops(FILL_STOPS, fatigueOf(readiness));
 }
 
 const prefersReducedMotion = () =>
   window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+export { prefersReducedMotion };
+
 /**
- * Anima um número de 'from' até 'to' com easing (easeOutExpo)
+ * Animates a number from 'from' to 'to' (easeOutExpo)
  */
 export function countUp(el, to, { from = 0, duration = 1100 } = {}) {
   if (!el) return;
@@ -38,11 +94,11 @@ export function countUp(el, to, { from = 0, duration = 1100 } = {}) {
 }
 
 /**
- * Resume o estado geral: pontuação média, título e músculos mais fatigados
+ * Overall picture: average score, a short verdict, and which muscles need time
  */
 export function summarizeReadiness(muscles) {
   if (!muscles || muscles.length === 0) {
-    return { score: 0, title: 'No data', sub: 'Log a session to start tracking.' };
+    return { score: 0, title: 'No data yet', sub: 'Log your first session to start the scan.' };
   }
 
   const score = Math.round(muscles.reduce((sum, m) => sum + m.readiness, 0) / muscles.length);
@@ -53,16 +109,17 @@ export function summarizeReadiness(muscles) {
   let title;
   if (score >= 90 && recovering.length === 0) title = 'Ready to train';
   else if (score >= 75) title = 'Good to go';
-  else if (score >= 55) title = 'Train smart';
-  else title = 'Recovery day';
+  else if (score >= 55) title = 'Train smart today';
+  else title = 'Take a recovery day';
 
   let sub;
   if (recovering.length === 0) {
-    sub = 'Every muscle group is fully recovered.';
+    sub = 'Every muscle group has recovered.';
   } else {
-    const names = recovering.slice(0, 2).map(m => m.display_name);
+    const names = recovering.slice(0, 2).map((m, i) => (i === 0 ? m.display_name : m.display_name.toLowerCase()));
     const extra = recovering.length - names.length;
-    sub = names.join(' & ') + (extra > 0 ? ` +${extra} more` : '') + ' still recovering.';
+    const verb = names.length > 1 ? 'are' : 'is';
+    sub = `${names.join(' and ')} ${verb} still recovering${extra > 0 ? `, plus ${extra} more` : ''}.`;
   }
 
   return { score, title, sub };

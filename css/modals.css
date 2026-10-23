@@ -10,10 +10,10 @@
   align-items: center;
   justify-content: center;
   padding: var(--sp-4);
-  background: rgba(5, 5, 6, 0.7);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  animation: fade 0.25s var(--ease);
+  background: rgba(6, 8, 22, 0.72);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: fade 0.2s var(--ease);
 }
 
 .modal-panel {
@@ -24,15 +24,15 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--surface-solid);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
-  animation: modal-in 0.4s var(--ease);
+  background: var(--deep);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-card);
+  box-shadow: 0 40px 90px -20px rgba(0, 0, 10, 0.75);
+  animation: modal-in 0.35s var(--ease-out);
 }
 
 @keyframes modal-in {
-  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
   to   { opacity: 1; transform: none; }
 }
 
@@ -42,12 +42,12 @@
   justify-content: space-between;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-5) var(--sp-4) var(--sp-3) var(--sp-5);
+  padding: var(--sp-5) var(--sp-4) var(--sp-4) var(--sp-6);
 }
 
 .modal-header .panel-label {
   margin: 0;
-  font-size: 26px;
+  font-size: 20px;
 }
 
 .modal-close {
@@ -57,33 +57,31 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: var(--r-ctl);
   font-size: 22px;
   line-height: 1;
-  color: var(--ink-2);
-  background: var(--surface-2);
-  transition: color 0.2s var(--ease), background 0.2s var(--ease), transform 0.3s var(--ease);
+  color: var(--ice-3);
+  transition: color 0.2s var(--ease), background-color 0.2s var(--ease);
 }
 
 @media (hover: hover) {
   .modal-close:hover {
-    color: var(--ink);
-    background: var(--surface-3);
-    transform: rotate(90deg);
+    color: var(--ice);
+    background: var(--raised);
   }
 }
 
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: var(--sp-2);
   margin-top: var(--sp-2);
 }
 
 .modal-actions .primary-btn,
 .modal-actions .modal-cancel-btn {
   min-height: 46px;
-  padding: 0 24px;
+  padding: 0 22px;
 }
 
 /* ---------- 1. EXERCISE PICKER ---------- */
@@ -91,8 +89,8 @@
 .picker-tabs {
   flex-shrink: 0;
   display: flex;
-  gap: var(--sp-2);
-  padding: var(--sp-1) var(--sp-5) var(--sp-3);
+  gap: 6px;
+  padding: 0 var(--sp-6) var(--sp-4);
   overflow-x: auto;
   scrollbar-width: none;
   border-bottom: 1px solid var(--line);
@@ -105,32 +103,34 @@
 .picker-tab {
   flex-shrink: 0;
   min-height: 34px;
-  padding: 0 16px;
+  padding: 0 14px;
   border-radius: var(--r-pill);
-  background: var(--surface-2);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ink-2);
+  border: 1px solid var(--line-strong);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ice-2);
   white-space: nowrap;
-  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  transition: background-color 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
 }
 
 .picker-tab.active {
-  background: var(--volt);
-  color: var(--volt-ink);
+  background: var(--ice);
+  border-color: var(--ice);
+  color: var(--night);
+  font-weight: 600;
 }
 
 @media (hover: hover) {
   .picker-tab:not(.active):hover {
-    background: var(--surface-3);
-    color: var(--ink);
+    background: var(--raised);
+    color: var(--ice);
   }
 }
 
 .picker-list {
   list-style: none;
   margin: 0;
-  padding: var(--sp-2) var(--sp-3);
+  padding: var(--sp-2) var(--sp-3) var(--sp-3);
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
@@ -146,36 +146,32 @@
   justify-content: space-between;
   align-items: center;
   gap: var(--sp-3);
-  min-height: 52px;
-  padding: 10px var(--sp-3);
-  border-radius: var(--r-sm);
+  min-height: 50px;
+  padding: 8px var(--sp-3);
+  border-radius: var(--r-ctl);
   cursor: pointer;
-  transition: background 0.15s var(--ease);
+  transition: background-color 0.15s var(--ease);
 }
 
 .picker-item:active {
-  background: var(--surface-3);
+  background: var(--raised-2);
 }
 
 @media (hover: hover) {
   .picker-item:hover {
-    background: var(--surface-2);
+    background: var(--raised);
   }
 }
 
 .picker-item-name {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 560;
 }
 
 .picker-item-meta {
   flex-shrink: 0;
-  padding: 3px 10px;
-  border-radius: var(--r-pill);
-  background: var(--surface-2);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--ink-3);
+  font-size: 13px;
+  color: var(--ice-3);
 }
 
 /* ---------- 2. WEIGHT HELP TOOLTIP ---------- */
@@ -183,18 +179,17 @@
 .weight-help-tooltip {
   position: fixed;
   z-index: var(--z-tooltip);
-  width: 240px;
+  width: 250px;
   max-width: calc(100vw - 16px);
   padding: var(--sp-3) 14px;
-  background: var(--surface-3);
+  background: var(--raised);
   border: 1px solid var(--line-strong);
-  border-radius: var(--r-md);
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: var(--r-ctl);
+  font-size: 14px;
   line-height: 1.5;
-  color: var(--ink);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
-  animation: rise 0.25s var(--ease);
+  color: var(--ice);
+  box-shadow: 0 20px 44px -12px rgba(0, 0, 10, 0.7);
+  animation: settle 0.2s var(--ease-out);
 }
 
 /* ---------- 3. PROFILE & AUTH FORMS ---------- */
@@ -204,14 +199,14 @@
 }
 
 .auth-modal-panel {
-  max-width: 410px;
+  max-width: 420px;
 }
 
 .profile-form {
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
-  padding: var(--sp-3) var(--sp-5) var(--sp-5);
+  padding: var(--sp-2) var(--sp-6) var(--sp-6);
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -223,14 +218,14 @@
 }
 
 .profile-field label {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 560;
+  color: var(--ice-2);
 }
 
 .profile-optional {
-  font-weight: 500;
-  color: var(--ink-3);
+  font-weight: 450;
+  color: var(--ice-3);
 }
 
 .profile-field input,
@@ -241,28 +236,28 @@
 .auth-tabs {
   display: flex;
   gap: 2px;
-  padding: 4px;
-  background: var(--surface-2);
-  border-radius: var(--r-pill);
+  padding: 3px;
+  border: 1px solid var(--line-strong);
+  border-radius: calc(var(--r-ctl) + 3px);
 }
 
 .auth-tab {
   min-height: 36px;
-  padding: 0 18px;
-  border-radius: var(--r-pill);
+  padding: 0 16px;
+  border-radius: var(--r-ctl);
   font-size: 14px;
-  font-weight: 700;
-  color: var(--ink-2);
-  transition: background 0.25s var(--ease), color 0.25s var(--ease);
+  font-weight: 560;
+  color: var(--ice-2);
+  transition: background-color 0.25s var(--ease), color 0.25s var(--ease);
 }
 
 .auth-tab.active {
-  background: var(--volt);
-  color: var(--volt-ink);
+  background: var(--ice);
+  color: var(--night);
 }
 
 @media (hover: hover) {
   .auth-tab:not(.active):hover {
-    color: var(--ink);
+    color: var(--ice);
   }
 }

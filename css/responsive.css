@@ -1,6 +1,6 @@
 /* ============================================================
-   RECOVERY — Responsive Layout & Mobile Engine
-   Breakpoints:  ≥1100 two columns  ·  720–1099 stacked  ·  <720 phone
+   RECOVERY — Responsive Layout
+   Breakpoints:  >=1100 two columns  ·  720-1099 stacked  ·  <720 phone
    ============================================================ */
 
 /* ---------- TABLET / STACKED (< 1100px) ---------- */
@@ -8,7 +8,7 @@
 @media (max-width: 1099px) {
   .hud-grid {
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--sp-4);
+    gap: var(--sp-8);
   }
 
   .hologram-panel {
@@ -17,16 +17,17 @@
   }
 
   .hologram-svg {
-    height: clamp(280px, 42vh, 420px);
+    height: clamp(340px, 52vh, 500px);
   }
 
   .hud-dock {
     position: sticky;
-    top: calc(var(--sp-2) + var(--safe-top));
+    top: var(--safe-top);
     z-index: var(--z-sticky);
-    background: rgba(21, 21, 23, 0.88);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
+    max-width: none;
+    background: rgba(11, 14, 36, 0.9);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
   }
 }
 
@@ -34,14 +35,14 @@
 
 @media (max-width: 719px) {
   :root {
-    --page-gutter: 14px;
+    --page-gutter: 16px;
   }
 
   body {
-    padding-bottom: calc(var(--dock-height) + var(--safe-bottom) + var(--sp-5));
+    padding-bottom: calc(var(--dock-height) + var(--safe-bottom) + var(--sp-6));
   }
 
-  /* Evita o auto-zoom do iOS ao focar campos */
+  /* Stops iOS zooming in when a field is focused */
   input[type="text"],
   input[type="email"],
   input[type="password"],
@@ -52,18 +53,14 @@
     font-size: 16px;
   }
 
-  .history-action-btn {
-    min-height: 40px;
-    flex: 1;
-  }
-
   /* Header */
   .hud-header {
-    margin-bottom: var(--sp-4);
+    padding-bottom: var(--sp-4);
+    margin-bottom: var(--sp-5);
   }
 
   .hud-brand {
-    font-size: 30px;
+    font-size: 22px;
   }
 
   .hud-clock,
@@ -74,49 +71,59 @@
   .hud-header-actions .hud-action-btn,
   .hud-header-actions .hud-action-btn-subtle {
     min-height: 38px;
-    padding: 0 14px;
-    font-size: 13px;
+    padding: 0 12px;
+    font-size: 14px;
   }
 
   /* Cards */
   .panel {
-    border-radius: 20px;
-    padding: 18px;
+    padding: 20px 18px;
+  }
+
+  /* The body column stays frameless on phones too */
+  .hologram-panel {
+    padding: 0;
   }
 
   .panel-label {
-    font-size: 22px;
+    font-size: 19px;
   }
 
-  /* Body card compacto e recolhível */
-  .score-ring {
-    width: 72px;
-    height: 72px;
+  /* Verdict + collapsible body map */
+  .readiness-hero {
+    gap: var(--sp-4);
   }
 
   .score-value {
-    font-size: 28px;
+    font-size: 60px;
   }
 
   .score-value small {
-    font-size: 12px;
-    margin-top: 6px;
+    font-size: 20px;
+  }
+
+  .readiness-copy {
+    padding-left: var(--sp-4);
   }
 
   .readiness-title {
-    font-size: 26px;
+    font-size: 19px;
   }
 
   .readiness-sub {
-    font-size: 12px;
+    font-size: 13px;
   }
 
   #hologram-collapse-btn {
     display: inline-flex;
   }
 
+  .hologram-stage {
+    margin-top: var(--sp-4);
+  }
+
   .hologram-svg {
-    height: clamp(230px, 38vh, 330px);
+    height: clamp(300px, 46vh, 420px);
   }
 
   .hologram-panel.collapsed .hologram-stage,
@@ -133,56 +140,37 @@
     right: 0;
     bottom: 0;
     z-index: var(--z-dock);
-    padding: 8px calc(8px + var(--safe-right)) calc(8px + var(--safe-bottom)) calc(8px + var(--safe-left));
-    background: rgba(13, 13, 14, 0.9);
-    -webkit-backdrop-filter: blur(18px) saturate(1.4);
-    backdrop-filter: blur(18px) saturate(1.4);
-    border: 0;
-    border-top: 1px solid var(--line);
-    border-radius: 0;
+    margin: 0;
+    padding: 6px calc(6px + var(--safe-right)) calc(6px + var(--safe-bottom)) calc(6px + var(--safe-left));
+    background: rgba(11, 14, 36, 0.94);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+    backdrop-filter: blur(16px) saturate(1.3);
+    box-shadow: inset 0 1px 0 var(--line);
   }
 
   .dock-indicator {
-    display: none;
+    top: 0;
+    bottom: auto;
+    left: 6px;
+    width: calc((100% - 12px) / 4);
+    background: linear-gradient(90deg, transparent 30%, var(--ice) 30%, var(--ice) 70%, transparent 70%);
   }
 
   .hud-dock-btn {
     flex-direction: column;
-    gap: 4px;
-    min-height: calc(var(--dock-height) - 16px);
-    padding: 0;
-    border-radius: var(--r-sm);
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--ink-3);
-  }
-
-  .dock-icon-wrap {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 54px;
-    height: 30px;
-    border-radius: var(--r-pill);
-    transition: background 0.35s var(--ease), color 0.35s var(--ease), transform 0.35s var(--ease-spring);
+    gap: 3px;
+    min-height: calc(var(--dock-height) - 12px);
+    font-size: 12px;
+    font-stretch: var(--normal);
+    font-weight: 560;
   }
 
   .dock-icon {
-    width: 20px;
-    height: 20px;
+    width: 21px;
+    height: 21px;
   }
 
-  .hud-dock-btn.active {
-    color: var(--ink);
-  }
-
-  .hud-dock-btn.active .dock-icon-wrap {
-    background: var(--volt);
-    color: var(--volt-ink);
-    transform: scale(1.04);
-  }
-
-  /* Set rows → cartões de duas linhas */
+  /* Set rows become two-line cards */
   .planner-columns-header {
     display: none;
   }
@@ -195,8 +183,8 @@
     gap: 12px var(--sp-2);
     padding: 12px;
     margin-bottom: 10px;
-    background: var(--surface-2);
-    border-radius: var(--r-md);
+    background: var(--raised);
+    border-radius: var(--r-ctl);
   }
 
   .planner-set-row {
@@ -208,13 +196,13 @@
 
   .set-row input {
     padding: 0 6px;
-    background: var(--surface-3);
+    background: var(--raised-2);
   }
 
   .set-row .exercise-picker-btn          { grid-area: ex; min-height: 48px; }
-  .set-row .exercise-picker-btn.selected { background: var(--surface-3); }
+  .set-row .exercise-picker-btn.selected { background: var(--raised-2); }
   .set-row .remove-set-btn               { grid-area: rm; width: var(--tap); height: var(--tap); align-self: center; }
-  .set-row .weight-help-btn              { grid-area: help; align-self: end; width: 36px; height: 36px; margin-bottom: 6px; background: var(--surface-3); }
+  .set-row .weight-help-btn              { grid-area: help; align-self: end; width: 36px; height: 36px; margin-bottom: 6px; }
   .set-row [data-field="sets"]           { grid-area: sets; }
   .set-row [data-field="reps"]           { grid-area: reps; }
   .set-row [data-field="weight"]         { grid-area: weight; }
@@ -228,13 +216,12 @@
     clip: auto;
     display: block;
     margin-bottom: 5px;
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 12px;
     text-align: center;
-    color: var(--ink-3);
+    color: var(--ice-3);
   }
 
-  /* Ações de formulário */
+  /* Form actions */
   .log-actions .ghost-btn {
     flex: 1 1 0;
     min-height: 46px;
@@ -269,32 +256,45 @@
     min-height: 48px;
   }
 
-  /* Analytics */
+  /* Progress */
   .analytics-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .analytics-card {
-    padding: var(--sp-4);
-  }
-
   .volume-chart {
-    height: 150px;
+    height: 156px;
   }
 
   .volume-bar-track {
-    height: 92px;
+    height: 96px;
   }
 
   .volume-bar-val {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .volume-bar-label {
-    font-size: 10px;
+    font-size: 11px;
   }
 
-  /* Modais → bottom sheets */
+  /* Session log stacks */
+  .history-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "date  actions"
+      "title title"
+      "sets  sets";
+  }
+
+  .history-card-actions {
+    opacity: 1;
+  }
+
+  .history-action-btn {
+    min-height: 36px;
+  }
+
+  /* Modals become bottom sheets */
   .modal-overlay {
     align-items: flex-end;
     padding: 0;
@@ -305,23 +305,27 @@
     max-height: 92vh;
     max-height: 92dvh;
     border-bottom: 0;
-    border-radius: 26px 26px 0 0;
-    animation: sheet-in 0.45s var(--ease);
+    border-radius: 20px 20px 0 0;
+    animation: sheet-in 0.4s var(--ease-out);
   }
 
   .modal-panel::before {
     content: "";
     flex-shrink: 0;
     align-self: center;
-    width: 40px;
-    height: 5px;
+    width: 36px;
+    height: 4px;
     margin-top: 10px;
     border-radius: var(--r-pill);
-    background: var(--surface-3);
+    background: var(--raised-2);
   }
 
   .modal-header {
     padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-5);
+  }
+
+  .picker-tabs {
+    padding: 0 var(--sp-5) var(--sp-3);
   }
 
   .modal-close {
@@ -352,20 +356,15 @@
 
 @media (max-width: 379px) {
   .hud-brand {
-    font-size: 26px;
+    font-size: 20px;
   }
 
-  .score-ring {
-    width: 64px;
-    height: 64px;
+  .score-value {
+    font-size: 52px;
   }
 
   .readiness-title {
-    font-size: 23px;
-  }
-
-  .dock-icon-wrap {
-    width: 48px;
+    font-size: 18px;
   }
 }
 
@@ -379,5 +378,6 @@
     animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
   }
 }

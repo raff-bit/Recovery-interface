@@ -1,16 +1,17 @@
 /* ============================================================
-   RECOVERY — Functional Panels
+   RECOVERY — Panels: readiness ledger, logging, planner,
+   progress and session log
    ============================================================ */
 
-/* ---------- 1. MUSCLE READINESS LIST ---------- */
+/* ---------- 1. MUSCLE READINESS LEDGER ---------- */
 
 .muscle-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-  column-gap: var(--sp-8);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  column-gap: var(--sp-10);
 }
 
 .muscle-list > p {
@@ -18,26 +19,27 @@
 }
 
 .muscle-row {
+  --heat: var(--ice);
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
-  gap: 10px var(--sp-3);
-  padding: 14px 0;
+  gap: 8px var(--sp-3);
+  padding: 13px 0 14px;
   border-bottom: 1px solid var(--line);
-  animation: rise 0.5s var(--ease) both;
-  animation-delay: calc(var(--i, 0) * 25ms);
+  animation: fade 0.5s var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 30ms);
+  transition: background-color 0.2s var(--ease);
 }
 
 .muscle-row-main {
   display: flex;
   flex-direction: column;
-  gap: 1px;
   min-width: 0;
 }
 
 .muscle-row-name {
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 560;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -45,48 +47,46 @@
 }
 
 .muscle-row-status {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-3);
+  font-size: 12.5px;
+  color: var(--ice-3);
 }
 
 .muscle-row-value {
-  font-family: var(--font-display);
   font-size: 30px;
-  font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -0.3px;
+  font-stretch: var(--narrow);
+  font-weight: 700;
+  line-height: 0.85;
+  color: var(--heat);
 }
 
 .muscle-row-value small {
   margin-left: 1px;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--ink-3);
+  font-size: 15px;
+  font-weight: 600;
+  opacity: 0.6;
 }
 
 .muscle-row-bar-track {
   grid-column: 1 / -1;
-  height: 6px;
-  background: var(--surface-3);
-  border-radius: var(--r-pill);
+  height: 2px;
+  background: var(--raised);
   overflow: hidden;
 }
 
 .muscle-row-bar-fill {
   height: 100%;
-  border-radius: var(--r-pill);
+  background: var(--heat);
   transform-origin: left;
-  animation: grow-x 1.1s var(--ease) both;
-  animation-delay: calc(120ms + var(--i, 0) * 35ms);
-  transition: width 0.6s var(--ease), background 0.4s var(--ease);
+  animation: grow-x 1.1s var(--ease-out) both;
+  animation-delay: calc(150ms + var(--i, 0) * 35ms);
+  transition: width 0.6s var(--ease);
 }
 
 .muscle-row.is-focus .muscle-row-name {
-  color: var(--volt);
+  color: var(--heat);
 }
 
-/* ---------- 2. SET ROWS (WORKOUT + PLANNER) ---------- */
+/* ---------- 2. SET ROWS (LOG + PLANNER) ---------- */
 
 #workout-label {
   margin-bottom: var(--sp-4);
@@ -98,7 +98,7 @@
   gap: var(--sp-2);
   align-items: center;
   margin-bottom: var(--sp-2);
-  animation: rise 0.4s var(--ease) both;
+  animation: settle 0.3s var(--ease-out) both;
 }
 
 .planner-set-row,
@@ -111,7 +111,7 @@
   min-width: 0;
 }
 
-/* Etiquetas por campo: escondidas no desktop, visíveis em telemóvel */
+/* Per-field labels: hidden on desktop (the column header does the job), shown on phones */
 .set-field-label {
   position: absolute;
   width: 1px;
@@ -123,13 +123,14 @@
 
 .set-row input {
   text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .exercise-picker-btn {
   width: 100%;
   min-width: 0;
   min-height: 44px;
-  padding: 0 14px;
+  padding: 0 12px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -137,96 +138,92 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: left;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink-3);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ice-3);
   background: transparent;
-  border: 1.5px dashed var(--line-strong);
-  border-radius: var(--r-sm);
-  transition: border-color 0.2s var(--ease), color 0.2s var(--ease), background 0.2s var(--ease);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-ctl);
+  transition: border-color 0.2s var(--ease), color 0.2s var(--ease), background-color 0.2s var(--ease);
 }
 
 .exercise-picker-btn::before {
   content: "+";
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: var(--volt-a16);
-  color: var(--volt);
-  font-size: 15px;
-  font-weight: 800;
+  border: 1px solid var(--line-strong);
+  font-size: 14px;
+  line-height: 1;
 }
 
 .exercise-picker-btn.selected {
-  color: var(--ink);
-  font-weight: 700;
-  background: var(--surface-2);
-  border: 1.5px solid transparent;
+  color: var(--ice);
+  font-weight: 560;
+  background: var(--raised);
+  border: 1px solid transparent;
 }
 
 .exercise-picker-btn.selected::before {
-  content: "✓";
-  font-size: 11px;
-  background: var(--volt);
-  color: var(--volt-ink);
+  display: none;
 }
 
 @media (hover: hover) {
   .exercise-picker-btn:hover {
-    border-color: var(--volt-a30);
-    color: var(--ink);
+    border-color: var(--ice-3);
+    color: var(--ice);
   }
 }
 
 .weight-help-btn {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: var(--surface-2);
-  color: var(--ink-2);
-  font-size: 13px;
-  font-weight: 800;
+  border: 1px solid var(--line-strong);
+  color: var(--ice-3);
+  font-size: 12px;
+  font-weight: 650;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   justify-self: center;
-  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
 }
 
 @media (hover: hover) {
   .weight-help-btn:hover {
-    background: var(--surface-3);
-    color: var(--ink);
+    background: var(--raised);
+    color: var(--ice);
   }
 }
 
-/* ---------- 3. FORM ACTIONS & FEEDBACK ---------- */
+/* ---------- 3. ACTIONS & FEEDBACK ---------- */
 
 .log-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--sp-2);
-  margin-top: var(--sp-4);
+  margin-top: var(--sp-5);
 }
 
 .log-actions .primary-btn {
   margin-left: auto;
   min-height: 46px;
-  padding: 0 26px;
+  padding: 0 24px;
 }
 
 .log-feedback {
   margin: var(--sp-3) 0 0;
-  font-size: 13px;
-  font-weight: 600;
-  min-height: 18px;
+  font-size: 14px;
+  font-weight: 500;
+  min-height: 20px;
 }
 
 .log-feedback:empty {
@@ -234,23 +231,33 @@
   margin: 0;
 }
 
-.log-feedback.success { color: var(--volt); }
-.log-feedback.error   { color: var(--danger); }
+.log-feedback.success { color: var(--ice); }
+.log-feedback.success::before { content: "✓  "; color: var(--flare); }
+.log-feedback.error   { color: var(--ember-ink); }
 
 /* ---------- 4. PLANNER ---------- */
+
+.planner-hint {
+  margin: calc(var(--sp-2) * -1) 0 var(--sp-5);
+  max-width: 62ch;
+  font-size: 14px;
+  color: var(--ice-2);
+}
 
 .planner-controls {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--sp-3);
-  margin-bottom: var(--sp-2);
+  margin-bottom: var(--sp-5);
+  padding-bottom: var(--sp-5);
+  border-bottom: 1px solid var(--line);
 }
 
 .planner-date-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 560;
+  color: var(--ice-2);
 }
 
 #planner-date {
@@ -262,21 +269,14 @@
   margin-left: auto;
 }
 
-.planner-hint {
-  margin: 0 0 var(--sp-5);
-  max-width: 60ch;
-}
-
 .planner-columns-header {
   display: grid;
   gap: var(--sp-2);
   padding: 0 2px 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 500;
   text-align: center;
-  color: var(--ink-3);
+  color: var(--ice-3);
 }
 
 .planner-columns-header span:first-child {
@@ -284,7 +284,7 @@
 }
 
 .planner-results {
-  margin-top: var(--sp-5);
+  margin-top: var(--sp-6);
 }
 
 .planner-results:empty {
@@ -292,9 +292,9 @@
 }
 
 .planner-results > p {
-  margin: 0 0 var(--sp-1);
-  font-weight: 700;
-  color: var(--ink-2);
+  grid-column: 1 / -1;
+  font-weight: 560;
+  color: var(--ice-2);
 }
 
 .planner-result-row {
@@ -305,57 +305,60 @@
   display: inline-flex;
   align-items: baseline;
   gap: var(--sp-2);
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 800;
+  font-size: 26px;
+  font-stretch: var(--narrow);
+  font-weight: 700;
   white-space: nowrap;
 }
 
 .planner-result-values .arrow {
-  font-family: var(--font-ui);
+  font-stretch: var(--normal);
   font-size: 14px;
-  color: var(--ink-3);
+  color: var(--ice-3);
 }
 
 .planner-result-values .before {
-  font-size: 18px;
-  opacity: 0.55;
+  font-size: 19px;
+  opacity: 0.6;
 }
 
-/* ---------- 5. ANALYTICS ---------- */
+/* ---------- 5. PROGRESS ----------
+   Sections divided by rules rather than boxed into more cards. */
 
 .analytics-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-3);
+  gap: 0 var(--sp-10);
 }
 
 .analytics-card {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  padding: var(--sp-5);
-  background: var(--surface-2);
-  border-radius: var(--r-md);
+  padding: var(--sp-5) 0 var(--sp-2);
+  border-top: 1px solid var(--line);
 }
 
 .analytics-card:first-child {
   grid-column: 1 / -1;
+  padding-top: 0;
+  padding-bottom: var(--sp-6);
+  border-top: 0;
 }
 
 .analytics-card-title {
   margin-bottom: var(--sp-4);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 560;
+  color: var(--ice-2);
 }
 
 .volume-chart {
   display: grid;
   grid-template-columns: repeat(8, minmax(0, 1fr));
-  gap: clamp(6px, 1.6vw, 14px);
+  gap: clamp(8px, 2vw, 18px);
   align-items: end;
-  height: 170px;
+  height: 180px;
 }
 
 .volume-chart > p {
@@ -369,66 +372,60 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: flex-end;
 }
 
 .volume-bar-val {
   margin-bottom: 6px;
-  min-height: 18px;
-  font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 800;
-  color: var(--ink-2);
+  min-height: 20px;
+  font-size: 18px;
+  font-stretch: var(--narrow);
+  font-weight: 700;
+  color: var(--ice-3);
 }
 
 .volume-bar-track {
   width: 100%;
-  max-width: 44px;
-  height: 110px;
+  height: 118px;
   display: flex;
   align-items: flex-end;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 8px;
-  overflow: hidden;
+  border-bottom: 1px solid var(--line-strong);
 }
 
 .volume-bar-fill {
   width: 100%;
-  min-height: 3px;
-  background: var(--surface-3);
-  border-radius: 8px;
+  min-height: 2px;
+  background: #3b3f86;
   transform-origin: bottom;
-  animation: grow-y 1s var(--ease) both;
+  animation: grow-y 0.9s var(--ease-out) both;
   transition: height 0.6s var(--ease);
 }
 
-.volume-bar-col:nth-child(1) .volume-bar-fill { animation-delay: 0.05s; }
-.volume-bar-col:nth-child(2) .volume-bar-fill { animation-delay: 0.1s; }
-.volume-bar-col:nth-child(3) .volume-bar-fill { animation-delay: 0.15s; }
-.volume-bar-col:nth-child(4) .volume-bar-fill { animation-delay: 0.2s; }
-.volume-bar-col:nth-child(5) .volume-bar-fill { animation-delay: 0.25s; }
-.volume-bar-col:nth-child(6) .volume-bar-fill { animation-delay: 0.3s; }
-.volume-bar-col:nth-child(7) .volume-bar-fill { animation-delay: 0.35s; }
-.volume-bar-col:nth-child(8) .volume-bar-fill { animation-delay: 0.4s; }
+.volume-bar-col:nth-child(1) .volume-bar-fill { animation-delay: 0.04s; }
+.volume-bar-col:nth-child(2) .volume-bar-fill { animation-delay: 0.08s; }
+.volume-bar-col:nth-child(3) .volume-bar-fill { animation-delay: 0.12s; }
+.volume-bar-col:nth-child(4) .volume-bar-fill { animation-delay: 0.16s; }
+.volume-bar-col:nth-child(5) .volume-bar-fill { animation-delay: 0.2s; }
+.volume-bar-col:nth-child(6) .volume-bar-fill { animation-delay: 0.24s; }
+.volume-bar-col:nth-child(7) .volume-bar-fill { animation-delay: 0.28s; }
+.volume-bar-col:nth-child(8) .volume-bar-fill { animation-delay: 0.32s; }
 
-/* A semana atual em destaque */
+/* This week runs hot */
 .volume-bar-col:last-child .volume-bar-fill {
-  background: var(--volt);
+  background: var(--flare);
 }
 
 .volume-bar-col:last-child .volume-bar-val,
 .volume-bar-col:last-child .volume-bar-label {
-  color: var(--ink);
+  color: var(--ice);
 }
 
 .volume-bar-label {
   margin-top: 8px;
   width: 100%;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--ink-3);
-  text-align: center;
+  font-size: 12px;
+  color: var(--ice-3);
   white-space: nowrap;
   overflow: hidden;
 }
@@ -436,7 +433,7 @@
 .balance-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 13px;
 }
 
 .balance-item {
@@ -453,30 +450,27 @@
 }
 
 .balance-region-name {
-  font-weight: 700;
+  font-weight: 560;
   text-transform: capitalize;
 }
 
 .balance-region-meta {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-3);
+  font-size: 13px;
+  color: var(--ice-3);
   white-space: nowrap;
 }
 
 .balance-bar-track {
-  height: 6px;
-  background: var(--surface-3);
-  border-radius: var(--r-pill);
+  height: 3px;
+  background: var(--raised);
   overflow: hidden;
 }
 
 .balance-bar-fill {
   height: 100%;
-  background: var(--volt);
-  border-radius: var(--r-pill);
+  background: #8f86e8;
   transform-origin: left;
-  animation: grow-x 1s 0.15s var(--ease) both;
+  animation: grow-x 0.9s 0.15s var(--ease-out) both;
 }
 
 .top-exercises-list {
@@ -489,10 +483,10 @@
 
 .top-exercise-item {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: var(--sp-3);
-  padding: 10px 0;
+  padding: 9px 0;
   border-bottom: 1px solid var(--line);
 }
 
@@ -502,27 +496,27 @@
 
 .top-exercise-left {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--sp-3);
   min-width: 0;
 }
 
 .top-exercise-rank {
   flex-shrink: 0;
-  width: 28px;
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--ink-3);
+  width: 26px;
+  font-size: 17px;
+  font-stretch: var(--narrow);
+  font-weight: 700;
+  color: var(--ice-3);
 }
 
 .top-exercise-item:first-child .top-exercise-rank {
-  color: var(--volt);
+  color: var(--ice);
 }
 
 .top-exercise-name {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -530,78 +524,83 @@
 
 .top-exercise-sets {
   flex-shrink: 0;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ink-3);
+  font-size: 13px;
+  color: var(--ice-3);
 }
 
-/* ---------- 6. RECENT SESSIONS ---------- */
+/* ---------- 6. SESSION LOG ----------
+   A log, not a wall of cards: date | what you did | actions */
 
 .history-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-  gap: var(--sp-3);
+  display: flex;
+  flex-direction: column;
 }
 
 .history-list > p {
-  grid-column: 1 / -1;
+  margin: 0;
 }
 
 .history-card {
-  display: flex;
-  flex-direction: column;
-  padding: 18px;
-  background: var(--surface-2);
-  border-radius: var(--r-md);
-  animation: rise 0.5s var(--ease) both;
-  transition: background 0.2s var(--ease);
+  display: grid;
+  grid-template-columns: 116px minmax(0, 1fr) auto;
+  grid-template-areas:
+    "date title actions"
+    "date sets  actions";
+  column-gap: var(--sp-6);
+  row-gap: 4px;
+  padding: var(--sp-4) 0;
+  border-top: 1px solid var(--line);
+  animation: fade 0.4s var(--ease) both;
 }
 
-@media (hover: hover) {
-  .history-card:hover {
-    background: var(--surface-3);
-  }
-}
-
-.history-card-title {
-  order: 2;
-  margin-bottom: 10px;
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 800;
-  line-height: 1;
-  text-transform: uppercase;
+.history-card:first-child {
+  border-top: 0;
+  padding-top: 0;
 }
 
 .history-card-date {
-  order: 1;
-  margin-bottom: 4px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ink-3);
+  grid-area: date;
+  padding-top: 2px;
+  font-size: 13px;
+  color: var(--ice-3);
+}
+
+.history-card-title {
+  grid-area: title;
+  font-size: 17px;
+  font-stretch: var(--wide);
+  font-weight: 600;
+  line-height: 1.25;
 }
 
 .history-card-sets {
-  order: 3;
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--ink-2);
+  grid-area: sets;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ice-2);
 }
 
 .history-card-sets strong {
-  color: var(--ink);
-  font-weight: 700;
+  color: var(--ice);
+  font-weight: 560;
 }
 
 .history-card-actions {
-  order: 4;
+  grid-area: actions;
   display: flex;
-  gap: var(--sp-2);
-  margin-top: auto;
-  padding-top: var(--sp-4);
+  align-items: flex-start;
+  gap: var(--sp-1);
+  opacity: 0.75;
+  transition: opacity 0.2s var(--ease);
+}
+
+@media (hover: hover) {
+  .history-card:hover .history-card-actions {
+    opacity: 1;
+  }
 }
 
 /* ---------- 7. EMPTY STATES ---------- */
@@ -611,7 +610,6 @@
 .picker-list > p,
 .balance-list > p,
 .top-exercises-list > p {
-  margin: 0;
   padding: var(--sp-4) 0;
-  color: var(--ink-3);
+  color: var(--ice-3);
 }

@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0d0d0e">
+<meta name="theme-color" content="#0b0e24">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Recovery</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="booting">
 
 <div id="boot-screen" class="boot-screen">
-  <div class="boot-mark">recovery<span>.</span></div>
+  <div class="boot-mark">recovery</div>
   <div class="boot-bar-track"><div class="boot-bar-fill" id="boot-bar-fill"></div></div>
   <div class="boot-status" id="boot-status"></div>
 </div>
@@ -23,18 +23,18 @@
 <div class="hud-frame pre-reveal" id="hud-frame">
 
   <header class="hud-header">
-    <div class="hud-brand">recovery<span class="hud-brand-dot">.</span></div>
+    <div class="hud-brand">recovery</div>
 
     <div class="hud-header-actions">
       <div class="hud-clock" id="clock"></div>
       <div id="auth-header-logged" style="display:none; align-items:center; gap:8px;">
         <span id="auth-user-name" class="hud-user-tag">--</span>
-        <button type="button" id="logout-btn" class="hud-action-btn-subtle" title="Sign out">Log out</button>
+        <button type="button" id="logout-btn" class="hud-action-btn-subtle">Log out</button>
       </div>
       <button type="button" id="login-open-btn" class="hud-action-btn" style="display:none">Sign in</button>
       <button type="button" id="profile-btn" class="hud-action-btn">
         <span class="profile-avatar" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
         </span>
         Profile
         <span id="profile-indicator" class="profile-dot" style="display:none"></span>
@@ -44,20 +44,13 @@
 
   <main class="hud-grid">
 
-    <!-- COLUNA ESQUERDA: SCORE DE PRONTIDÃO + MAPA CORPORAL -->
-    <section class="panel hologram-panel" id="hologram-panel">
+    <!-- LEFT: READINESS + BODY MAP -->
+    <section class="panel hologram-panel" id="hologram-panel" aria-label="Body scan">
       <div class="readiness-hero">
-        <div class="score-ring">
-          <svg viewBox="0 0 120 120" aria-hidden="true">
-            <circle class="score-track" cx="60" cy="60" r="52"/>
-            <circle class="score-progress" id="score-progress" cx="60" cy="60" r="52"/>
-          </svg>
-          <div class="score-value"><span id="score-value">0</span><small>%</small></div>
-        </div>
+        <div class="score-value"><span id="score-value">0</span><small>%</small></div>
         <div class="readiness-copy">
-          <div class="readiness-kicker" id="readiness-kicker">Today</div>
-          <div class="readiness-title" id="readiness-title">Scanning</div>
-          <div class="readiness-sub" id="readiness-sub">&nbsp;</div>
+          <h1 class="readiness-title" id="readiness-title">Scanning</h1>
+          <p class="readiness-sub" id="readiness-sub">&nbsp;</p>
         </div>
         <button type="button" id="hologram-collapse-btn" aria-expanded="true" aria-controls="hologram-stage" title="Hide body map">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>
@@ -66,166 +59,25 @@
 
       <div class="hologram-stage" id="hologram-stage">
         <div class="body-tip" id="body-tip" aria-hidden="true"></div>
-        <div class="hologram-rotator" id="hologram-rotator">
-
-          <!-- MALE FRONT VIEW -->
-          <svg id="body-front" class="hologram-svg hologram-face front" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg">
-            <g class="hud-marker">
-              <path d="M 12 12 L 26 12 M 12 12 L 12 26"/>
-              <path d="M 228 12 L 214 12 M 228 12 L 228 26"/>
-              <path d="M 12 420 L 26 420 M 12 420 L 12 406"/>
-              <path d="M 228 420 L 214 420 M 228 420 L 228 406"/>
-              <path d="M 22 140 L 30 140 M 26 136 L 26 144"/>
-              <path d="M 214 140 L 222 140 M 218 136 L 218 144"/>
-            </g>
-            <g class="body-outline">
-              <circle cx="120" cy="35" r="24"/>
-              <path d="M100 58 L100 74 L140 74 L140 58 Z"/>
-              <path d="M70 80 Q120 68 170 80 L178 188 Q120 202 62 188 Z"/>
-              <path d="M62 188 Q60 225 66 258 L94 258 Q90 220 70 188 Z"/>
-              <path d="M178 188 Q180 225 174 258 L146 258 Q150 220 170 188 Z"/>
-            </g>
-            <ellipse class="muscle-shape" data-muscle="front_delts" cx="68" cy="92" rx="15" ry="17"><title>Front Delts</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="front_delts" cx="172" cy="92" rx="15" ry="17"><title>Front Delts</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="side_delts" cx="54" cy="95" rx="9" ry="15"><title>Side Delts</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="side_delts" cx="186" cy="95" rx="9" ry="15"><title>Side Delts</title></ellipse>
-            <path class="muscle-shape" data-muscle="upper_chest" d="M90 82 L118 82 L118 112 L92 108 Z"><title>Upper Chest</title></path>
-            <path class="muscle-shape" data-muscle="upper_chest" d="M150 82 L122 82 L122 112 L148 108 Z"><title>Upper Chest</title></path>
-            <path class="muscle-shape" data-muscle="lower_chest" d="M92 110 L118 114 L118 140 L96 136 Z"><title>Lower Chest</title></path>
-            <path class="muscle-shape" data-muscle="lower_chest" d="M148 110 L122 114 L122 140 L144 136 Z"><title>Lower Chest</title></path>
-            <ellipse class="muscle-shape" data-muscle="biceps" cx="52" cy="140" rx="13" ry="30"><title>Biceps</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="biceps" cx="188" cy="140" rx="13" ry="30"><title>Biceps</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="forearms" cx="46" cy="195" rx="11" ry="28"><title>Forearms</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="forearms" cx="194" cy="195" rx="11" ry="28"><title>Forearms</title></ellipse>
-            <rect class="muscle-shape" data-muscle="abs" x="108" y="112" width="24" height="18" rx="3"><title>Abs</title></rect>
-            <rect class="muscle-shape" data-muscle="abs" x="108" y="132" width="24" height="18" rx="3"><title>Abs</title></rect>
-            <rect class="muscle-shape" data-muscle="abs" x="108" y="152" width="24" height="18" rx="3"><title>Abs</title></rect>
-            <rect class="muscle-shape" data-muscle="obliques" x="90" y="115" width="14" height="55" rx="4"><title>Obliques</title></rect>
-            <rect class="muscle-shape" data-muscle="obliques" x="136" y="115" width="14" height="55" rx="4"><title>Obliques</title></rect>
-            <ellipse class="muscle-shape" data-muscle="quads" cx="98" cy="270" rx="21" ry="52"><title>Quads</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="quads" cx="142" cy="270" rx="21" ry="52"><title>Quads</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="calves" cx="98" cy="375" rx="15" ry="38"><title>Calves</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="calves" cx="142" cy="375" rx="15" ry="38"><title>Calves</title></ellipse>
-          </svg>
-
-          <!-- MALE BACK VIEW -->
-          <svg id="body-back" class="hologram-svg hologram-face back" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg">
-            <g class="hud-marker">
-              <path d="M 12 12 L 26 12 M 12 12 L 12 26"/>
-              <path d="M 228 12 L 214 12 M 228 12 L 228 26"/>
-            </g>
-            <g class="body-outline">
-              <circle cx="120" cy="35" r="24"/>
-              <path d="M100 58 L100 74 L140 74 L140 58 Z"/>
-              <path d="M70 80 Q120 68 170 80 L178 188 Q120 202 62 188 Z"/>
-              <path d="M62 188 Q60 225 66 258 L94 258 Q90 220 70 188 Z"/>
-              <path d="M178 188 Q180 225 174 258 L146 258 Q150 220 170 188 Z"/>
-            </g>
-            <g class="body-outline-muted">
-              <ellipse cx="52" cy="195" rx="10" ry="26"/>
-              <ellipse cx="188" cy="195" rx="10" ry="26"/>
-              <ellipse cx="98" cy="375" rx="14" ry="36"/>
-              <ellipse cx="142" cy="375" rx="14" ry="36"/>
-            </g>
-            <path class="muscle-shape" data-muscle="traps" d="M100 78 L140 78 L155 100 L120 112 L85 100 Z"><title>Traps</title></path>
-            <ellipse class="muscle-shape" data-muscle="rear_delts" cx="68" cy="92" rx="15" ry="17"><title>Rear Delts</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="rear_delts" cx="172" cy="92" rx="15" ry="17"><title>Rear Delts</title></ellipse>
-            <path class="muscle-shape" data-muscle="lats" d="M85 105 L118 112 L112 175 L78 165 Z"><title>Lats</title></path>
-            <path class="muscle-shape" data-muscle="lats" d="M155 105 L122 112 L128 175 L162 165 Z"><title>Lats</title></path>
-            <rect class="muscle-shape" data-muscle="lower_back" x="102" y="175" width="36" height="35" rx="6"><title>Lower Back</title></rect>
-            <ellipse class="muscle-shape" data-muscle="triceps" cx="52" cy="140" rx="13" ry="30"><title>Triceps</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="triceps" cx="188" cy="140" rx="13" ry="30"><title>Triceps</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="glutes" cx="98" cy="228" rx="23" ry="26"><title>Glutes</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="glutes" cx="142" cy="228" rx="23" ry="26"><title>Glutes</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="hamstrings" cx="98" cy="300" rx="19" ry="48"><title>Hamstrings</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="hamstrings" cx="142" cy="300" rx="19" ry="48"><title>Hamstrings</title></ellipse>
-          </svg>
-
-          <!-- FEMALE FRONT VIEW -->
-          <svg id="body-front-female" class="hologram-svg hologram-face front" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg" style="display:none">
-            <g class="hud-marker">
-              <path d="M 12 12 L 26 12 M 12 12 L 12 26"/>
-              <path d="M 228 12 L 214 12 M 228 12 L 228 26"/>
-              <path d="M 12 420 L 26 420 M 12 420 L 12 406"/>
-              <path d="M 228 420 L 214 420 M 228 420 L 228 406"/>
-            </g>
-            <g class="body-outline">
-              <circle cx="120" cy="35" r="23"/>
-              <path d="M104 56 L104 74 L136 74 L136 56 Z"/>
-              <path d="M78 82 Q120 72 162 82 Q164 120 150 148 Q174 185 174 212 L144 245 Q150 205 160 178 Q140 162 120 162 Q100 162 80 178 Q90 205 96 245 L66 212 Q66 185 90 148 Q76 120 78 82 Z"/>
-            </g>
-            <ellipse class="muscle-shape" data-muscle="front_delts" cx="74" cy="94" rx="13" ry="15"><title>Front Delts</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="front_delts" cx="166" cy="94" rx="13" ry="15"><title>Front Delts</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="side_delts" cx="62" cy="96" rx="8" ry="14"><title>Side Delts</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="side_delts" cx="178" cy="96" rx="8" ry="14"><title>Side Delts</title></ellipse>
-            <path class="muscle-shape" data-muscle="upper_chest" d="M92 84 L118 84 L118 108 L94 105 Z"><title>Upper Chest</title></path>
-            <path class="muscle-shape" data-muscle="upper_chest" d="M148 84 L122 84 L122 108 L146 105 Z"><title>Upper Chest</title></path>
-            <path class="muscle-shape" data-muscle="lower_chest" d="M93 107 L118 110 L118 132 L95 128 Z"><title>Lower Chest</title></path>
-            <path class="muscle-shape" data-muscle="lower_chest" d="M147 107 L122 110 L122 132 L145 128 Z"><title>Lower Chest</title></path>
-            <ellipse class="muscle-shape" data-muscle="biceps" cx="60" cy="140" rx="11" ry="26"><title>Biceps</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="biceps" cx="180" cy="140" rx="11" ry="26"><title>Biceps</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="forearms" cx="54" cy="192" rx="9" ry="25"><title>Forearms</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="forearms" cx="186" cy="192" rx="9" ry="25"><title>Forearms</title></ellipse>
-            <rect class="muscle-shape" data-muscle="abs" x="110" y="112" width="20" height="16" rx="3"><title>Abs</title></rect>
-            <rect class="muscle-shape" data-muscle="abs" x="110" y="130" width="20" height="16" rx="3"><title>Abs</title></rect>
-            <rect class="muscle-shape" data-muscle="abs" x="110" y="148" width="20" height="16" rx="3"><title>Abs</title></rect>
-            <rect class="muscle-shape" data-muscle="obliques" x="94" y="115" width="12" height="48" rx="4"><title>Obliques</title></rect>
-            <rect class="muscle-shape" data-muscle="obliques" x="134" y="115" width="12" height="48" rx="4"><title>Obliques</title></rect>
-            <ellipse class="muscle-shape" data-muscle="quads" cx="98" cy="270" rx="19" ry="50"><title>Quads</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="quads" cx="142" cy="270" rx="19" ry="50"><title>Quads</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="calves" cx="98" cy="375" rx="14" ry="36"><title>Calves</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="calves" cx="142" cy="375" rx="14" ry="36"><title>Calves</title></ellipse>
-          </svg>
-
-          <!-- FEMALE BACK VIEW -->
-          <svg id="body-back-female" class="hologram-svg hologram-face back" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg" style="display:none">
-            <g class="hud-marker">
-              <path d="M 12 12 L 26 12 M 12 12 L 12 26"/>
-              <path d="M 228 12 L 214 12 M 228 12 L 228 26"/>
-            </g>
-            <g class="body-outline">
-              <circle cx="120" cy="35" r="23"/>
-              <path d="M104 56 L104 74 L136 74 L136 56 Z"/>
-              <path d="M78 82 Q120 72 162 82 Q164 120 150 148 Q174 185 174 212 L144 245 Q150 205 160 178 Q140 162 120 162 Q100 162 80 178 Q90 205 96 245 L66 212 Q66 185 90 148 Q76 120 78 82 Z"/>
-            </g>
-            <g class="body-outline-muted">
-              <ellipse cx="60" cy="192" rx="9" ry="24"/>
-              <ellipse cx="180" cy="192" rx="9" ry="24"/>
-              <ellipse cx="98" cy="375" rx="13" ry="34"/>
-              <ellipse cx="142" cy="375" rx="13" ry="34"/>
-            </g>
-            <path class="muscle-shape" data-muscle="traps" d="M102 78 L138 78 L150 98 L120 110 L90 98 Z"><title>Traps</title></path>
-            <ellipse class="muscle-shape" data-muscle="rear_delts" cx="74" cy="94" rx="13" ry="15"><title>Rear Delts</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="rear_delts" cx="166" cy="94" rx="13" ry="15"><title>Rear Delts</title></ellipse>
-            <path class="muscle-shape" data-muscle="lats" d="M88 102 L118 110 L112 160 L82 152 Z"><title>Lats</title></path>
-            <path class="muscle-shape" data-muscle="lats" d="M152 102 L122 110 L128 160 L158 152 Z"><title>Lats</title></path>
-            <rect class="muscle-shape" data-muscle="lower_back" x="104" y="160" width="32" height="32" rx="5"><title>Lower Back</title></rect>
-            <ellipse class="muscle-shape" data-muscle="triceps" cx="60" cy="140" rx="11" ry="26"><title>Triceps</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="triceps" cx="180" cy="140" rx="11" ry="26"><title>Triceps</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="glutes" cx="96" cy="216" rx="22" ry="26"><title>Glutes</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="glutes" cx="144" cy="216" rx="22" ry="26"><title>Glutes</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="hamstrings" cx="98" cy="295" rx="18" ry="46"><title>Hamstrings</title></ellipse>
-            <ellipse class="muscle-shape" data-muscle="hamstrings" cx="142" cy="295" rx="18" ry="46"><title>Hamstrings</title></ellipse>
-          </svg>
-
-        </div>
+        <!-- The four bodies are drawn here by js/bodymap.js -->
+        <div class="hologram-rotator" id="hologram-rotator"></div>
       </div>
 
       <div class="hologram-footer">
         <div class="heat-legend">
-          <span>Fatigued</span>
-          <span class="heat-legend-bar" aria-hidden="true"></span>
           <span>Recovered</span>
+          <span class="heat-legend-bar" aria-hidden="true"></span>
+          <span>Fatigued</span>
         </div>
-        <button type="button" id="toggle-view" class="hud-chip-btn">Back view</button>
+        <button type="button" id="toggle-view" class="hud-chip-btn">Show back</button>
       </div>
       <p class="hologram-footnote" id="last-updated"></p>
     </section>
 
-    <!-- COLUNA DIREITA: SEPARADORES + CONTEÚDO -->
+    <!-- RIGHT: TABS + CONTENT -->
     <div class="hud-console">
 
-      <nav class="hud-dock" id="hud-dock">
+      <nav class="hud-dock" id="hud-dock" aria-label="Sections">
         <span class="dock-indicator" aria-hidden="true"></span>
         <button type="button" class="hud-dock-btn active" data-tab="tab-status">
           <span class="dock-icon-wrap"><svg class="dock-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span>
@@ -247,7 +99,7 @@
 
       <div class="hud-deck">
 
-        <!-- TAB 1: PRONTIDÃO MUSCULAR -->
+        <!-- TAB 1: MUSCLE READINESS -->
         <section class="panel hud-tab-panel active" id="tab-status">
           <div class="panel-head">
             <h2 class="panel-label">Muscle readiness</h2>
@@ -256,14 +108,14 @@
           <ul id="muscle-list" class="muscle-list"></ul>
         </section>
 
-        <!-- TAB 2: REGISTAR TREINO -->
+        <!-- TAB 2: LOG A SESSION -->
         <section class="panel hud-tab-panel" id="tab-workout">
           <h2 class="panel-label" id="log-panel-label">Log a session</h2>
           <form id="workout-form">
-            <input type="text" id="workout-label" placeholder="Session name (optional), e.g. Push Day">
+            <input type="text" id="workout-label" placeholder="Session name (optional), e.g. Push day">
             <div id="sets-container"></div>
             <div class="log-actions">
-              <button type="button" id="add-set-btn" class="ghost-btn">+ Add set</button>
+              <button type="button" id="add-set-btn" class="ghost-btn">Add set</button>
               <button type="button" id="cancel-edit-btn" class="ghost-btn" style="display:none">Cancel edit</button>
               <button type="submit" id="save-workout-btn" class="primary-btn">Save workout</button>
             </div>
@@ -271,15 +123,15 @@
           <p id="log-feedback" class="log-feedback"></p>
         </section>
 
-        <!-- TAB 3: PLANEAR / SIMULAR -->
+        <!-- TAB 3: PLAN AHEAD -->
         <section class="panel hud-tab-panel" id="tab-simulator">
           <h2 class="panel-label">Plan ahead</h2>
+          <p class="hologram-footnote planner-hint">Sketch a future session and see how ready each muscle would be afterwards. Fatigue scales with load, reps, RPE and your profile.</p>
           <div class="planner-controls">
             <label for="planner-date" class="planner-date-label">Training on</label>
             <input type="date" id="planner-date">
-            <button type="button" id="planner-add-set-btn" class="ghost-btn">+ Add exercise</button>
+            <button type="button" id="planner-add-set-btn" class="ghost-btn">Add exercise</button>
           </div>
-          <p class="hologram-footnote planner-hint">Sketch a future session and see how ready each muscle would be. Fatigue scales with load, reps, RPE and your profile.</p>
           <div class="planner-columns-header">
             <span>Exercise</span>
             <span>Sets</span>
@@ -297,31 +149,28 @@
           <ul id="planner-results" class="muscle-list planner-results"></ul>
         </section>
 
-        <!-- TAB 4: INTEL & ARCHIVE (ANALYTICS + RECENT SESSIONS) -->
+        <!-- TAB 4: PROGRESS + RECENT SESSIONS -->
         <div class="hud-tab-panel hud-tab-stack" id="tab-archive">
-          <!-- Bloco Analytics -->
           <section class="panel analytics-panel" id="analytics-panel">
             <div class="panel-head">
               <h2 class="panel-label">Progress</h2>
-              <span class="panel-meta">Last 8 weeks</span>
             </div>
             <div class="analytics-grid">
               <div class="analytics-card">
-                <div class="analytics-card-title">Sets per week</div>
+                <h3 class="analytics-card-title">Sets per week, last 8 weeks</h3>
                 <div id="weekly-volume-chart" class="volume-chart"></div>
               </div>
               <div class="analytics-card">
-                <div class="analytics-card-title">Muscle balance · 30 days</div>
+                <h3 class="analytics-card-title">Sets by muscle group, last 30 days</h3>
                 <div id="muscle-balance-list" class="balance-list"></div>
               </div>
               <div class="analytics-card">
-                <div class="analytics-card-title">Top exercises · 30 days</div>
+                <h3 class="analytics-card-title">Most-logged exercises, last 30 days</h3>
                 <ul id="top-exercises-list" class="top-exercises-list"></ul>
               </div>
             </div>
           </section>
 
-          <!-- Bloco Histórico Recente -->
           <section class="panel history-panel" id="history-panel">
             <h2 class="panel-label">Recent sessions</h2>
             <ul id="history-list" class="history-list"></ul>
@@ -337,10 +186,10 @@
 <div id="weight-help-tooltip" class="weight-help-tooltip" style="display:none"></div>
 
 <div id="exercise-picker-modal" class="modal-overlay" style="display:none">
-  <div class="modal-panel">
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="picker-title">
     <div class="modal-header">
-      <h2 class="panel-label">Choose exercise</h2>
-      <button type="button" id="close-picker-btn" class="modal-close">×</button>
+      <h2 class="panel-label" id="picker-title">Choose an exercise</h2>
+      <button type="button" id="close-picker-btn" class="modal-close" aria-label="Close">×</button>
     </div>
     <div class="picker-tabs" id="picker-tabs"></div>
     <ul class="picker-list" id="picker-list"></ul>
@@ -348,14 +197,14 @@
 </div>
 
 <div id="profile-modal" class="modal-overlay" style="display:none">
-  <div class="modal-panel profile-modal-panel">
+  <div class="modal-panel profile-modal-panel" role="dialog" aria-modal="true" aria-labelledby="profile-title">
     <div class="modal-header">
-      <h2 class="panel-label">Your profile</h2>
-      <button type="button" id="close-profile-btn" class="modal-close">×</button>
+      <h2 class="panel-label" id="profile-title">Your profile</h2>
+      <button type="button" id="close-profile-btn" class="modal-close" aria-label="Close">×</button>
     </div>
     <form id="profile-form" class="profile-form">
       <div class="profile-field">
-        <label for="profile-units">Unit System</label>
+        <label for="profile-units">Units</label>
         <select id="profile-units">
           <option value="metric">Metric (kg, cm)</option>
           <option value="imperial">Imperial (lbs, in)</option>
@@ -365,7 +214,7 @@
       <div class="profile-field">
         <label for="profile-sex">Sex</label>
         <select id="profile-sex">
-          <option value="unspecified">Unspecified</option>
+          <option value="unspecified">Prefer not to say</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
         </select>
@@ -387,13 +236,13 @@
       </div>
 
       <div class="profile-field">
-        <label for="profile-activity">Activity Level</label>
+        <label for="profile-activity">How active are you?</label>
         <select id="profile-activity">
-          <option value="sedentary">Sedentary</option>
-          <option value="lightly_active">Lightly Active</option>
-          <option value="moderately_active">Moderately Active</option>
-          <option value="very_active">Very Active</option>
-          <option value="athlete">Athlete</option>
+          <option value="sedentary">Mostly sitting</option>
+          <option value="lightly_active">Lightly active</option>
+          <option value="moderately_active">Moderately active</option>
+          <option value="very_active">Very active</option>
+          <option value="athlete">Training like an athlete</option>
         </select>
       </div>
 
@@ -408,24 +257,24 @@
 </div>
 
 <div id="auth-modal" class="modal-overlay" style="display:none">
-  <div class="modal-panel auth-modal-panel">
+  <div class="modal-panel auth-modal-panel" role="dialog" aria-modal="true" aria-label="Sign in or create an account">
     <div class="modal-header">
       <div class="auth-tabs">
         <button type="button" id="tab-login" class="auth-tab active">Sign in</button>
-        <button type="button" id="tab-register" class="auth-tab">Register</button>
+        <button type="button" id="tab-register" class="auth-tab">Create account</button>
       </div>
-      <button type="button" id="close-auth-btn" class="modal-close">&times;</button>
+      <button type="button" id="close-auth-btn" class="modal-close" aria-label="Close">&times;</button>
     </div>
 
-    <!-- Login Form -->
+    <!-- Sign in -->
     <form id="login-form" class="profile-form">
       <div class="profile-field">
         <label for="login-email">Email</label>
-        <input type="email" id="login-email" placeholder="name@example.com" required>
+        <input type="email" id="login-email" placeholder="name@example.com" autocomplete="email" required>
       </div>
       <div class="profile-field">
         <label for="login-password">Password</label>
-        <input type="password" id="login-password" placeholder="••••••••" required>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required>
       </div>
       <p id="login-feedback" class="log-feedback"></p>
       <div class="modal-actions">
@@ -433,19 +282,19 @@
       </div>
     </form>
 
-    <!-- Register Form -->
+    <!-- Create account -->
     <form id="register-form" class="profile-form" style="display:none">
       <div class="profile-field">
         <label for="reg-name">Name</label>
-        <input type="text" id="reg-name" placeholder="Your name" required>
+        <input type="text" id="reg-name" placeholder="Your name" autocomplete="name" required>
       </div>
       <div class="profile-field">
         <label for="reg-email">Email</label>
-        <input type="email" id="reg-email" placeholder="name@example.com" required>
+        <input type="email" id="reg-email" placeholder="name@example.com" autocomplete="email" required>
       </div>
       <div class="profile-field">
-        <label for="reg-password">Password (min. 6 chars)</label>
-        <input type="password" id="reg-password" placeholder="••••••••" minlength="6" required>
+        <label for="reg-password">Password, at least 6 characters</label>
+        <input type="password" id="reg-password" placeholder="••••••••" minlength="6" autocomplete="new-password" required>
       </div>
       <p id="register-feedback" class="log-feedback"></p>
       <div class="modal-actions">

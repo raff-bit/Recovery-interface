@@ -6,7 +6,7 @@ import { state, getWeightUnitLabel, displayWeightToKg } from './state.js';
 import { postPreview } from './api.js';
 import { openExercisePicker } from './picker.js';
 import { refreshMuscles } from './hologram.js';
-import { readinessColor } from './ui.js';
+import { readinessColor, thermalFill } from './ui.js';
 
 export function addPlannerSetRow() {
   const container = document.getElementById('planner-sets-container');
@@ -116,10 +116,9 @@ export function renderPlannerResults(muscles, targetDateIso) {
 export function applyPreviewColors(muscles) {
   muscles.filter(m => m.affected).forEach(m => {
     const shapes = document.querySelectorAll(`.muscle-shape[data-muscle="${m.muscle_key}"]`);
-    const color = readinessColor(m.readiness_after);
+        const color = thermalFill(m.readiness_after);
     shapes.forEach(shape => {
       shape.style.fill = color;
-      shape.style.fillOpacity = '1';
       shape.style.filter = `drop-shadow(0 0 8px ${color})`;
     });
   });
