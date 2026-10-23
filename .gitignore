@@ -23,3 +23,6 @@ composer.lock
 *.swp
 *.swo
 *~
+
+# Database backups (contain personal data — never commit)
+backups/

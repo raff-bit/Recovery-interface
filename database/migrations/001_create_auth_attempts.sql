@@ -7,7 +7,7 @@
 -- per account without keeping a list of typed emails.
 -- ============================================================
 
-USE muscle_recovery_v2;
+
 
 CREATE TABLE IF NOT EXISTS auth_attempts (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
