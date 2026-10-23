@@ -1,0 +1,9 @@
+# Store every text file with LF line endings in the repository,
+# no matter which OS edits it. Git decides what's text vs binary.
+* text=auto eol=lf
+
+# Never touch binary files
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff2 binary
