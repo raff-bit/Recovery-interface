@@ -17,7 +17,7 @@ Thumbs.db
 # Dependências e caches PHP
 /vendor/
 .phpunit.result.cache
-composer.lock
+
 
 # Ficheiros temporários de editores
 *.swp
@@ -26,3 +26,6 @@ composer.lock
 
 # Database backups (contain personal data — never commit)
 backups/
+
+# PHPUnit 10+ cache
+.phpunit.cache/

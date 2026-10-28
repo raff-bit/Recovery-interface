@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  PHPUnit configuration. Run with:  composer test   (or vendor/bin/phpunit)
+  Unit tests only: no database, no web server, run in milliseconds.
+  The end-to-end HTTP checks stay in tests/ApiSmokeTest.php (composer test:smoke).
+-->
+<phpunit bootstrap="vendor/autoload.php"
+         colors="true"
+         failOnWarning="true"
+         failOnRisky="true">
+    <testsuites>
+        <testsuite name="unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
