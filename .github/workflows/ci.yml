@@ -21,9 +21,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  unit:
-  - name: Static analysis (PHPStan level 6)
-    run: vendor/bin/phpstan analyse --no-progress --memory-limit=512M
+    unit:
     name: Unit tests (PHP ${{ matrix.php }})
     runs-on: ubuntu-24.04
     strategy:
@@ -51,6 +49,9 @@ jobs:
 
       - name: PHP syntax check (every file, including ones no test touches)
         run: find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l > /dev/null
+
+      - name: Static analysis (PHPStan level 6)
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=512M
 
       - name: Unit tests
         run: vendor/bin/phpunit --testdox
