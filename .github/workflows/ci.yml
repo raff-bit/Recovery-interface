@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-    unit:
+  unit:
     name: Unit tests (PHP ${{ matrix.php }})
     runs-on: ubuntu-24.04
     strategy:
