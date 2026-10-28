@@ -30,6 +30,15 @@ class Database
 
             try {
                 self::$connection = new PDO($dsn, $user, $pass, $options);
+                
+                // Every connection runs with the same rules, whatever the server's my.ini says:
+                //  - time_zone UTC → NOW()/CURRENT_TIMESTAMP agree with PHP (see config/env.php)
+                //  - strict mode   → invalid data is an ERROR, never silently truncated/zeroed
+                //  - ONLY_FULL_GROUP_BY → no ambiguous GROUP BY queries returning random rows
+                self::$connection->exec(
+                    "SET time_zone = '+00:00', sql_mode = 'STRICT_ALL_TABLES,ONLY_FULL_GROUP_BY,"
+                    . "NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'"
+                );
             } catch (PDOException $e) {
                 // Log the real reason, show the user a generic one (never leak host/user)
                 error_log('Database connection error: ' . $e->getMessage());

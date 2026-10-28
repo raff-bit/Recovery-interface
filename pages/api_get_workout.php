@@ -33,4 +33,6 @@ $workout['sets'] = array_map(function ($s) {
     ];
 }, $sets);
 
+$workout['workout_date'] = isoUtc($workout['workout_date']);
+
 echo json_encode(['workout' => $workout]);

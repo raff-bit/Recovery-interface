@@ -71,10 +71,11 @@ final class WorkoutValidator
         return $clean;
     }
 
-    /**
-     * Accepts 'Y-m-d H:i:s', 'Y-m-d H:i', 'Y-m-d\TH:i' or 'Y-m-d\TH:i:s'
-     * (the last two are what <input type="datetime-local"> sends).
-     * Returns a MySQL DATETIME string, or $fallback when nothing was sent.
+        /**
+     * Returns a UTC MySQL DATETIME string, or $fallback when nothing was sent.
+     * Accepts:
+     *   - ISO 8601 with offset: '2026-10-28T11:17:00+01:00', '2026-10-28T10:17:00.000Z' → converted to UTC
+     *   - 'Y-m-d H:i:s', 'Y-m-d H:i', 'Y-m-d\TH:i', 'Y-m-d\TH:i:s' → already UTC
      */
     public static function validateDate(mixed $raw, string $fallback): string
     {
@@ -84,6 +85,28 @@ final class WorkoutValidator
         if (!is_string($raw)) {
             throw new ValidationException('workout_date must be a string.');
         }
+
+        
+        // ISO 8601 WITH an explicit offset ("...Z", "...+01:00"), e.g. from JS toISOString():
+        // unambiguous, so convert it to UTC for storage.
+        if (preg_match('/^(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}(:\d{2}(\.\d{1,6})?)?(Z|[+-]\d{2}:\d{2})$/', $raw, $m)) {
+            try {
+                $dt = new DateTimeImmutable($raw);
+            } catch (Exception $e) {
+                throw new ValidationException('workout_date has an invalid format.');
+            }
+            // Calendar check in the ORIGINAL offset: rejects 2026-02-31 instead of rolling it over
+            if ($dt->format('Y-m-d') !== $m[1]) {
+                throw new ValidationException('workout_date has an invalid format.');
+            }
+            $year = (int) $dt->format('Y');
+            if ($year < 2000 || $year > 2100) {
+                throw new ValidationException('workout_date is out of range.');
+            }
+            return $dt->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
+        }
+
+        // Formats WITHOUT an offset are taken as UTC (the app's storage timezone)
 
         foreach (['Y-m-d H:i:s', 'Y-m-d H:i', 'Y-m-d\TH:i', 'Y-m-d\TH:i:s'] as $format) {
             $dt = DateTime::createFromFormat('!' . $format, $raw);

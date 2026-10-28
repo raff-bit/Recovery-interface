@@ -69,6 +69,10 @@ check(WorkoutValidator::validateDate('2026-10-23 18:30:15', 'x') === '2026-10-23
 check(rejects(fn() => WorkoutValidator::validateDate('2026-02-31 10:00:00', 'x')), 'Impossible date (Feb 31) is rejected');
 check(rejects(fn() => WorkoutValidator::validateDate('tomorrow', 'x')), 'Free-text date is rejected');
 check(rejects(fn() => WorkoutValidator::validateDate('1970-01-01 00:00:00', 'x')), 'Out-of-range year is rejected');
+check(WorkoutValidator::validateDate('2026-10-28T11:17:00+01:00', 'x') === '2026-10-28 10:17:00', 'ISO with +01:00 offset is converted to UTC');
+check(WorkoutValidator::validateDate('2026-07-15T18:00:00+02:00', 'x') === '2026-07-15 16:00:00', 'ISO with summer +02:00 offset is converted to UTC');
+check(WorkoutValidator::validateDate('2026-10-28T10:17:00.000Z', 'x') === '2026-10-28 10:17:00', 'JS toISOString() format (…Z) is accepted');
+check(rejects(fn() => WorkoutValidator::validateDate('2026-02-31T10:00:00Z', 'x')), 'Impossible ISO date (Feb 31) is rejected');
 
 check(WorkoutValidator::optionalText('   ', 100, 'label') === null, 'Whitespace-only text becomes null');
 check(WorkoutValidator::optionalText('  Push Day ', 100, 'label') === 'Push Day', 'Text is trimmed');

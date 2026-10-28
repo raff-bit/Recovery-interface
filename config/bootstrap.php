@@ -138,6 +138,15 @@ function readJsonBody(): array
 }
 
 /** Client IP — REMOTE_ADDR only; X-Forwarded-For is trivially spoofable. */
+/**
+ * DB DATETIME (stored in UTC) → ISO 8601 with "Z", e.g. "2026-10-28T10:17:00Z".
+ * The "Z" makes the timezone explicit: every browser converts it to the user's
+ * local time correctly. A bare "2026-10-28 10:17:00" would be guessed as LOCAL.
+ */
+function isoUtc(?string $dbDatetime): ?string
+{
+    return $dbDatetime === null ? null : str_replace(' ', 'T', $dbDatetime) . 'Z';
+}
 function clientIp(): string
 {
     return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';

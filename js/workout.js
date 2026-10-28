@@ -99,7 +99,8 @@ export function renderHistory(workouts) {
       (bySets[s.exercise_name] = bySets[s.exercise_name] || []).push(line);
     });
 
-    const date = new Date(w.workout_date.replace(' ', 'T'));
+        // workout_date arrives as UTC ISO ("...Z"); the browser converts it to local time
+    const date = new Date(w.workout_date);
     const dateStr = date.toLocaleDateString(undefined, { 
       month: 'short', 
       day: 'numeric', 

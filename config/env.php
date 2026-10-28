@@ -1,5 +1,12 @@
 <?php
 /**
+ * The whole app thinks in UTC. Every entry point (API, tests, migrations,
+ * backup) loads this file, so this one line decides PHP's clock everywhere —
+ * php.ini's date.timezone (XAMPP ships Europe/Berlin) no longer matters.
+ * Converting to the user's local time is the browser's job, at display time.
+ */
+date_default_timezone_set('UTC');
+/**
  * Minimal .env loader (no external dependencies).
  * Real environment variables always win over the .env file, so a
  * production server can configure the app without any .env at all.

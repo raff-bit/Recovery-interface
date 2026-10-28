@@ -193,6 +193,11 @@ try {
 
     $r = http('GET', 'pages/api_workout_history.php');
     check(($r['json']['workouts'][0]['id'] ?? null) == $workoutId, 'History lists the new workout');
+    
+    // UTC end-to-end: the date we get back must be explicit UTC ("…Z") and match the real current instant
+    $returned = $r['json']['workouts'][0]['workout_date'] ?? '';
+    $driftSeconds = abs(strtotime($returned) - time());
+    check(str_ends_with($returned, 'Z') && $driftSeconds < 120, 'Workout date is stored and returned as UTC', "got '{$returned}', drift {$driftSeconds}s");
 
     $r = post('pages/api_update_workout.php', ['workout_id' => $workoutId, 'label' => 'Edited', 'sets' => [
         ['exercise_id' => $exerciseId, 'reps' => 10, 'weight_kg' => 50, 'rpe' => 7],

@@ -26,13 +26,13 @@ if ($format === 'csv') {
         $sets = $setsByWorkout[$w['id']] ?? [];
 
         if (empty($sets)) {
-            fputcsv($out, [$w['workout_date'], $w['label'], $w['notes'], '', '', '', '', '']);
+            fputcsv($out, [isoUtc($w['workout_date']), $w['label'], $w['notes'], '', '', '', '', '']);
             continue;
         }
 
         foreach ($sets as $s) {
             fputcsv($out, [
-                $w['workout_date'],
+                isoUtc($w['workout_date']),
                 $w['label'],
                 $w['notes'],
                 $s['exercise_name'],
@@ -54,7 +54,7 @@ header('Content-Disposition: attachment; filename="recovery-interface-export-' .
 $exportWorkouts = array_map(function ($w) use ($setsByWorkout) {
     $sets = $setsByWorkout[$w['id']] ?? [];
     return [
-        'workout_date' => $w['workout_date'],
+        'workout_date' => isoUtc($w['workout_date']),
         'label'        => $w['label'],
         'notes'        => $w['notes'],
         'sets'         => array_map(function ($s) {
