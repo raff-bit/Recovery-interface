@@ -1,0 +1,106 @@
+# ============================================================
+# Continuous Integration — runs on every push to main and every PR.
+#   job 1 "unit":  syntax check, dependency audit, PHPUnit on PHP 8.1 + 8.3
+#   job 2 "smoke": the REAL app on Apache + MariaDB, hit over HTTP by
+#                  tests/ApiSmokeTest.php (security, auth, full workout flow)
+# ============================================================
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Least privilege: this workflow only needs to READ the code
+permissions:
+  contents: read
+
+# A newer push to the same branch cancels the older, now-pointless run
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: Unit tests (PHP ${{ matrix.php }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.1', '8.3']   # oldest supported + current: proves the 8.1 floor in composer.json is real
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, pdo_mysql
+          coverage: none
+          tools: composer:v2
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Audit dependencies for known vulnerabilities
+        run: composer audit
+
+      - name: PHP syntax check (every file, including ones no test touches)
+        run: find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l > /dev/null
+
+      - name: Unit tests
+        run: vendor/bin/phpunit --testdox
+
+  smoke:
+    name: End-to-end smoke test (Apache + MariaDB)
+    runs-on: ubuntu-24.04
+    needs: unit   # no point booting a server if the unit tests already failed
+
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: root-ci-only
+          MARIADB_DATABASE: muscle_recovery_v2
+          MARIADB_USER: fitapp
+          MARIADB_PASSWORD: ci-password
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+
+    env:
+      APP_DIR: /var/www/html/fit-app
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Apache + PHP 8.3
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q apache2 libapache2-mod-php8.3 php8.3-cli php8.3-mysql php8.3-mbstring
+
+      - name: Deploy the app into Apache (with .htaccess enabled, like XAMPP)
+        run: |
+          sudo a2enmod rewrite headers
+          sudo sed -i 's#</VirtualHost>#<Directory /var/www/html>\n  AllowOverride All\n</Directory>\n</VirtualHost>#' /etc/apache2/sites-available/000-default.conf
+          sudo mkdir -p "$APP_DIR"
+          sudo cp -a . "$APP_DIR/"
+          printf 'DB_HOST=127.0.0.1\nDB_PORT=3306\nDB_NAME=muscle_recovery_v2\nDB_USER=fitapp\nDB_PASS=ci-password\nAPP_ENV=production\nAPP_DEBUG=false\n' \
+            | sudo tee "$APP_DIR/.env" > /dev/null
+          sudo chown -R www-data:www-data "$APP_DIR"
+          sudo systemctl restart apache2
+
+      - name: Create database (schema → seeds → migrations)
+        working-directory: ${{ env.APP_DIR }}
+        run: php8.3 database/install.php
+
+      - name: Smoke test
+        working-directory: ${{ env.APP_DIR }}
+        run: BASE_URL=http://localhost/fit-app php8.3 tests/ApiSmokeTest.php
+
+      - name: Show Apache error log
+        if: failure()
+        run: sudo tail -n 100 /var/log/apache2/error.log
