@@ -35,7 +35,7 @@ final class PasswordPolicy
             return 'This password is too common. Please choose another.';
         }
 
-        $emailLocal = mb_strtolower(explode('@', $email)[0] ?? '');
+                $emailLocal = mb_strtolower(explode('@', $email)[0]);
         if ($emailLocal !== '' && $lower === $emailLocal) {
             return 'Password cannot be the same as your email.';
         }

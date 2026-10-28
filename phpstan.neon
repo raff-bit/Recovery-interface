@@ -1,0 +1,17 @@
+# PHPStan — static analysis. Run with: vendor/bin/phpstan analyse
+parameters:
+    # 0 (lenient) → 10 (strictest). 6 = checks types everywhere, the usual
+    # bar for a well-maintained project.
+    level: 6
+    paths:
+        - bll
+        - dal
+        - config
+        - pages
+        - database
+        - tests
+    ignoreErrors:
+        # Level 6 also wants every array described in detail (array<string, int>…).
+        # This codebase passes DB rows around as plain arrays; documenting all of
+        # them is a separate refactor, so this one rule is consciously deferred.
+        - identifier: missingType.iterableValue

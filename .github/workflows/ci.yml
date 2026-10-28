@@ -22,6 +22,8 @@ concurrency:
 
 jobs:
   unit:
+  - name: Static analysis (PHPStan level 6)
+    run: vendor/bin/phpstan analyse --no-progress --memory-limit=512M
     name: Unit tests (PHP ${{ matrix.php }})
     runs-on: ubuntu-24.04
     strategy:

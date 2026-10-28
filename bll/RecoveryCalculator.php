@@ -160,8 +160,7 @@ class RecoveryCalculator
 
         $activityMult = self::ACTIVITY_RECOVERY_MULTIPLIERS[$profile['activity_level']] ?? 1.0;
         $sexMult = self::SEX_RECOVERY_MULTIPLIERS[$profile['sex']] ?? 1.0;
-        $age = isset($profile['age']) && $profile['age'] !== null ? (int) $profile['age'] : null;
-        $ageMult = $this->ageRecoveryMultiplier($age);
+        $age = isset($profile['age']) ? (int) $profile['age'] : null;        $ageMult = $this->ageRecoveryMultiplier($age);
 
         return (int) round($baseHours * $activityMult * $sexMult * $ageMult);
     }
@@ -255,8 +254,7 @@ class RecoveryCalculator
         $byMuscleHypothetical = [];
         foreach ($hypotheticalSets as $set) {
             $exerciseId = (int) $set['exercise_id'];
-            $rpe = isset($set['rpe']) && $set['rpe'] !== null ? (float) $set['rpe'] : null;
-            $weightKg = isset($set['weight_kg']) ? (float) $set['weight_kg'] : 0.0;
+            $rpe = isset($set['rpe']) ? (float) $set['rpe'] : null;            $weightKg = isset($set['weight_kg']) ? (float) $set['weight_kg'] : 0.0;
             $reps = isset($set['reps']) ? (int) $set['reps'] : 10;
             $exerciseActivations = $activationsByExercise[$exerciseId] ?? [];
 

@@ -48,7 +48,7 @@ function http(string $method, string $path, ?array $body = null, array $headers 
         exit(2);
     }
 
-    $responseHeaders = $http_response_header ?? [];
+    $responseHeaders = $http_response_header;
     preg_match('#HTTP/\S+ (\d{3})#', $responseHeaders[0] ?? '', $m);
     $status = (int) ($m[1] ?? 0);
 
@@ -71,18 +71,21 @@ function http(string $method, string $path, ?array $body = null, array $headers 
 
 // ---------------- assertions ----------------
 
-$passed = 0;
-$failed = 0;
+/** Pass/fail counters. A class (not globals) so static analysis can follow the changes. */
+final class Results
+{
+    public static int $passed = 0;
+    public static int $failed = 0;
+}
 
 function check(bool $condition, string $name, string $detail = ''): void
 {
-    global $passed, $failed;
     if ($condition) {
         echo "  \033[32m✔ PASS\033[0m: {$name}\n";
-        $passed++;
+        Results::$passed++;
     } else {
         echo "  \033[31m✖ FAIL\033[0m: {$name}" . ($detail !== '' ? "  → {$detail}" : '') . "\n";
-        $failed++;
+        Results::$failed++;
     }
 }
 
@@ -193,7 +196,7 @@ try {
 
     $r = http('GET', 'pages/api_workout_history.php');
     check(($r['json']['workouts'][0]['id'] ?? null) == $workoutId, 'History lists the new workout');
-    
+
     // UTC end-to-end: the date we get back must be explicit UTC ("…Z") and match the real current instant
     $returned = $r['json']['workouts'][0]['workout_date'] ?? '';
     $driftSeconds = abs(strtotime($returned) - time());
@@ -258,7 +261,7 @@ try {
 }
 
 echo "\n" . str_repeat('=', 50) . "\n";
-echo "Results: {$passed} passed, {$failed} failed.\n";
+echo "Results: " . Results::$passed . " passed, " . Results::$failed . " failed.\n";
 echo str_repeat('=', 50) . "\n";
 
-exit($failed > 0 ? 1 : 0);
+exit(Results::$failed > 0 ? 1 : 0);
