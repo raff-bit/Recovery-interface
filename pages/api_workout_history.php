@@ -36,7 +36,8 @@ foreach ($sets as $s) {
 }
 
 foreach ($workouts as &$w) {
-        $w['workout_date'] = isoUtc($w['workout_date']);
+    $w['workout_date'] = isoUtc($w['workout_date']);
+    $w['sets'] = $setsByWorkout[$w['id']] ?? [];
 }
 unset($w);
 

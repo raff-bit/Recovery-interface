@@ -197,6 +197,8 @@ try {
     $r = http('GET', 'pages/api_workout_history.php');
     check(($r['json']['workouts'][0]['id'] ?? null) == $workoutId, 'History lists the new workout');
 
+    check(count($r['json']['workouts'][0]['sets'] ?? []) === 2, 'History includes each workout\'s sets (the frontend renders them)');
+
     // UTC end-to-end: the date we get back must be explicit UTC ("…Z") and match the real current instant
     $returned = $r['json']['workouts'][0]['workout_date'] ?? '';
     $driftSeconds = abs(strtotime($returned) - time());
