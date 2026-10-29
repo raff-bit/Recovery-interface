@@ -25,9 +25,12 @@ Height is stored for display only and is not used in any calculation.
 
 Body weight, age, sex and training data can count as **health data** under the GDPR (Art. 9), depending on the context. If you run a public instance for other people, you are the data controller. You need a lawful basis, which for this category usually means explicit consent, and you should tell your users how long you keep their data.
 
+Children: the profile accepts ages from 12. In Portugal, someone under 13 needs parental consent for this kind of service (GDPR Art. 8), and the threshold is higher in some other EU countries. A public instance should set its minimum age accordingly.
+
 ## Your data
 
 - **Export.** While signed in, open `pages/api_export_data.php?format=json` (or `?format=csv`) to download your complete training history.
+- **Backups.** `database/backup.php` keeps the 14 most recent dumps. Each one contains every account's data, so deleted data also disappears from backups only once older dumps rotate out.
 - **Deletion.** Self-service account deletion is on the [roadmap](README.md#roadmap). Until then, the operator of the instance can delete an account. This removes the profile and every workout with it (cascading delete).
 
 ## Security measures

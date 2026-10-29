@@ -77,7 +77,7 @@ MySQL / MariaDB (InnoDB)
 - `composer validate`, `composer audit` (known vulnerabilities), `php -l` on every file
 - **PHPStan level 6** static analysis
 - **PHPUnit** on PHP 8.1 and 8.3, with 41 unit tests using stubs instead of a database. The tests pin the model's exact numbers, not just its direction.
-- an **end-to-end smoke test**: a real Apache + MariaDB, a fresh install, then 44 HTTP checks covering file exposure, CSP, CSRF, throttling, the full workout lifecycle and UTC handling.
+- an **end-to-end smoke test**: a real Apache + MariaDB, a fresh install, then 50 HTTP checks covering file exposure (including backups), CSP, CSRF, throttling, payload limits, the full workout lifecycle and UTC handling.
 
 ## Tech stack
 
@@ -108,7 +108,19 @@ Dev tooling: Composer, PHPUnit, PHPStan, GitHub Actions
 5. Open **http://localhost/recovery/**
 
 **Upgrading an existing install:** `php database/migrate.php` (`--status` lists what's applied).
-**Backups:** `php database/backup.php` writes a compressed, consistent dump to `backups/` and keeps the latest 14.
+**Backups:** `php database/backup.php` writes a compressed, consistent dump to `backups/` (or `BACKUP_DIR` from `.env`) and keeps the latest 14.
+
+### Before exposing it to a network
+
+The defaults are meant for a personal machine. If others can reach your instance:
+
+- **Serve it over HTTPS.** The session cookie automatically becomes `Secure`.
+- **Keep `APP_ENV=production` and `APP_DEBUG=false`**, which are the defaults in `.env.example`.
+- **Use a dedicated database user** with a strong password, not XAMPP's password-less `root`.
+- **Set `BACKUP_DIR` outside the web root.** Dumps contain every account's data.
+- **On nginx or another server that ignores `.htaccess`**, replicate its rules. Only `index.html`, `css/`, `js/` and `pages/` should be public.
+- **Behind a reverse proxy**, sign-in throttling sees the proxy's IP. Configure trusted forwarding first.
+- **Personal use only?** Bind Apache to `127.0.0.1` so other devices on your Wi-Fi can't reach it.
 
 ## Running the checks
 

@@ -15,11 +15,11 @@ Options -Indexes
     RewriteRule (^|/)\. - [F,L]
 
     # 3. Block internal folders — only index.html, css/, js/ and pages/ are public
-    RewriteRule ^(bll|dal|config|database|tests|docs|vendor)(/|$) - [F,L]
+    RewriteRule ^(bll|dal|config|database|tests|docs|vendor|backups)(/|$) - [F,L]
 </IfModule>
 
 # 4. Defence in depth: block these file types even if they end up somewhere public
-<FilesMatch "\.(sql|log|md|example|ini|sh|bak|dist)$">
+<FilesMatch "\.(sql|gz|zip|tar|7z|rar|log|md|example|ini|sh|bak|dist|neon|cache)$">
     Require all denied
 </FilesMatch>
 <FilesMatch "^(composer\.(json|lock)|phpunit\.xml|package(-lock)?\.json|LICENSE)$">

@@ -12,12 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $userId = requireAuth();
 
-$input = json_decode(file_get_contents('php://input'), true);
-if (!is_array($input)) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Request body must be valid JSON.']);
-    exit;
-}
+$input = readJsonBody();   // JSON object, capped at 64 KB (a 100-set workout is ~8 KB)
 
 $workoutId = filter_var($input['workout_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 if ($workoutId === false) {

@@ -4,6 +4,7 @@
  * ------------------------------------------------------------
  * Usage (from the project root):  php database/backup.php
  * Output: backups/<db>_YYYY-mm-dd_HHMMSS.sql.gz  (keeps the newest 14)
+ *         Set BACKUP_DIR in .env to keep them OUTSIDE the web folder (recommended).
  *
  * Why not copy C:\xampp\mysql\data? InnoDB keeps data in memory and in
  * shared files (ibdata1, redo logs); a copied folder taken while MySQL runs
@@ -47,10 +48,17 @@ foreach ($candidates as $candidate) {
     }
 }
 
-$backupDir = __DIR__ . '/../backups';
+// Dumps contain every account's email, password hash and training data.
+// Best: BACKUP_DIR outside the web root. Default: ./backups, which .htaccess blocks.
+$backupDir = rtrim(env('BACKUP_DIR', __DIR__ . '/../backups'), '/\\');
 if (!is_dir($backupDir) && !mkdir($backupDir, 0700, true)) {
     fwrite(STDERR, "Cannot create {$backupDir}\n");
     exit(1);
+}
+// Defence in depth: deny web access from inside the folder too, in case the
+// root .htaccess is ever changed or the folder is copied somewhere public.
+if (!is_file("{$backupDir}/.htaccess")) {
+    file_put_contents("{$backupDir}/.htaccess", "Require all denied\n");
 }
 
 $file = sprintf('%s/%s_%s.sql.gz', $backupDir, $dbName, date('Y-m-d_His'));

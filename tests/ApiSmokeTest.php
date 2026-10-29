@@ -125,12 +125,19 @@ try {
             'tests/ApiSmokeTest.php',
             'database/schema.sql',
             'README.md',
-            'LICENSE'
+            'LICENSE',
+            'phpstan.neon',
+            'composer.json'
         ] as $path
     ) {
         $r = http('GET', $path);
         check(in_array($r['status'], [403, 404], true), "/{$path} is not publicly reachable", "got HTTP {$r['status']}");
     }
+
+    // Database dumps contain every account's data. The folder must be blocked even when
+    // the file doesn't exist, so a name-guessing attacker learns nothing (403, never 404).
+    $r = http('GET', 'backups/muscle_recovery_v2_2026-01-01_000000.sql.gz');
+    check($r['status'] === 403, '/backups/ is blocked (database dumps)', "got HTTP {$r['status']}");
 
     $page = http('GET', 'index.html');
     check($page['status'] === 200, 'index.html is served');
@@ -193,6 +200,16 @@ try {
     // Wrong JSON types trigger a PHP TypeError internally — the user must only see a generic message
     $r = post('pages/api_preview_workout.php', ['target_date' => ['not', 'a', 'string'], 'sets' => [['exercise_id' => $exerciseId, 'reps' => 5]]]);
     check($r['status'] >= 400 && !preg_match('/\.php|Stack trace|Fatal error|Warning:/i', $r['raw']), 'Internal errors never leak file paths or stack traces', substr($r['raw'], 0, 120));
+
+    // Abuse limits: oversized payloads and the guest-accessible planner are bounded
+    $r = post('pages/api_preview_workout.php', ['sets' => array_fill(0, 101, ['exercise_id' => $exerciseId, 'reps' => 5])]);
+    check($r['status'] === 400, 'Planner rejects more than 100 sets');
+
+    $r = post('pages/api_log_workout.php', ['label' => 'x', 'notes' => str_repeat('a', 70000), 'sets' => [['exercise_id' => $exerciseId, 'reps' => 5]]]);
+    check($r['status'] === 413, 'Request bodies over 64 KB are rejected (413)', "got HTTP {$r['status']}");
+
+    $r = post('pages/api_save_profile.php', ['body_weight_kg' => 80, 'height_cm' => -5]);
+    check($r['status'] === 400, 'Profile rejects an impossible height');
 
     $r = http('GET', 'pages/api_workout_history.php');
     check(($r['json']['workouts'][0]['id'] ?? null) == $workoutId, 'History lists the new workout');
