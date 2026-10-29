@@ -1,0 +1,15 @@
+/* ============================================================
+   Archivo — self-hosted variable font (SIL Open Font License, see fonts/OFL.txt)
+   Served from our own origin instead of Google Fonts: no visitor IP
+   is sent to a third party (GDPR), the CSP stays 'self'-only, and the
+   app no longer depends on an external CDN to render its typography.
+   One file carries both axes the design uses: width 62–125%, weight 100–900.
+   ============================================================ */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  src: url('fonts/archivo-variable.woff2') format('woff2');
+}

@@ -37,7 +37,7 @@ Options -Indexes
     # Even if an attacker injected <script> into the page, it wouldn't execute.
     #   script-src 'self'            → only our own js/ files; no inline scripts, no eval
     #   style-src 'unsafe-inline'    → temporary: index.html still uses style="" attributes
-    #   fonts.googleapis/gstatic     → the Archivo font
+    #   font-src 'self'              → the Archivo font is self-hosted (css/fonts/)
     #   img-src data:                → the SVG icons embedded in CSS
-    Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" "expr=%{CONTENT_TYPE} =~ m#text/html#"
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" "expr=%{CONTENT_TYPE} =~ m#text/html#"
 </IfModule>
