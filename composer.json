@@ -2,7 +2,7 @@
     "name": "rafael-monteiro/recovery-interface",
     "description": "Muscle readiness and workout fatigue tracker (PHP, MySQL, vanilla JS)",
     "type": "project",
-    "license": "proprietary",
+    "license": "AGPL-3.0-only",
     "require": {
         "php": ">=8.1"
     },
