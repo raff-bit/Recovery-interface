@@ -23,6 +23,7 @@ if (PHP_SAPI !== 'cli') {
 require_once __DIR__ . '/../dal/UserRepository.php';
 require_once __DIR__ . '/../dal/ProfileRepository.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
+require_once __DIR__ . '/../dal/RoutineRepository.php';
 
 $email = strtolower($argv[1] ?? 'demo@example.com');
 
@@ -109,6 +110,20 @@ foreach ($schedule as $daysAgo => $session) {
     $workouts->commit();
 }
 
-printf("Demo account ready: %d workouts over %d days.\n", count($schedule), $oldestCycle);
+// One personal routine with today's loads, so "Your routines" isn't empty in the demo
+$currentWeek = intdiv($oldestCycle, 4);
+$items = [];
+foreach ($program['Push'] as [$name, $setCount, $reps, $load, $increase, $rpe]) {
+    $items[] = [
+        'exercise_id' => $exerciseId($name),
+        'sets'        => $setCount,
+        'reps'        => $reps,
+        'weight_kg'   => $load + $currentWeek * $increase,
+        'rpe'         => $rpe,
+    ];
+}
+(new RoutineRepository())->save($userId, null, 'My push (current loads)', $items);
+
+printf("Demo account ready: %d workouts over %d days, 1 routine.\n", count($schedule), $oldestCycle);
 echo "  Email:    {$email}\n";
 echo "  Password: {$password}   (random — shown only now)\n";
