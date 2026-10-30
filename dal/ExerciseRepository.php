@@ -48,4 +48,20 @@ class ExerciseRepository
         $stmt->execute($exerciseIds);
         return $stmt->fetchAll();
     }
+
+    /**
+     * True only if EVERY id in the list is a real exercise. Lets endpoints answer
+     * 400 "unknown exercise" instead of failing on the foreign key (500).
+     */
+    public function allExist(array $exerciseIds): bool
+    {
+        $unique = array_values(array_unique(array_map('intval', $exerciseIds)));
+        if ($unique === []) {
+            return false;
+        }
+        $placeholders = implode(',', array_fill(0, count($unique), '?'));
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM exercises WHERE id IN ($placeholders)");
+        $stmt->execute($unique);
+        return (int) $stmt->fetchColumn() === count($unique);
+    }
 }

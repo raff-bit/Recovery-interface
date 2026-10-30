@@ -94,6 +94,7 @@ function check(bool $condition, string $name, string $detail = ''): void
 $db        = Database::getConnection();
 $testStart = $db->query('SELECT NOW()')->fetchColumn();
 $email     = 'smoke_' . bin2hex(random_bytes(4)) . '@test.local';
+$emailB    = 'smoke_b_' . bin2hex(random_bytes(4)) . '@test.local'; // second account for cross-user checks
 $password  = 'correct-horse-battery';
 $csrf      = '';
 
@@ -246,6 +247,77 @@ try {
     $r = post('pages/api_delete_workout.php', ['workout_id' => $workoutId]);
     check($r['status'] === 200, 'Workout can be deleted');
 
+    echo "\nRoutines\n";
+
+    $r = http('GET', 'pages/api_routines.php');
+    $templates = array_values(array_filter($r['json']['routines'] ?? [], fn($x) => $x['is_template']));
+    $templateId = $templates[0]['id'] ?? 0;
+    check($r['status'] === 200 && count($templates) >= 3 && count($templates[0]['items']) > 0, 'Routine list includes the built-in templates');
+
+    $item = ['exercise_id' => $exerciseId, 'sets' => 4, 'reps' => 8, 'weight_kg' => 60, 'rpe' => 8];
+    $r = post('pages/api_save_routine.php', ['name' => 'Smoke routine', 'items' => [$item]]);
+    $routineId = $r['json']['routine_id'] ?? 0;
+    check($r['status'] === 200 && $routineId > 0, 'Routine can be created', $r['raw']);
+
+    $r = http('GET', 'pages/api_routines.php');
+    $mine = array_values(array_filter($r['json']['routines'] ?? [], fn($x) => $x['id'] === $routineId));
+    check(($mine[0]['is_template'] ?? true) === false && ($mine[0]['items'][0]['sets'] ?? 0) === 4, 'New routine is listed as yours, with its items');
+
+    $r = post('pages/api_save_routine.php', ['name' => 'SMOKE ROUTINE', 'items' => [$item]]);
+    check($r['status'] === 409, 'Duplicate routine name (different case) is rejected (409)', "got HTTP {$r['status']}");
+
+    $r = post('pages/api_save_routine.php', ['routine_id' => $routineId, 'name' => 'Smoke routine v2', 'items' => [$item, array_merge($item, ['sets' => 2, 'weight_kg' => null, 'rpe' => null])]]);
+    $r2 = http('GET', 'pages/api_routines.php');
+    $mine = array_values(array_filter($r2['json']['routines'] ?? [], fn($x) => $x['id'] === $routineId));
+    check($r['status'] === 200 && ($mine[0]['name'] ?? '') === 'Smoke routine v2' && count($mine[0]['items'] ?? []) === 2, 'Routine can be updated (name + items replaced)');
+
+    $r = post('pages/api_save_routine.php', ['name' => 'Ghost', 'items' => [array_merge($item, ['exercise_id' => 999999])]]);
+    check($r['status'] === 400 && !str_contains($r['raw'], 'SQLSTATE'), 'Routine with an unknown exercise is rejected (400)', "got HTTP {$r['status']}");
+
+    $r = post('pages/api_save_routine.php', ['name' => 'Huge', 'items' => array_fill(0, 31, $item)]);
+    check($r['status'] === 400, 'Routine with more than 30 exercises is rejected');
+
+    $r  = post('pages/api_save_routine.php', ['routine_id' => $templateId, 'name' => 'Hijacked', 'items' => [$item]]);
+    $r2 = post('pages/api_delete_routine.php', ['routine_id' => $templateId]);
+    $r3 = http('GET', 'pages/api_routines.php');
+    $stillThere = array_filter($r3['json']['routines'] ?? [], fn($x) => $x['id'] === $templateId && $x['is_template'] && $x['name'] !== 'Hijacked');
+    check($r['status'] === 404 && $r2['status'] === 404 && count($stillThere) === 1, 'Built-in templates cannot be edited or deleted (404)');
+
+    // Second account: must not see, edit or delete the first account's routine
+    $savedCookies = $cookies;
+    $savedCsrf    = $csrf;
+    $cookies = [];
+    $csrf = http('GET', 'pages/api_me.php')['json']['csrf_token'] ?? '';
+    $r = post('pages/api_register.php', ['name' => 'Smoke B', 'email' => $emailB, 'password' => $password]);
+    $csrf = $r['json']['csrf_token'] ?? $csrf;
+
+    $r = http('GET', 'pages/api_routines.php');
+    $leaked = array_filter($r['json']['routines'] ?? [], fn($x) => $x['id'] === $routineId);
+    check($r['status'] === 200 && $leaked === [], "Another user cannot see your routines");
+
+    $r  = post('pages/api_save_routine.php', ['routine_id' => $routineId, 'name' => 'Stolen', 'items' => [$item]]);
+    $r2 = post('pages/api_delete_routine.php', ['routine_id' => $routineId]);
+    check($r['status'] === 404 && $r2['status'] === 404, "Another user cannot edit or delete your routine (404)");
+
+    $cookies = $savedCookies;
+    $csrf    = $savedCsrf;
+
+    $r = http('GET', 'pages/api_routines.php');
+    $mine = array_values(array_filter($r['json']['routines'] ?? [], fn($x) => $x['id'] === $routineId));
+    check(($mine[0]['name'] ?? '') === 'Smoke routine v2', 'Your routine is untouched after the other user\'s attempts');
+
+    // Per-account cap: 30 routines. We have 1, so 29 more are fine and the 31st is refused.
+    for ($i = 2; $i <= 30; $i++) {
+        post('pages/api_save_routine.php', ['name' => "Cap {$i}", 'items' => [$item]]);
+    }
+    $r = post('pages/api_save_routine.php', ['name' => 'Cap 31', 'items' => [$item]]);
+    check($r['status'] === 400, 'Each account is limited to 30 routines', "got HTTP {$r['status']}");
+
+    $r = post('pages/api_delete_routine.php', ['routine_id' => $routineId]);
+    $r2 = http('GET', 'pages/api_routines.php');
+    $gone = array_filter($r2['json']['routines'] ?? [], fn($x) => $x['id'] === $routineId);
+    check($r['status'] === 200 && $gone === [], 'Routine can be deleted');
+
     echo "\nAuth — logout & brute force\n";
 
     $r = http('GET', 'pages/api_logout.php');
@@ -261,6 +333,13 @@ try {
     $r = http('GET', 'pages/api_workout_history.php');
     check(($r['json']['workouts'] ?? null) === [], 'Logged-out user sees no workouts');
 
+    $r = http('GET', 'pages/api_routines.php');
+    $routines = $r['json']['routines'] ?? [];
+    check($routines !== [] && count(array_filter($routines, fn($x) => !$x['is_template'])) === 0, 'Logged-out user sees only the templates');
+
+    $r = post('pages/api_save_routine.php', ['name' => 'Anon', 'items' => [['exercise_id' => $exerciseId, 'sets' => 1, 'reps' => 5]]]);
+    check($r['status'] === 401, 'Saving a routine requires an account (401)');
+
     $r = post('pages/api_login.php', ['email' => 'nobody_' . bin2hex(random_bytes(4)) . '@test.local', 'password' => 'whatever-123']);
     $r2 = post('pages/api_login.php', ['email' => $email, 'password' => 'wrong-password-1']);
     check(
@@ -275,7 +354,7 @@ try {
     check($r['status'] === 429 && isset($r['headers']['retry-after']), 'After 5 failures the account is throttled (429) — even with the right password');
 } finally {
     // ---------------- teardown: leave the database exactly as we found it ----------------
-    $db->prepare('DELETE FROM users WHERE email = ?')->execute([strtolower($email)]); // cascades to workouts/profile
+    $db->prepare('DELETE FROM users WHERE email IN (?, ?)')->execute([strtolower($email), strtolower($emailB)]); // cascades to workouts/profile/routines
     $db->prepare("DELETE FROM auth_attempts WHERE created_at >= ? AND ip IN ('127.0.0.1', '::1')")->execute([$testStart]);
 }
 

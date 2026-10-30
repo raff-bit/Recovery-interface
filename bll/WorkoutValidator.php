@@ -142,9 +142,9 @@ final class WorkoutValidator
         return $text;
     }
 
-    // ---------- private primitives ----------
+    // ---------- primitives (public: RoutineValidator reuses them) ----------
 
-    private static function positiveInt(mixed $raw, string $field): int
+    public static function positiveInt(mixed $raw, string $field): int
     {
         // filter_var rejects "12abc", "1.5", true, arrays — (int) cast would silently accept them
         $value = filter_var($raw, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
@@ -154,7 +154,7 @@ final class WorkoutValidator
         return $value;
     }
 
-    private static function intInRange(mixed $raw, int $min, int $max, string $field): int
+    public static function intInRange(mixed $raw, int $min, int $max, string $field): int
     {
         $value = filter_var($raw, FILTER_VALIDATE_INT, ['options' => ['min_range' => $min, 'max_range' => $max]]);
         if ($value === false || is_bool($raw)) {
@@ -164,7 +164,7 @@ final class WorkoutValidator
     }
 
     /** null / '' → null (field is optional). Anything else must be a number in range. */
-    private static function optionalFloatInRange(mixed $raw, float $min, float $max, string $field): ?float
+    public static function optionalFloatInRange(mixed $raw, float $min, float $max, string $field): ?float
     {
         if ($raw === null || $raw === '') {
             return null;
