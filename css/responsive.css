@@ -176,10 +176,10 @@
   }
 
   .set-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) var(--tap);
+    grid-template-columns: repeat(3, minmax(0, 1fr)) var(--tap) var(--tap);
     grid-template-areas:
-      "ex   ex     ex  rm"
-      "reps weight rpe help";
+      "ex   ex     ex  rep  rm"
+      "reps weight rpe help help";
     gap: 12px var(--sp-2);
     padding: 12px;
     margin-bottom: 10px;
@@ -202,7 +202,8 @@
   .set-row .exercise-picker-btn          { grid-area: ex; min-height: 48px; }
   .set-row .exercise-picker-btn.selected { background: var(--raised-2); }
   .set-row .remove-set-btn               { grid-area: rm; width: var(--tap); height: var(--tap); align-self: center; }
-  .set-row .weight-help-btn              { grid-area: help; align-self: end; width: 36px; height: 36px; margin-bottom: 6px; }
+  .set-row .repeat-set-btn               { grid-area: rep; width: var(--tap); height: var(--tap); align-self: center; }
+  .set-row .weight-help-btn              { grid-area: help; align-self: end; justify-self: center; width: 36px; height: 36px; margin-bottom: 6px; }
   .set-row [data-field="sets"]           { grid-area: sets; }
   .set-row [data-field="reps"]           { grid-area: reps; }
   .set-row [data-field="weight"]         { grid-area: weight; }

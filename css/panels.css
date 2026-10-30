@@ -92,9 +92,10 @@
   margin-bottom: var(--sp-4);
 }
 
+/* exercise | reps | weight | ? | RPE | repeat | remove */
 .set-row {
   display: grid;
-  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr) minmax(0, 1fr) auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr) minmax(0, 1fr) auto minmax(0, 1fr) auto auto;
   gap: var(--sp-2);
   align-items: center;
   margin-bottom: var(--sp-2);
@@ -109,6 +110,22 @@
 .set-field {
   display: block;
   min-width: 0;
+}
+
+.repeat-set-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.repeat-set-btn:focus-visible,
+.remove-set-btn:focus-visible {
+  outline: 2px solid var(--ice-2);
+  outline-offset: 1px;
 }
 
 /* Per-field labels: hidden on desktop (the column header does the job), shown on phones */

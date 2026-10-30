@@ -9,9 +9,13 @@ import { refreshMuscles } from './hologram.js';
 import { refreshAnalytics } from './analytics.js';
 import { switchConsoleTab } from './main.js';
 
-export function addSetRow() {
+/**
+ * Adds a set row. With `afterRow`, the new row is inserted right below it
+ * (used by "Repeat set"); otherwise it goes to the end. Returns the new row.
+ */
+export function addSetRow(afterRow = null) {
   const container = document.getElementById('sets-container');
-  if (!container) return;
+  if (!container) return null;
   const row = document.createElement('div');
   row.className = 'set-row';
   const unit = getWeightUnitLabel();
@@ -31,12 +35,53 @@ export function addSetRow() {
       <span class="set-field-label">RPE</span>
       <input type="number" class="set-rpe" placeholder="RPE" min="1" max="10" step="0.5" inputmode="decimal">
     </label>
-    <button type="button" class="remove-set-btn" title="Remove set">×</button>
+    <button type="button" class="repeat-set-btn" title="Repeat this set" aria-label="Repeat this set">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg>
+    </button>
+    <button type="button" class="remove-set-btn" title="Remove set" aria-label="Remove set">×</button>
   `;
   row.querySelector('.exercise-picker-btn').addEventListener('click', () => openExercisePicker(row));
   row.querySelector('.weight-help-btn').addEventListener('click', (event) => toggleWeightHelp(event, row));
+  row.querySelector('.repeat-set-btn').addEventListener('click', () => repeatSetRow(row));
   row.querySelector('.remove-set-btn').addEventListener('click', () => row.remove());
-  container.appendChild(row);
+
+  if (afterRow) {
+    afterRow.after(row);
+  } else {
+    container.appendChild(row);
+  }
+  return row;
+}
+
+/**
+ * "Repeat set": copies exercise, reps, weight and RPE into a new row right below.
+ * Do one set, tap Repeat for each identical set, tweak only what changed (e.g. RPE).
+ * Weight is copied as displayed, so kg/lb stays consistent.
+ */
+export function repeatSetRow(sourceRow) {
+  const row = addSetRow(sourceRow);
+  if (!row) return;
+
+  const srcExercise = sourceRow.querySelector('.set-exercise');
+  const newExercise = row.querySelector('.set-exercise');
+  if (srcExercise.value) {
+    newExercise.value = srcExercise.value;
+    newExercise.dataset.equipment = srcExercise.dataset.equipment || '';
+    newExercise.dataset.bodyweight = srcExercise.dataset.bodyweight || '0';
+    const btn = row.querySelector('.exercise-picker-btn');
+    btn.textContent = sourceRow.querySelector('.exercise-picker-btn').textContent;
+    btn.classList.add('selected');
+  }
+
+  for (const field of ['.set-reps', '.set-weight', '.set-rpe']) {
+    row.querySelector(field).value = sourceRow.querySelector(field).value;
+  }
+
+  // Ready to tweak: focus the new row's reps, selected so typing replaces it
+  const reps = row.querySelector('.set-reps');
+  reps.focus({ preventScroll: true });
+  reps.select();
+  row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
 export function collectSetsFromForm() {

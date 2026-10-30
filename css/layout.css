@@ -94,7 +94,8 @@ button:disabled {
   color: var(--ember-ink);
 }
 
-.remove-set-btn {
+.remove-set-btn,
+.repeat-set-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -122,6 +123,11 @@ button:disabled {
   .modal-cancel-btn:hover,
   .history-action-btn:hover,
   .hud-action-btn-subtle:hover {
+    color: var(--ice);
+    background: var(--raised);
+  }
+
+  .repeat-set-btn:hover {
     color: var(--ice);
     background: var(--raised);
   }
