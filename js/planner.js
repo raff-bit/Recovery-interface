@@ -8,9 +8,10 @@ import { openExercisePicker } from './picker.js';
 import { refreshMuscles } from './hologram.js';
 import { readinessColor, thermalFill } from './ui.js';
 
+/** Adds a planner row and returns it (routines.js fills it in). */
 export function addPlannerSetRow() {
   const container = document.getElementById('planner-sets-container');
-  if (!container) return;
+  if (!container) return null;
   const row = document.createElement('div');
   row.className = 'set-row planner-set-row';
   const unit = getWeightUnitLabel();
@@ -38,6 +39,7 @@ export function addPlannerSetRow() {
   row.querySelector('.exercise-picker-btn').addEventListener('click', () => openExercisePicker(row));
   row.querySelector('.remove-set-btn').addEventListener('click', () => row.remove());
   container.appendChild(row);
+  return row;
 }
 
 export function collectPlannerSets() {

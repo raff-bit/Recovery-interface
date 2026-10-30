@@ -8,6 +8,7 @@ import { refreshAnalytics } from './analytics.js';
 import { closeExercisePicker, closeWeightHelp, initExercisePicker } from './picker.js';
 import { addSetRow, handleWorkoutSubmit, exitEditMode, refreshHistory, showFeedback } from './workout.js';
 import { addPlannerSetRow, handlePreviewClick, handleClearPreview } from './planner.js';
+import { initRoutines, loadRoutines, closeRoutineModal } from './routines.js';
 import { openProfileModal, closeProfileModal, handleProfileSubmit, loadProfile, updateProfileUnitLabels } from './profile.js';
 import { handleViewToggle, toggleHologramCollapse, refreshMuscles, initHologram3DInteractions } from './hologram.js';
 import {
@@ -126,7 +127,7 @@ function initDockNavigation() {
 function bindEvents() {
   document.getElementById('toggle-view').addEventListener('click', handleViewToggle);
   document.getElementById('hologram-collapse-btn').addEventListener('click', toggleHologramCollapse);
-  document.getElementById('add-set-btn').addEventListener('click', addSetRow);
+  document.getElementById('add-set-btn').addEventListener('click', () => addSetRow());
   document.getElementById('workout-form').addEventListener('submit', handleWorkoutSubmit);
   document.getElementById('cancel-edit-btn').addEventListener('click', exitEditMode);
 
@@ -144,7 +145,8 @@ function bindEvents() {
     if (event.target.id === 'exercise-picker-modal') closeExercisePicker();
   });
 
-  document.getElementById('planner-add-set-btn').addEventListener('click', addPlannerSetRow);
+  document.getElementById('planner-add-set-btn').addEventListener('click', () => addPlannerSetRow());
+  initRoutines();
   document.getElementById('preview-btn').addEventListener('click', handlePreviewClick);
   document.getElementById('clear-preview-btn').addEventListener('click', handleClearPreview);
 
@@ -162,6 +164,7 @@ function bindEvents() {
       closeExercisePicker();
       closeProfileModal();
       closeAuthModal();
+      closeRoutineModal();
     }
   });
 
@@ -212,7 +215,7 @@ async function init() {
       // Now: 3 "waves" → load time ≈ the slowest request of each wave.
       //   wave 1: session (sets the cookie + CSRF token everything else relies on)
       //   wave 2: profile + exercise library (the hologram needs the profile's sex)
-      //   wave 3: readiness + history + analytics
+      //   wave 3: readiness + history + analytics + routines
       await checkAuthSession();
       await Promise.all([loadProfile(), loadExercises()]);
 
@@ -225,7 +228,7 @@ async function init() {
       }
       addPlannerSetRow();
 
-      await Promise.all([refreshMuscles(), refreshHistory(), refreshAnalytics()]);
+      await Promise.all([refreshMuscles(), refreshHistory(), refreshAnalytics(), loadRoutines()]);
     } catch (err) {
       console.error(err);
       showFeedback('Could not reach the backend — check XAMPP is running.', true);

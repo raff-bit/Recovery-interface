@@ -375,6 +375,15 @@
   .readiness-title {
     font-size: 18px;
   }
+
+  /* Routine menu and "Save as routine" stack instead of squeezing */
+  .routine-bar {
+    flex-wrap: wrap;
+  }
+
+  .routine-bar .ghost-btn {
+    flex: 1 1 100%;
+  }
 }
 
 /* ---------- REDUCED MOTION ---------- */

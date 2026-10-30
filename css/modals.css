@@ -309,3 +309,56 @@
     color: var(--ice);
   }
 }
+
+/* ---------- 4. ROUTINES ---------- */
+
+.routine-modal-panel {
+  max-width: 460px;
+}
+
+.routine-summary {
+  margin: 0;
+}
+
+.routine-manage .analytics-card-title {
+  margin-bottom: var(--sp-2);
+}
+
+.routine-manage-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.routine-manage-list .hologram-footnote {
+  margin: 0;
+}
+
+.routine-manage-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.routine-manage-item:last-child {
+  border-bottom: none;
+}
+
+.routine-manage-name {
+  font-size: 15px;
+  font-weight: 560;
+  color: var(--ice);
+  overflow-wrap: anywhere;
+}
+
+.routine-manage-meta {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--ice-3);
+}

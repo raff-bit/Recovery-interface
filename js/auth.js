@@ -8,6 +8,7 @@ import { loadProfile, openProfileModal } from './profile.js';
 import { refreshMuscles } from './hologram.js';
 import { refreshHistory } from './workout.js';
 import { refreshAnalytics } from './analytics.js';
+import { loadRoutines } from './routines.js';
 
 export function updateAuthHeader() {
   const loggedContainer = document.getElementById('auth-header-logged');
@@ -59,6 +60,7 @@ export async function handleLoginSubmit(event) {
     await refreshMuscles();
     await refreshHistory();
     await refreshAnalytics();
+    await loadRoutines();
   } catch (err) {
     feedback.textContent = err.message;
     feedback.className = 'log-feedback error';
@@ -82,6 +84,7 @@ export async function handleRegisterSubmit(event) {
     await refreshMuscles();
     await refreshHistory();
     await refreshAnalytics();
+    await loadRoutines();
 
     openProfileModal();
     const profileFeedback = document.getElementById('profile-feedback');

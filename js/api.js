@@ -69,6 +69,7 @@ export const fetchExercises = () => getJson('pages/api_exercises.php', 'Failed t
 export const fetchHistory   = () => getJson('pages/api_workout_history.php?limit=9', 'Failed to load workout history');
 export const fetchProfile   = () => getJson('pages/api_get_profile.php', 'Failed to load profile');
 export const fetchAnalytics = () => getJson('pages/api_analytics.php', 'Failed to load analytics data');
+export const fetchRoutines  = () => getJson('pages/api_routines.php', 'Failed to load routines');
 
 export async function fetchWorkoutById(workoutId) {
   const id = encodeURIComponent(workoutId);
@@ -87,3 +88,11 @@ export const updateWorkout = (workoutId, payload) =>
 
 export const deleteWorkoutApi = (workoutId) =>
   postJson('pages/api_delete_workout.php', { workout_id: workoutId }, 'Failed to delete workout');
+
+/* ---------------- Routines ---------------- */
+
+export const saveRoutineApi = (payload) =>
+  postJson('pages/api_save_routine.php', payload, 'Failed to save routine');
+
+export const deleteRoutineApi = (routineId) =>
+  postJson('pages/api_delete_routine.php', { routine_id: routineId }, 'Failed to delete routine');

@@ -111,6 +111,11 @@
         <section class="panel hud-tab-panel" id="tab-workout">
           <h2 class="panel-label" id="log-panel-label">Log a session</h2>
           <form id="workout-form">
+            <div class="routine-bar">
+              <label for="log-routine-select" class="visually-hidden">Load a routine</label>
+              <select id="log-routine-select" class="routine-select"><option value="">Load a routine…</option></select>
+              <button type="button" id="log-save-routine-btn" class="ghost-btn" style="display:none">Save as routine</button>
+            </div>
             <input type="text" id="workout-label" placeholder="Session name (optional), e.g. Push day">
             <div id="sets-container"></div>
             <div class="log-actions">
@@ -126,6 +131,11 @@
         <section class="panel hud-tab-panel" id="tab-simulator">
           <h2 class="panel-label">Plan ahead</h2>
           <p class="hologram-footnote planner-hint">Sketch a future session and see how ready each muscle would be afterwards. Fatigue scales with load, reps, RPE and your profile.</p>
+          <div class="routine-bar">
+            <label for="planner-routine-select" class="visually-hidden">Load a routine into the planner</label>
+            <select id="planner-routine-select" class="routine-select"><option value="">Load a routine…</option></select>
+            <button type="button" id="planner-save-routine-btn" class="ghost-btn" style="display:none">Save as routine</button>
+          </div>
           <div class="planner-controls">
             <label for="planner-date" class="planner-date-label">Training on</label>
             <input type="date" id="planner-date">
@@ -253,6 +263,31 @@
       <div class="modal-actions">
         <button type="button" id="cancel-profile-btn" class="modal-cancel-btn">Cancel</button>
         <button type="submit" id="save-profile-btn" class="primary-btn">Save profile</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="routine-modal" class="modal-overlay" style="display:none">
+  <div class="modal-panel routine-modal-panel" role="dialog" aria-modal="true" aria-labelledby="routine-title">
+    <div class="modal-header">
+      <h2 class="panel-label" id="routine-title">Save as routine</h2>
+      <button type="button" id="close-routine-btn" class="modal-close" aria-label="Close">×</button>
+    </div>
+    <form id="routine-form" class="profile-form">
+      <p id="routine-summary" class="hologram-footnote routine-summary"></p>
+      <div class="profile-field">
+        <label for="routine-name">Routine name</label>
+        <input type="text" id="routine-name" maxlength="100" placeholder="e.g. Upper body A" autocomplete="off">
+      </div>
+      <div class="routine-manage">
+        <h3 class="analytics-card-title">Your routines</h3>
+        <ul id="routine-manage-list" class="routine-manage-list"></ul>
+      </div>
+      <p id="routine-feedback" class="log-feedback"></p>
+      <div class="modal-actions">
+        <button type="button" id="cancel-routine-btn" class="modal-cancel-btn">Cancel</button>
+        <button type="submit" id="save-routine-btn" class="primary-btn">Save routine</button>
       </div>
     </form>
   </div>

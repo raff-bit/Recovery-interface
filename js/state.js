@@ -12,6 +12,7 @@ export const state = {
   activePickerRow: null,
   activePickerRegion: 'all',
   editingWorkoutId: null,
+  routines: [],           // your routines + built-in templates (js/routines.js)
 };
 
 export const MUSCLE_GROUPS = [

@@ -92,6 +92,24 @@
   margin-bottom: var(--sp-4);
 }
 
+/* Routines: "Load a routine…" menu + "Save as routine" (Log and Plan) */
+.routine-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.routine-bar .routine-select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.routine-bar .ghost-btn {
+  flex-shrink: 0;
+  min-height: 44px;
+}
+
 /* exercise | reps | weight | ? | RPE | repeat | remove */
 .set-row {
   display: grid;
