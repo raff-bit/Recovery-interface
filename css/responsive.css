@@ -328,6 +328,10 @@
     padding: 0 var(--sp-5) var(--sp-3);
   }
 
+  .picker-search {
+    padding: 0 var(--sp-5) var(--sp-3);
+  }
+
   .modal-close {
     width: var(--tap);
     height: var(--tap);
@@ -338,7 +342,11 @@
   }
 
   .profile-form {
-    padding: var(--sp-2) var(--sp-5) calc(var(--sp-5) + var(--safe-bottom));
+    padding: var(--sp-2) var(--sp-5) 0;
+  }
+
+  .profile-form .modal-actions {
+    padding-bottom: calc(var(--sp-5) + var(--safe-bottom));
   }
 
   .modal-actions > button {

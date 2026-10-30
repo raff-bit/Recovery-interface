@@ -190,7 +190,10 @@
       <h2 class="panel-label" id="picker-title">Choose an exercise</h2>
       <button type="button" id="close-picker-btn" class="modal-close" aria-label="Close">×</button>
     </div>
-    <div class="picker-tabs" id="picker-tabs"></div>
+    <div class="picker-search">
+      <input type="search" id="picker-search" placeholder="Search exercises…" aria-label="Search exercises" autocomplete="off" enterkeyhint="go">
+    </div>
+    <div class="picker-tabs" id="picker-tabs" role="group" aria-label="Filter by muscle group"></div>
     <ul class="picker-list" id="picker-list"></ul>
   </div>
 </div>

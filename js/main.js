@@ -5,7 +5,7 @@
 import { state, LBS_PER_KG, IN_PER_CM } from './state.js';
 import { fetchExercises } from './api.js';
 import { refreshAnalytics } from './analytics.js';
-import { closeExercisePicker, closeWeightHelp } from './picker.js';
+import { closeExercisePicker, closeWeightHelp, initExercisePicker } from './picker.js';
 import { addSetRow, handleWorkoutSubmit, exitEditMode, refreshHistory, showFeedback } from './workout.js';
 import { addPlannerSetRow, handlePreviewClick, handleClearPreview } from './planner.js';
 import { openProfileModal, closeProfileModal, handleProfileSubmit, loadProfile, updateProfileUnitLabels } from './profile.js';
@@ -138,6 +138,7 @@ function bindEvents() {
     if (event.target.id === 'profile-modal') closeProfileModal();
   });
 
+  initExercisePicker();
   document.getElementById('close-picker-btn').addEventListener('click', closeExercisePicker);
   document.getElementById('exercise-picker-modal').addEventListener('click', (event) => {
     if (event.target.id === 'exercise-picker-modal') closeExercisePicker();

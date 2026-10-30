@@ -86,18 +86,43 @@
 
 /* ---------- 1. EXERCISE PICKER ---------- */
 
+/* Search box above the filters */
+.picker-search {
+  flex-shrink: 0;
+  padding: 0 var(--sp-6) var(--sp-3);
+}
+
+.picker-search input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  background: var(--raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-ctl);
+  color: var(--ice);
+  font: inherit;
+  font-size: 15px;
+}
+
+.picker-search input::placeholder {
+  color: var(--ice-3);
+}
+
+.picker-search input:focus-visible {
+  outline: 2px solid var(--ice-2);
+  outline-offset: 1px;
+}
+
+/* Filters WRAP onto a second line instead of scrolling sideways with a hidden
+   scrollbar: on desktop a mouse wheel can't scroll horizontally, so "Legs" and
+   others used to be cut off and unreachable. Nothing is hidden now. */
 .picker-tabs {
   flex-shrink: 0;
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   padding: 0 var(--sp-6) var(--sp-4);
-  overflow-x: auto;
-  scrollbar-width: none;
   border-bottom: 1px solid var(--line);
-}
-
-.picker-tabs::-webkit-scrollbar {
-  display: none;
 }
 
 .picker-tab {
@@ -141,16 +166,28 @@
   text-align: center;
 }
 
+/* Each exercise is a real <button>: reachable with Tab, selectable with Enter/Space */
 .picker-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--sp-3);
+  width: 100%;
   min-height: 50px;
   padding: 8px var(--sp-3);
+  background: none;
+  border: 0;
   border-radius: var(--r-ctl);
+  color: inherit;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
   transition: background-color 0.15s var(--ease);
+}
+
+.picker-item:focus-visible {
+  outline: 2px solid var(--ice-2);
+  outline-offset: -2px;
 }
 
 .picker-item:active {
@@ -206,9 +243,20 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
-  padding: var(--sp-2) var(--sp-6) var(--sp-6);
+  padding: var(--sp-2) var(--sp-6) 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+}
+
+/* Save/Cancel stay pinned to the bottom of the modal while the fields scroll
+   underneath — on short screens they used to sit below the fold, unseen. */
+.profile-form .modal-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  padding: var(--sp-3) 0 var(--sp-6);
+  background: var(--deep);
+  box-shadow: 0 -14px 16px -14px rgba(0, 0, 10, 0.7);
 }
 
 .profile-field {
