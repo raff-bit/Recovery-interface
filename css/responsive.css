@@ -199,6 +199,12 @@
     background: var(--raised-2);
   }
 
+  /* Typed numbers use the narrow width (like every other number in the app),
+     so "102.5" fits a phone-sized field. Placeholders ("Reps", "kg") keep the normal width. */
+  .set-row input:not(:placeholder-shown) {
+    font-stretch: var(--narrow);
+  }
+
   .set-row .exercise-picker-btn          { grid-area: ex; min-height: 48px; }
   .set-row .exercise-picker-btn.selected { background: var(--raised-2); }
   .set-row .remove-set-btn               { grid-area: rm; width: var(--tap); height: var(--tap); align-self: center; }
@@ -222,7 +228,7 @@
     color: var(--ice-3);
   }
 
-    /* Log: the sets of one exercise stack into a single block of joined cards.
+  /* Log: the sets of one exercise stack into a single block of joined cards.
      Vertical margins of sibling rows collapse: 10px bottom + (-6px) top = 4px gap */
   #sets-container .set-row.group-start:not(:first-child) {
     margin-top: var(--sp-6);
@@ -251,7 +257,7 @@
     clip: rect(0 0 0 0);
     white-space: nowrap;
   }
-  
+
   /* Form actions */
   .log-actions .ghost-btn {
     flex: 1 1 0;
@@ -413,6 +419,34 @@
 
   .routine-bar .ghost-btn {
     flex: 1 1 100%;
+  }
+
+  /* Legend + "Show back" don't fit on one line below ~350px: the button wraps
+     instead of pushing the whole page wider than the screen (horizontal scroll) */
+  .hologram-footer {
+    flex-wrap: wrap;
+  }
+}
+
+/* ---------- VERY NARROW PHONES (< 350px, e.g. iPhone SE 1st gen) ---------- */
+
+@media (max-width: 349px) {
+  /* Log set cards: slimmer icon columns and gaps, so "82.5" fits in the inputs.
+     Scoped to the Log: planner rows use their own 4-column grid. */
+  #sets-container .set-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 36px 36px;
+    column-gap: 6px;
+    padding: 10px;
+  }
+
+  #sets-container .set-row .remove-set-btn,
+  #sets-container .set-row .repeat-set-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  #sets-container .set-row input {
+    padding: 0 2px;
   }
 }
 
