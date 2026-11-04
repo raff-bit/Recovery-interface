@@ -670,6 +670,31 @@
   }
 }
 
+/* ---------- 6b. YOUR DATA (export) ---------- */
+
+.data-hint {
+  margin: 0 0 var(--sp-4);
+  max-width: 62ch;
+  line-height: 1.5;
+}
+
+.data-actions {
+  display: flex;
+  flex-wrap: wrap;   /* two buttons side by side; stacked on narrow phones */
+  gap: var(--sp-2);
+}
+
+.data-actions .ghost-btn {
+  flex: 1 1 200px;
+  min-height: 44px;
+  border-color: var(--line-strong);
+}
+
+.data-actions .ghost-btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
 /* ---------- 7. EMPTY STATES ---------- */
 
 .muscle-list > p,

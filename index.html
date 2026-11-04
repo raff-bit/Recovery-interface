@@ -184,6 +184,17 @@
             <h2 class="panel-label">Recent sessions</h2>
             <ul id="history-list" class="history-list"></ul>
           </section>
+          
+          <section class="panel data-panel" id="data-panel">
+            <h2 class="panel-label">Your data</h2>
+            <p class="hologram-footnote data-hint">Download your full training history. The Excel file has a sheet of sessions and a sheet of sets, with dates in your time zone. JSON is the complete raw copy.</p>
+            <div class="data-actions" id="export-actions" style="display:none">
+              <button type="button" id="export-xlsx-btn" class="ghost-btn">Download Excel (.xlsx)</button>
+              <button type="button" id="export-json-btn" class="ghost-btn">Download JSON</button>
+            </div>
+            <p class="hologram-footnote" id="export-guest-hint">Sign in to download your data.</p>
+            <p id="export-feedback" class="log-feedback" role="status"></p>
+          </section>
         </div>
 
       </div>

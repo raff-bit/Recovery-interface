@@ -9,6 +9,7 @@ import { refreshMuscles } from './hologram.js';
 import { refreshHistory } from './workout.js';
 import { refreshAnalytics } from './analytics.js';
 import { loadRoutines } from './routines.js';
+import { updateExportPanel } from './export.js';
 
 export function updateAuthHeader() {
   const loggedContainer = document.getElementById('auth-header-logged');
@@ -23,6 +24,7 @@ export function updateAuthHeader() {
     loggedContainer.style.display = 'none';
     loginOpenBtn.style.display = 'inline-flex';
   }
+    updateExportPanel(); // export buttons only for signed-in users
 }
 
 export function openAuthModal(defaultTab = 'login') {

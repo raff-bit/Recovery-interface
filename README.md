@@ -26,7 +26,7 @@ Plan a future session, and it projects what your readiness would be afterwards.
 - **Planner** — sketch a future session and see each muscle's readiness *before → after* on that date, without saving anything.
 - **Progress** — weekly volume over 8 weeks, set distribution per muscle group, most-trained exercises.
 - **Personalisation** — optional profile (body weight, age, sex, activity level) scales fatigue by *relative* load and adjusts recovery speed. No profile → the unpersonalised baseline, unchanged.
-- **Data export** — your full history as JSON or CSV.
+- **Data export** — your full history as a real Excel workbook (sessions + sets, dates in your time zone) or as JSON, from Progress → *Your data*. The `.xlsx` is written by a small pure-PHP ZIP + SpreadsheetML writer (no ext-zip needed), and user text is always stored as text, never as a formula.
 
 ## How the model works
 
@@ -148,7 +148,7 @@ docs/                model specification, screenshots
 
 ## Roadmap
 
-- Self-service account deletion and an export button in the UI (both are API-only today)
+- Self-service account deletion (operator-only today)
 - Learning per-user recovery constants from post-session soreness feedback
 - Remove `'unsafe-inline'` from the style CSP (move the remaining inline styles to classes)
 - Offline-capable PWA

@@ -9,6 +9,7 @@ import { closeExercisePicker, closeWeightHelp, initExercisePicker } from './pick
 import { addSetRow, handleWorkoutSubmit, exitEditMode, refreshHistory, showFeedback } from './workout.js';
 import { addPlannerSetRow, handlePreviewClick, handleClearPreview } from './planner.js';
 import { initRoutines, loadRoutines, closeRoutineModal } from './routines.js';
+import { initExport } from './export.js';
 import { openProfileModal, closeProfileModal, handleProfileSubmit, loadProfile, updateProfileUnitLabels } from './profile.js';
 import { handleViewToggle, toggleHologramCollapse, refreshMuscles, initHologram3DInteractions } from './hologram.js';
 import {
@@ -147,6 +148,7 @@ function bindEvents() {
 
   document.getElementById('planner-add-set-btn').addEventListener('click', () => addPlannerSetRow());
   initRoutines();
+  initExport();
   document.getElementById('preview-btn').addEventListener('click', handlePreviewClick);
   document.getElementById('clear-preview-btn').addEventListener('click', handleClearPreview);
 

@@ -29,7 +29,7 @@ Children: the profile accepts ages from 12. In Portugal, someone under 13 needs 
 
 ## Your data
 
-- **Export.** While signed in, open `pages/api_export_data.php?format=json` (or `?format=csv`) to download your complete training history.
+- **Export.** While signed in, open **Progress → Your data** and choose *Download Excel (.xlsx)* or *Download JSON* to get your complete training history (GDPR Art. 20, data portability). The Excel file shows dates in your browser's time zone; the JSON keeps them in UTC. The files are generated on request, sent only to you, and never stored or cached on the server. (`pages/api_export_data.php?format=csv` still works too.)
 - **Backups.** `database/backup.php` keeps the 14 most recent dumps. Each one contains every account's data, so deleted data also disappears from backups only once older dumps rotate out.
 - **Deletion.** Self-service account deletion is on the [roadmap](README.md#roadmap). Until then, the operator of the instance can delete an account. This removes the profile and every workout with it (cascading delete).
 
