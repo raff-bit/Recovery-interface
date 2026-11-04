@@ -1,11 +1,24 @@
 <?php
+/**
+ * GET pages/api_export_data.php?format=xlsx|json|csv[&tz=Europe/Lisbon]
+ * Downloads the signed-in user's full training history.
+ *   xlsx → Excel workbook: "Sessions" + "Sets" sheets, dates in the user's time zone
+ *   json → complete raw copy (dates in UTC, ISO 8601)
+ *   csv  → kept for compatibility; one row per set
+ * Cache-Control: no-store is already sent for every API response (config/bootstrap.php).
+ */
 require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
+require_once __DIR__ . '/../bll/TrainingExport.php';
 
 $userId = requireAuth();
-$format = strtolower($_GET['format'] ?? 'json');
-$workoutRepo = new WorkoutRepository();
 
+$format = is_string($_GET['format'] ?? null) ? strtolower($_GET['format']) : 'json';
+if (!in_array($format, ['json', 'csv', 'xlsx'], true)) {
+    jsonResponse(['error' => 'Unknown format. Use xlsx, json or csv.'], 400);
+}
+
+$workoutRepo = new WorkoutRepository();
 $workouts = $workoutRepo->getAllWorkoutsForExport($userId);
 $ids = array_column($workouts, 'id');
 $allSets = $workoutRepo->getSetsForWorkouts($ids);
@@ -13,6 +26,31 @@ $allSets = $workoutRepo->getSetsForWorkouts($ids);
 $setsByWorkout = [];
 foreach ($allSets as $s) {
     $setsByWorkout[$s['workout_id']][] = $s;
+}
+
+if ($format === 'xlsx') {
+    $tz = TrainingExport::resolveTimezone($_GET['tz'] ?? null);
+    $file = TrainingExport::toXlsx($workouts, $setsByWorkout, $tz);
+    $today = (new DateTimeImmutable('now', $tz))->format('Y-m-d');
+
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="recovery-interface-export-' . $today . '.xlsx"');
+    header('Content-Length: ' . strlen($file));
+    echo $file;
+    exit;
+}
+
+/**
+ * CSV cells starting with = + - @ (or tab / carriage return) are run as FORMULAS by Excel:
+ * a session named =HYPERLINK("http://evil","click") would become a live link.
+ * Prefixing a ' makes Excel show the text as-is (OWASP "CSV injection").
+ */
+function csvText(?string $value): ?string
+{
+    if ($value !== null && $value !== '' && strpbrk($value[0], "=+-@\t\r") !== false) {
+        return "'" . $value;
+    }
+    return $value;
 }
 
 if ($format === 'csv') {
@@ -24,18 +62,20 @@ if ($format === 'csv') {
 
     foreach ($workouts as $w) {
         $sets = $setsByWorkout[$w['id']] ?? [];
+        $label = csvText($w['label']);
+        $notes = csvText($w['notes']);
 
         if (empty($sets)) {
-            fputcsv($out, [isoUtc($w['workout_date']), $w['label'], $w['notes'], '', '', '', '', '']);
+            fputcsv($out, [isoUtc($w['workout_date']), $label, $notes, '', '', '', '', '']);
             continue;
         }
 
         foreach ($sets as $s) {
             fputcsv($out, [
                 isoUtc($w['workout_date']),
-                $w['label'],
-                $w['notes'],
-                $s['exercise_name'],
+                $label,
+                $notes,
+                csvText($s['exercise_name']),
                 $s['set_number'],
                 $s['reps'],
                 $s['weight_kg'],

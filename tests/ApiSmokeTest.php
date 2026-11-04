@@ -12,6 +12,7 @@
  */
 
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/Support/ZipReader.php'; // opens the .xlsx export without ext-zip
 
 $baseUrl = rtrim(getenv('BASE_URL') ?: 'http://localhost/Fit%20App', '/');
 
@@ -244,6 +245,46 @@ try {
     $r = http('GET', 'pages/api_analytics.php');
     check($r['status'] === 200 && isset($r['json']['weekly_volume']), 'Analytics load');
 
+    echo "\nExport\n";
+
+    // A name Excel would RUN if it were ever written as a formula (or left raw in a CSV)
+    $r = post('pages/api_log_workout.php', ['label' => '=1+1', 'sets' => [['exercise_id' => $exerciseId, 'reps' => 5, 'weight_kg' => 40, 'rpe' => 7]]]);
+    check($r['status'] === 200, 'Workout with a formula-like name is saved');
+
+    $r = http('GET', 'pages/api_export_data.php?format=xlsx&tz=Europe/Lisbon');
+    check($r['status'] === 200 && str_starts_with($r['raw'], "PK\x03\x04"), 'Excel export downloads a real .xlsx (ZIP signature)', "HTTP {$r['status']}");
+    $disposition = $r['headers']['content-disposition'] ?? '';
+    check(
+        str_contains($r['headers']['content-type'] ?? '', 'spreadsheetml.sheet') && str_contains($disposition, 'attachment') && str_contains($disposition, '.xlsx"'),
+        'Excel export has the Excel content type and downloads as an attachment'
+    );
+    check(str_contains($r['headers']['cache-control'] ?? '', 'no-store'), 'Excel export is never cached (no-store)');
+
+    try {
+        $files = ZipReader::read($r['raw']);
+    } catch (RuntimeException $e) {
+        $files = [];
+    }
+    $sessionsXml = $files['xl/worksheets/sheet1.xml'] ?? '';
+    $setsXml     = $files['xl/worksheets/sheet2.xml'] ?? '';
+    check($files !== [] && substr_count($setsXml, '<row r=') === 3, 'Excel export opens and has one row per set (header + 2 sets)', 'rows: ' . substr_count($setsXml, '<row r='));
+    check(str_contains($sessionsXml, '<t xml:space="preserve">=1+1</t>') && !str_contains($sessionsXml . $setsXml, '<f>'), 'Formula-like text is exported as text, never as a formula');
+
+    // Dates: stored in UTC, shown in the zone the browser asked for (Lisbon wall clock, now)
+    preg_match('#<c r="A2" s="2"><v>([0-9.]+)</v>#', $sessionsXml, $m);
+    $lisbonOffset = (new DateTimeZone('Europe/Lisbon'))->getOffset(new DateTime('now'));
+    $expected = (time() + $lisbonOffset) / 86400 + 25569;
+    check(isset($m[1]) && abs((float) $m[1] - $expected) < 10 / 1440, 'Excel dates are real dates in the user\'s time zone', 'got ' . ($m[1] ?? 'none'));
+
+    $r = http('GET', 'pages/api_export_data.php?format=xlsx&tz=' . urlencode('../../etc/passwd'));
+    check($r['status'] === 200 && str_starts_with($r['raw'], 'PK'), 'An invalid time zone falls back to UTC instead of failing');
+
+    $r = http('GET', 'pages/api_export_data.php?format=csv');
+    check(str_contains($r['raw'], "'=1+1") && !preg_match('/(^|,)=1\+1/m', $r['raw']), 'CSV export neutralises formula-like text');
+
+    $r = http('GET', 'pages/api_export_data.php?format=exe');
+    check($r['status'] === 400, 'Unknown export format is rejected (400)');
+
     $r = post('pages/api_delete_workout.php', ['workout_id' => $workoutId]);
     check($r['status'] === 200, 'Workout can be deleted');
 
@@ -299,6 +340,14 @@ try {
     $r2 = post('pages/api_delete_routine.php', ['routine_id' => $routineId]);
     check($r['status'] === 404 && $r2['status'] === 404, "Another user cannot edit or delete your routine (404)");
 
+    $r = http('GET', 'pages/api_export_data.php?format=xlsx');
+    try {
+        $otherSets = ZipReader::read($r['raw'])['xl/worksheets/sheet2.xml'] ?? '';
+    } catch (RuntimeException $e) {
+        $otherSets = '';
+    }
+    check($r['status'] === 200 && substr_count($otherSets, '<row r=') === 1, "Another user's export contains none of your sets (header only)");
+
     $cookies = $savedCookies;
     $csrf    = $savedCsrf;
 
@@ -332,6 +381,9 @@ try {
 
     $r = http('GET', 'pages/api_workout_history.php');
     check(($r['json']['workouts'] ?? null) === [], 'Logged-out user sees no workouts');
+
+    $r = http('GET', 'pages/api_export_data.php?format=xlsx');
+    check($r['status'] === 401 && !str_starts_with($r['raw'], 'PK'), 'Export requires an account (401)');
 
     $r = http('GET', 'pages/api_routines.php');
     $routines = $r['json']['routines'] ?? [];
