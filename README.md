@@ -12,21 +12,28 @@ Plan a future session, and it projects what your readiness would be afterwards.
 
 <table>
   <tr>
+    <td width="70%"><img src="docs/screenshots/log.png" alt="Log — a routine loaded, sets grouped into numbered blocks per exercise"></td>
+    <td width="30%" rowspan="2"><img src="docs/screenshots/mobile.png" alt="Mobile layout — the same sets as joined cards"></td>
+  </tr>
+  <tr>
     <td width="70%"><img src="docs/screenshots/planner.png" alt="Planner — projected readiness for a future session"></td>
-    <td width="30%"><img src="docs/screenshots/mobile.png" alt="Mobile layout"></td>
   </tr>
 </table>
+
+![Progress — weekly volume, muscle-group balance, most-logged exercises](docs/screenshots/progress.png)
 
 ---
 
 ## What it does
 
 - **Readiness map** — 17 muscle groups, colour-coded from recovered to fatigued, on a front/back body map.
-- **Workout log** — 52 exercises, each mapped to the muscles it trains (primary/secondary activation). Edit and delete past sessions.
+- **Workout log** — 52 exercises, each mapped to the muscles it trains (primary/secondary activation), with accent-insensitive search and muscle-group filters. Consecutive sets of the same exercise are grouped into numbered blocks, and **Repeat set** copies a set in one tap. Edit and delete past sessions.
+- **Routines** — load a built-in Push / Pull / Leg day or one of your own into the log or the planner; save what's on screen as a routine.
 - **Planner** — sketch a future session and see each muscle's readiness *before → after* on that date, without saving anything.
 - **Progress** — weekly volume over 8 weeks, set distribution per muscle group, most-trained exercises.
 - **Personalisation** — optional profile (body weight, age, sex, activity level) scales fatigue by *relative* load and adjusts recovery speed. No profile → the unpersonalised baseline, unchanged.
 - **Data export** — your full history as a real Excel workbook (sessions + sets, dates in your time zone) or as JSON, from Progress → *Your data*. The `.xlsx` is written by a small pure-PHP ZIP + SpreadsheetML writer (no ext-zip needed), and user text is always stored as text, never as a formula.
+- **Responsive** — desktop two-column layout down to phones as narrow as 300 px, with a bottom tab bar.
 
 ## How the model works
 
@@ -52,14 +59,17 @@ Full specification, coefficients and limitations: **[docs/recovery-model.md](doc
 ```
 js/      ES modules (UI, state, single API transport)  ──HTTP/JSON──▶
 pages/   thin endpoints: auth, validation, response shaping
-bll/     business rules: RecoveryCalculator, WorkoutValidator, AuthThrottle, PasswordPolicy
+bll/     business rules: RecoveryCalculator, Workout/RoutineValidator, AuthThrottle,
+         PasswordPolicy, TrainingExport (+ XlsxWriter, ZipWriter)
 dal/     repositories (PDO, prepared statements only)
 MySQL / MariaDB (InnoDB)
 ```
 
 **Security.**
-- Every endpoint goes through one bootstrap: hardened session cookie (`HttpOnly`, `SameSite=Lax`, strict mode), **CSRF** tokens on every state-changing request, and a global error handler, so no stack trace ever reaches the browser.
-- **Content-Security-Policy** with `script-src 'self'`; all user-entered text rendered via `textContent`.
+- Every endpoint goes through one bootstrap: hardened session cookie (`HttpOnly`, `SameSite=Lax`, strict mode), **CSRF** tokens on every state-changing request, and a global error handler, so no stack trace ever reaches the browser. Session ID and CSRF token both rotate at sign-in.
+- **Ownership enforced in SQL**: every write carries `AND user_id = ?`, including the child-row deletes, so another user's workout or routine answers 404 even to a hand-crafted request. Built-in templates (`user_id NULL`) can't be modified by anyone.
+- **Content-Security-Policy** with `script-src 'self'`; everything that comes from the server is rendered via `textContent`, never `innerHTML`.
+- **Exports can't carry formulas**: the `.xlsx` stores text as inline strings, and the CSV prefixes `= + - @` cells (CSV injection).
 - **Brute-force throttling**: 5 failed logins per account and 20 per IP per 15 min, plus a timing-safe login so response times don't reveal which emails exist. Registration is rate-limited too.
 - Passwords: bcrypt, 10–72 bytes (bcrypt's real limit), common-password deny-list.
 - Input validation follows *reject, don't repair*: `"12abc"` reps is a 400, never silently `12`.
@@ -76,8 +86,8 @@ MySQL / MariaDB (InnoDB)
 **Testing & CI.** On every push, GitHub Actions runs:
 - `composer validate`, `composer audit` (known vulnerabilities), `php -l` on every file
 - **PHPStan level 6** static analysis
-- **PHPUnit** on PHP 8.1 and 8.3, with 41 unit tests using stubs instead of a database. The tests pin the model's exact numbers, not just its direction.
-- an **end-to-end smoke test**: a real Apache + MariaDB, a fresh install, then 50 HTTP checks covering file exposure (including backups), CSP, CSRF, throttling, payload limits, the full workout lifecycle and UTC handling.
+- **PHPUnit** on PHP 8.1 and 8.3, with 76 unit tests using stubs instead of a database. The tests pin the model's exact numbers, not just its direction, and read the generated `.xlsx` back with an independent ZIP reader.
+- an **end-to-end smoke test**: a real Apache + MariaDB, a fresh install, then 80 HTTP checks covering file exposure (including backups), CSP, CSRF, throttling, payload limits, the full workout lifecycle, UTC handling, routines across two accounts (IDOR) and the Excel export (formula injection, time zones).
 
 ## Tech stack
 
@@ -142,6 +152,7 @@ config/              bootstrap (security), env loader, DB connection
 js/  css/            frontend (ES modules, modular CSS, self-hosted font)
 database/            schema, seeds, migrations, install/migrate/backup/demo scripts
 tests/Unit/          PHPUnit suites
+tests/Support/       test helpers (independent ZIP reader for the .xlsx export)
 tests/ApiSmokeTest.php   end-to-end HTTP checks
 docs/                model specification, screenshots
 ```
@@ -149,6 +160,7 @@ docs/                model specification, screenshots
 ## Roadmap
 
 - Self-service account deletion (operator-only today)
+- Exercise demonstrations (start/end position images) in the exercise picker
 - Learning per-user recovery constants from post-session soreness feedback
 - Remove `'unsafe-inline'` from the style CSP (move the remaining inline styles to classes)
 - Offline-capable PWA
