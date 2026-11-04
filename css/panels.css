@@ -165,13 +165,15 @@
   width: 100%;
   min-width: 0;
   min-height: 44px;
-  padding: 0 12px;
+  padding: 6px 12px;
   display: flex;
   align-items: center;
   gap: 10px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* Long names wrap to a 2nd line instead of being cut ("Overhead Tricep Extension").
+     (text-overflow: ellipsis never worked here: it doesn't apply to flex containers.) */
+  white-space: normal;
+  line-height: 1.2;
   text-align: left;
   font-size: 15px;
   font-weight: 500;
@@ -212,6 +214,36 @@
     border-color: var(--ice-3);
     color: var(--ice);
   }
+}
+
+/* ---------- 2b. LOG: SETS GROUPED BY EXERCISE ----------
+   regroupSetRows() (js/workout.js) tags consecutive rows of the same exercise:
+   .group-start / .group-continue / .group-end, plus data-set-num on the button.
+   Scoped to #sets-container: planner rows are 1 row = 1 exercise already. */
+
+/* A new exercise opens with breathing room and a divider */
+#sets-container .set-row.group-start:not(:first-child) {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--line);
+}
+
+/* Set number: reuses the circle that shows "+" on an empty row */
+#sets-container .exercise-picker-btn.selected[data-set-num]::before {
+  display: inline-flex;
+  content: attr(data-set-num);
+  color: var(--ice-2);
+  font-size: 12px;
+  font-weight: 650;
+  font-stretch: var(--narrow);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sets 2, 3, 4…: the name steps back, so only the block's first row "shouts" */
+#sets-container .set-row.group-continue .exercise-picker-btn.selected {
+  color: var(--ice-3);
+  font-weight: 450;
+  background: transparent;
 }
 
 .weight-help-btn {

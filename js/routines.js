@@ -10,7 +10,7 @@
 
 import { state, kgToDisplayWeight, displayWeightToKg } from './state.js';
 import { fetchRoutines, saveRoutineApi, deleteRoutineApi } from './api.js';
-import { addSetRow } from './workout.js';
+import { addSetRow, regroupSetRows } from './workout.js';
 import { addPlannerSetRow } from './planner.js';
 
 const MAX_SETS_PER_ITEM = 20; // mirrors RoutineValidator::MAX_SETS_PER_ITEM
@@ -110,7 +110,7 @@ export function applyRoutineToLog(routine) {
       row.querySelector('.set-rpe').value = item.rpe ?? '';
     }
   });
-
+  regroupSetRows();
   const label = document.getElementById('workout-label');
   if (label && label.value.trim() === '') label.value = routine.name;
   return true;

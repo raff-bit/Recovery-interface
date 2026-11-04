@@ -43,14 +43,57 @@ export function addSetRow(afterRow = null) {
   row.querySelector('.exercise-picker-btn').addEventListener('click', () => openExercisePicker(row));
   row.querySelector('.weight-help-btn').addEventListener('click', (event) => toggleWeightHelp(event, row));
   row.querySelector('.repeat-set-btn').addEventListener('click', () => repeatSetRow(row));
-  row.querySelector('.remove-set-btn').addEventListener('click', () => row.remove());
+  row.querySelector('.remove-set-btn').addEventListener('click', () => {
+    row.remove();
+    regroupSetRows();
+  });
 
   if (afterRow) {
     afterRow.after(row);
   } else {
     container.appendChild(row);
   }
+  regroupSetRows();
   return row;
+}
+
+
+/**
+ * Presentation only: tags CONSECUTIVE rows of the same exercise as one block,
+ * so 4 sets of Bench Press read as one exercise instead of 4 lookalike rows.
+ *   .group-start / .group-continue / .group-end  → spacing, divider, joined cards (CSS)
+ *   data-set-num on the exercise button          → the "1, 2, 3…" badge (CSS ::before)
+ * The data sent to the server is untouched: collectSetsFromForm() still reads row by row.
+ * Call it after anything that adds, removes or changes the exercise of a row.
+ */
+export function regroupSetRows() {
+  const rows = document.querySelectorAll('#sets-container .set-row');
+  let previousId = null;
+  let setNumber = 0;
+
+  rows.forEach((row, i) => {
+    const exerciseId = row.querySelector('.set-exercise').value;
+    // An empty row ("Choose Exercise") never joins a block: it's always its own
+    const continues = exerciseId !== '' && exerciseId === previousId;
+    setNumber = continues ? setNumber + 1 : 1;
+
+    const next = rows[i + 1];
+    const nextId = next ? next.querySelector('.set-exercise').value : null;
+    const endsHere = exerciseId === '' || nextId !== exerciseId;
+
+    row.classList.toggle('group-start', !continues);
+    row.classList.toggle('group-continue', continues);
+    row.classList.toggle('group-end', endsHere);
+
+    const btn = row.querySelector('.exercise-picker-btn');
+    if (exerciseId === '') {
+      delete btn.dataset.setNum; // keeps the "+" circle
+    } else {
+      btn.dataset.setNum = String(setNumber);
+    }
+
+    previousId = exerciseId;
+  });
 }
 
 /**
@@ -76,6 +119,8 @@ export function repeatSetRow(sourceRow) {
   for (const field of ['.set-reps', '.set-weight', '.set-rpe']) {
     row.querySelector(field).value = sourceRow.querySelector(field).value;
   }
+
+  regroupSetRows(); // the copy now has the exercise → it joins the block
 
   // Ready to tweak: focus the new row's reps, selected so typing replaces it
   const reps = row.querySelector('.set-reps');
@@ -144,13 +189,13 @@ export function renderHistory(workouts) {
       (bySets[s.exercise_name] = bySets[s.exercise_name] || []).push(line);
     });
 
-        // workout_date arrives as UTC ISO ("...Z"); the browser converts it to local time
+    // workout_date arrives as UTC ISO ("...Z"); the browser converts it to local time
     const date = new Date(w.workout_date);
-    const dateStr = date.toLocaleDateString(undefined, { 
-      month: 'short', 
-      day: 'numeric', 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    const dateStr = date.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
 
     const li = document.createElement('li');
@@ -242,6 +287,8 @@ export function enterEditMode(workout) {
     row.querySelector('.set-weight').value = s.weight_kg ? kgToDisplayWeight(s.weight_kg) : '';
     row.querySelector('.set-rpe').value = s.rpe ?? '';
   });
+
+  regroupSetRows();
 
   // Comuta automaticamente para o ecrã de Workout
   switchConsoleTab('tab-workout');

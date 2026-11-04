@@ -222,6 +222,36 @@
     color: var(--ice-3);
   }
 
+    /* Log: the sets of one exercise stack into a single block of joined cards.
+     Vertical margins of sibling rows collapse: 10px bottom + (-6px) top = 4px gap */
+  #sets-container .set-row.group-start:not(:first-child) {
+    margin-top: var(--sp-6);
+    padding-top: 12px;   /* the card's own padding (the desktop divider padding is not needed) */
+    border-top: 0;
+  }
+
+  #sets-container .set-row.group-continue {
+    margin-top: -6px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+  }
+
+  #sets-container .set-row:not(.group-end) {
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+  }
+
+  /* Reps / kg / RPE labelled once per block: the cards below line up under them.
+     Still in the DOM (visually hidden), so screen readers keep each field's name. */
+  #sets-container .set-row.group-continue .set-field-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  
   /* Form actions */
   .log-actions .ghost-btn {
     flex: 1 1 0;

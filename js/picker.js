@@ -3,6 +3,7 @@
    ============================================================ */
 
 import { state, MUSCLE_GROUPS } from './state.js';
+import { regroupSetRows } from './workout.js';  
 
 export function getExercisePrimaryRegion(exercise) {
   if (!exercise.muscles || exercise.muscles.length === 0) return 'other';
@@ -163,6 +164,8 @@ export function selectExerciseForRow(exercise) {
   hiddenInput.value = exercise.id;
   hiddenInput.dataset.equipment = exercise.equipment || '';
   hiddenInput.dataset.bodyweight = exercise.is_bodyweight ? '1' : '0';
+    // Log rows only: picking Bench on a row right under Bench rows merges it into that block
+  if (row.closest('#sets-container')) regroupSetRows();
 
   closeExercisePicker();
 }
