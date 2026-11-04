@@ -4,7 +4,7 @@
 
 import { state } from './state.js';
 import { fetchMuscles } from './api.js';
-import { readinessColor, thermalFill, countUp, summarizeReadiness, prefersReducedMotion } from './ui.js';
+import { readinessColor, thermalFill, countUp, summarizeReadiness, prefersReducedMotion, el } from './ui.js';
 import { buildBodyMap } from './bodymap.js';
 
 const SCAN_MS = 1700;
@@ -27,21 +27,25 @@ export function renderMuscleList(muscles) {
     li.style.setProperty('--i', index);
     li.style.setProperty('--heat', color);
 
-    li.innerHTML = `
-      <div class="muscle-row-main">
-        <span class="muscle-row-name">${m.display_name}</span>
-        <span class="muscle-row-status">${m.status}</span>
-      </div>
-      <span class="muscle-row-value"><span class="num">0</span><small>%</small></span>
-      <div class="muscle-row-bar-track">
-        <div class="muscle-row-bar-fill" style="width:${m.readiness}%"></div>
-      </div>
-    `;
+    // Built with textContent (el), never an innerHTML template: names come from the server
+    const main = el('div', 'muscle-row-main');
+    main.append(el('span', 'muscle-row-name', m.display_name), el('span', 'muscle-row-status', m.status));
+
+    const num = el('span', 'num', '0');
+    const value = el('span', 'muscle-row-value');
+    value.append(num, el('small', '', '%'));
+
+    const track = el('div', 'muscle-row-bar-track');
+    const fill = el('div', 'muscle-row-bar-fill');
+    fill.style.width = `${m.readiness}%`;
+    track.append(fill);
+
+    li.append(main, value, track);
     li.addEventListener('mouseenter', () => setMuscleFocus(m.muscle_key));
     li.addEventListener('mouseleave', () => setMuscleFocus(null));
     list.appendChild(li);
 
-    countUp(li.querySelector('.num'), m.readiness, { duration: 900 + index * 25 });
+    countUp(num, m.readiness, { duration: 900 + index * 25 });
   });
 }
 

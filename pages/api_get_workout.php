@@ -3,21 +3,19 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
 
-if (empty($_GET['id'])) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Missing id parameter.']);
-    exit;
+$userId = requireAuth();
+
+// filter_var, not (int): "1abc" or id[]=1 is a 400, never silently read as workout 1
+$workoutId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+if ($workoutId === false) {
+    jsonResponse(['error' => 'Missing or invalid id parameter.'], 400);
 }
 
-$userId = requireAuth();
-$workoutId = (int) $_GET['id'];
 $workoutRepo = new WorkoutRepository();
 
 $workout = $workoutRepo->getWorkoutById($workoutId, $userId);
 if (!$workout) {
-    http_response_code(404);
-    echo json_encode(['error' => 'Workout not found.']);
-    exit;
+    jsonResponse(['error' => 'Workout not found.'], 404);
 }
 
 $sets = $workoutRepo->getSetsForWorkouts([$workoutId]);

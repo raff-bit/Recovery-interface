@@ -6,7 +6,7 @@ import { state, getWeightUnitLabel, displayWeightToKg } from './state.js';
 import { postPreview } from './api.js';
 import { openExercisePicker } from './picker.js';
 import { refreshMuscles } from './hologram.js';
-import { readinessColor, thermalFill } from './ui.js';
+import { readinessColor, thermalFill, el } from './ui.js';
 
 /** Adds a planner row and returns it (routines.js fills it in). */
 export function addPlannerSetRow() {
@@ -103,14 +103,14 @@ export function renderPlannerResults(muscles, targetDateIso) {
     const li = document.createElement('li');
     li.className = 'muscle-row planner-result-row';
     li.style.setProperty('--i', index);
-    li.innerHTML = `
-      <span class="muscle-row-name">${m.display_name}</span>
-      <span class="planner-result-values">
-        <span class="before" style="color:${readinessColor(m.readiness_before)}">${m.readiness_before}%</span>
-        <span class="arrow">→</span>
-        <span style="color:${readinessColor(m.readiness_after)}">${m.readiness_after}%</span>
-      </span>
-    `;
+    const before = el('span', 'before', `${m.readiness_before}%`);
+    before.style.color = readinessColor(m.readiness_before);
+    const after = el('span', '', `${m.readiness_after}%`);
+    after.style.color = readinessColor(m.readiness_after);
+
+    const values = el('span', 'planner-result-values');
+    values.append(before, el('span', 'arrow', '→'), after);
+    li.append(el('span', 'muscle-row-name', m.display_name), values);
     list.appendChild(li);
   });
 }

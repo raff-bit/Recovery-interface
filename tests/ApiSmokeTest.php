@@ -172,9 +172,14 @@ try {
     $r = post('pages/api_register.php', ['name' => 'Smoke', 'email' => $email, 'password' => '1234567890']);
     check($r['status'] === 400, 'Common password is rejected');
 
+    $loggedOutToken = $csrf;
     $r = post('pages/api_register.php', ['name' => 'Smoke', 'email' => $email, 'password' => $password]);
     check($r['status'] === 200 && ($r['json']['success'] ?? false), 'Strong password registers successfully', $r['raw']);
     $csrf = $r['json']['csrf_token'] ?? $csrf;
+
+    // A token seen while logged OUT must be useless once logged IN
+    $r = http('POST', 'pages/api_save_profile.php', ['body_weight_kg' => 80], ['X-CSRF-Token' => $loggedOutToken]);
+    check($csrf !== $loggedOutToken && $r['status'] === 403, 'Signing in issues a new CSRF token; the old one is rejected', "HTTP {$r['status']}");
 
     $r = post('pages/api_register.php', ['name' => 'Smoke', 'email' => strtoupper($email), 'password' => $password]);
     check($r['status'] === 409, 'Duplicate email (different case) is rejected');
@@ -197,7 +202,7 @@ try {
     check($r['status'] === 400, 'Invalid reps are rejected with 400 (not 500)');
 
     $r = post('pages/api_log_workout.php', ['sets' => [['exercise_id' => 999999, 'reps' => 5]]]);
-    check($r['status'] >= 400 && !str_contains($r['raw'], 'SQLSTATE'), 'Unknown exercise fails without leaking SQL errors');
+    check($r['status'] === 400 && !str_contains($r['raw'], 'SQLSTATE'), 'Unknown exercise is a 400 (client error), without leaking SQL errors', "HTTP {$r['status']}");
 
     // Wrong JSON types trigger a PHP TypeError internally — the user must only see a generic message
     $r = post('pages/api_preview_workout.php', ['target_date' => ['not', 'a', 'string'], 'sets' => [['exercise_id' => $exerciseId, 'reps' => 5]]]);
@@ -230,6 +235,14 @@ try {
 
     $r = http('GET', "pages/api_get_workout.php?id={$workoutId}");
     check(($r['json']['workout']['label'] ?? '') === 'Edited' && count($r['json']['workout']['sets'] ?? []) === 1, 'Update is persisted');
+
+    $r = post('pages/api_update_workout.php', ['workout_id' => $workoutId, 'sets' => [['exercise_id' => 999999, 'reps' => 5]]]);
+    $r2 = http('GET', "pages/api_get_workout.php?id={$workoutId}");
+    check($r['status'] === 400 && count($r2['json']['workout']['sets'] ?? []) === 1, 'Update with an unknown exercise is a 400 and changes nothing', "HTTP {$r['status']}");
+
+    $r  = http('GET', "pages/api_get_workout.php?id={$workoutId}abc");
+    $r2 = http('GET', 'pages/api_get_workout.php?id[]=' . $workoutId);
+    check($r['status'] === 400 && $r2['status'] === 400, 'Malformed workout ids ("12abc", id[]) are rejected, not repaired', "HTTP {$r['status']} / {$r2['status']}");
 
     $r = post('pages/api_save_profile.php', ['sex' => 'male', 'body_weight_kg' => 80, 'age' => 25, 'activity_level' => 'very_active']);
     check($r['status'] === 200, 'Profile can be saved');
@@ -282,8 +295,9 @@ try {
     $r = http('GET', 'pages/api_export_data.php?format=csv');
     check(str_contains($r['raw'], "'=1+1") && !preg_match('/(^|,)=1\+1/m', $r['raw']), 'CSV export neutralises formula-like text');
 
-    $r = http('GET', 'pages/api_export_data.php?format=exe');
-    check($r['status'] === 400, 'Unknown export format is rejected (400)');
+    $r  = http('GET', 'pages/api_export_data.php?format=exe');
+    $r2 = http('GET', 'pages/api_export_data.php?format[]=xlsx');
+    check($r['status'] === 400 && $r2['status'] === 400, 'Unknown or malformed export format is rejected (400)', "HTTP {$r['status']} / {$r2['status']}");
 
     $r = post('pages/api_delete_workout.php', ['workout_id' => $workoutId]);
     check($r['status'] === 200, 'Workout can be deleted');

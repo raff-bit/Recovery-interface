@@ -139,10 +139,19 @@ class WorkoutRepository
         ]);
     }
 
-    public function deleteSetsForWorkout(int $workoutId): void
+    /**
+     * Ownership is enforced HERE too, not only by the endpoint's check:
+     * the JOIN means sets of someone else's workout can never be deleted,
+     * even if a future caller forgets to check first (defence in depth).
+     */
+    public function deleteSetsForWorkout(int $workoutId, int $userId): void
     {
-        $stmt = $this->db->prepare('DELETE FROM workout_sets WHERE workout_id = :id');
-        $stmt->execute([':id' => $workoutId]);
+        $stmt = $this->db->prepare(
+            'DELETE ws FROM workout_sets ws
+             JOIN workouts w ON w.id = ws.workout_id
+             WHERE ws.workout_id = :id AND w.user_id = :user_id'
+        );
+        $stmt->execute([':id' => $workoutId, ':user_id' => $userId]);
     }
 
     public function getAllWorkoutsForExport(int $userId): array

@@ -2,6 +2,7 @@
 header('Content-Type: application/json');
 require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
+require_once __DIR__ . '/../dal/ExerciseRepository.php';
 require_once __DIR__ . '/../bll/WorkoutValidator.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -25,6 +26,11 @@ try {
     http_response_code(400);
     echo json_encode(['error' => $e->getMessage()]);
     exit;
+}
+
+// An unknown exercise is the CLIENT's mistake → 400, not a foreign-key failure logged as a 500
+if (!(new ExerciseRepository())->allExist(array_column($sets, 'exercise_id'))) {
+    jsonResponse(['error' => 'One of the exercises does not exist.'], 400);
 }
 
 // 2. Persist atomically — either the whole workout is saved, or nothing is

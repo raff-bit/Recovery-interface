@@ -13,8 +13,8 @@ require_once __DIR__ . '/../bll/TrainingExport.php';
 
 $userId = requireAuth();
 
-$format = is_string($_GET['format'] ?? null) ? strtolower($_GET['format']) : 'json';
-if (!in_array($format, ['json', 'csv', 'xlsx'], true)) {
+$format = $_GET['format'] ?? 'json';
+if (!is_string($format) || !in_array($format = strtolower($format), ['json', 'csv', 'xlsx'], true)) {
     jsonResponse(['error' => 'Unknown format. Use xlsx, json or csv.'], 400);
 }
 

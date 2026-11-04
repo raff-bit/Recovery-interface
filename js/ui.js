@@ -55,6 +55,18 @@ const fatigueOf = (readiness) => 1 - Math.max(0, Math.min(100, Number(readiness)
 /**
  * Readable colour for numbers, bars and labels.
  */
+/**
+ * Creates an element whose content is set with textContent — never parsed as HTML.
+ * Use it for anything that comes from the server, even "trusted" reference data:
+ * exercise and muscle names could one day be user-created.
+ */
+export function el(tag, className = '', text = null) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== null) node.textContent = String(text);
+  return node;
+}
+
 export function readinessColor(readiness) {
   return sampleStops(INK_STOPS, fatigueOf(readiness));
 }

@@ -2,6 +2,7 @@
 header('Content-Type: application/json');
 require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../dal/WorkoutRepository.php';
+require_once __DIR__ . '/../dal/ExerciseRepository.php';
 require_once __DIR__ . '/../bll/WorkoutValidator.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -43,11 +44,15 @@ try {
     exit;
 }
 
+if (!(new ExerciseRepository())->allExist(array_column($sets, 'exercise_id'))) {
+    jsonResponse(['error' => 'One of the exercises does not exist.'], 400);
+}
+
 try {
     $workoutRepo->beginTransaction();
 
     $workoutRepo->updateWorkoutMeta($workoutId, $userId, $workoutDate, $label, $notes);
-    $workoutRepo->deleteSetsForWorkout($workoutId);
+    $workoutRepo->deleteSetsForWorkout($workoutId, $userId);
     $workoutRepo->addSets($workoutId, $sets);
 
     $workoutRepo->commit();

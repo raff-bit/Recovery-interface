@@ -104,6 +104,14 @@ class RoutineRepository
                 $stmt->execute([$userId, $name]);
                 $routineId = (int) $this->db->lastInsertId();
             } else {
+                // Re-check ownership INSIDE the transaction and lock the row (FOR UPDATE):
+                // the items DELETE below has no user_id of its own, so without this a caller
+                // that forgot isOwnedBy() could wipe someone else's routine (defence in depth).
+                $own = $this->db->prepare('SELECT id FROM routines WHERE id = ? AND user_id = ? FOR UPDATE');
+                $own->execute([$routineId, $userId]);
+                if ($own->fetchColumn() === false) {
+                    throw new RuntimeException('Routine not owned by this user.');
+                }
                 $stmt = $this->db->prepare('UPDATE routines SET name = ? WHERE id = ? AND user_id = ?');
                 $stmt->execute([$name, $routineId, $userId]);
                 $this->db->prepare('DELETE FROM routine_items WHERE routine_id = ?')->execute([$routineId]);

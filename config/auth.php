@@ -32,6 +32,9 @@ function setAuthenticatedUser(int $userId): void
 {
     // New session ID on privilege change → a pre-planted session ID becomes useless
     session_regenerate_id(true);
+    // New CSRF token too: a token seen while logged OUT is worthless once logged IN.
+    // csrfToken() mints a fresh one; login/register return it and api.js picks it up.
+    unset($_SESSION['csrf_token']);
     $_SESSION['user_id'] = $userId;
 }
 
