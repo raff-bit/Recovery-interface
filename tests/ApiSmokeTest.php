@@ -11,6 +11,13 @@
  * everything it created (user, workouts, throttle rows).
  */
 
+// Command line only. Requested through a web server (e.g. a misconfigured one that
+// ignores .htaccess), this file would run the whole test suite for any visitor.
+if (PHP_SAPI !== 'cli') {
+    http_response_code(404);
+    exit;
+}
+
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/Support/ZipReader.php'; // opens the .xlsx export without ext-zip
 
@@ -140,6 +147,31 @@ try {
     // the file doesn't exist, so a name-guessing attacker learns nothing (403, never 404).
     $r = http('GET', 'backups/muscle_recovery_v2_2026-01-01_000000.sql.gz');
     check($r['status'] === 403, '/backups/ is blocked (database dumps)', "got HTTP {$r['status']}");
+
+    // Windows (XAMPP) file names are case-insensitive: "CONFIG/" opens "config/".
+    // Rules must refuse every letter case. On Linux these paths don't exist at all,
+    // so only a 403 (refused by .htaccess, not merely "not found") proves the rule.
+    foreach (
+        [
+            'CONFIG/database.php',
+            'Tests/ApiSmokeTest.php',
+            'BLL/ZipWriter.php',
+            'VENDOR/autoload.php',
+            'BACKUPS/muscle_recovery_v2_2026-01-01_000000.SQL.GZ',
+            'README.MD',
+            'docs/screenshots/log.png',
+            'pages/api_me.php/extra',
+        ] as $path
+    ) {
+        $r = http('GET', $path);
+        check($r['status'] === 403, "/{$path} is refused in any letter case (allow-list)", "got HTTP {$r['status']}");
+    }
+
+    // ...and the allow-list must still let the app itself through
+    foreach (['', 'css/style.css', 'js/main.js', 'css/fonts/archivo-variable.woff2'] as $path) {
+        $r = http('GET', $path);
+        check($r['status'] === 200, '/' . ($path ?: '(app folder)') . ' is served', "got HTTP {$r['status']}");
+    }
 
     $page = http('GET', 'index.html');
     check($page['status'] === 200, 'index.html is served');

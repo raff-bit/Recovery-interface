@@ -2,6 +2,11 @@
 # Recovery Interface — Apache access rules & security headers
 # Rules are RELATIVE to this file's folder, so they work both at
 # web root and inside a subfolder like localhost/fit-app/.
+#
+# Every match below is CASE-INSENSITIVE ([NC], (?i)) on purpose: on Windows
+# (XAMPP) file names are case-insensitive, so "/CONFIG/database.php" opens the
+# same file as "/config/database.php". A case-sensitive rule would block the
+# second and let the first straight through.
 # ============================================================
 
 # 1. No directory listings
@@ -14,19 +19,26 @@ Options -Indexes
     #    <FilesMatch> alone can't do this: for /.git/HEAD it only sees "HEAD".
     RewriteRule (^|/)\. - [F,L]
 
-    # 3. Block internal folders — only index.html, css/, js/ and pages/ are public
-    RewriteRule ^(bll|dal|config|database|tests|docs|vendor|backups)(/|$) - [F,L]
+    # 3. ALLOW-LIST: only the public parts of the app can be requested at all —
+    #    the page (index.html or the folder itself), css/, js/ and the API endpoints.
+    #    Everything else is 403: bll/, dal/, config/, tests/, vendor/, backups/, docs/,
+    #    README.md… and any folder added in the future, without having to list it here.
+    RewriteRule !^(index\.html|css/.+|js/.+|pages/api_[a-z_]+\.php)?$ - [F,NC,L]
+
+    # 4. Second layer: the internal folders by name (in case rule 3 is ever loosened)
+    RewriteRule ^(bll|dal|config|database|tests|docs|vendor|backups)(/|$) - [F,NC,L]
 </IfModule>
 
-# 4. Defence in depth: block these file types even if they end up somewhere public
-<FilesMatch "\.(sql|gz|zip|tar|7z|rar|log|md|example|ini|sh|bak|dist|neon|cache)$">
+# 5. Defence in depth: block these file types even if they end up somewhere public
+#    (also covers servers without mod_rewrite, where rules 2–4 don't run)
+<FilesMatch "(?i)\.(sql|gz|zip|tar|7z|rar|log|md|example|ini|sh|bak|dist|neon|cache|env)$">
     Require all denied
 </FilesMatch>
-<FilesMatch "^(composer\.(json|lock)|phpunit\.xml|package(-lock)?\.json|LICENSE)$">
+<FilesMatch "(?i)^(composer\.(json|lock)|phpunit\.xml|package(-lock)?\.json|LICENSE)$">
     Require all denied
 </FilesMatch>
 
-# 5. Security headers for the page itself (index.html, css, js)
+# 6. Security headers for the page itself (index.html, css, js)
 <IfModule mod_headers.c>
     Header always set X-Content-Type-Options "nosniff"
     Header always set X-Frame-Options "DENY"

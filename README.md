@@ -73,7 +73,7 @@ MySQL / MariaDB (InnoDB)
 - **Brute-force throttling**: 5 failed logins per account and 20 per IP per 15 min, plus a timing-safe login so response times don't reveal which emails exist. Registration is rate-limited too.
 - Passwords: bcrypt, 10–72 bytes (bcrypt's real limit), common-password deny-list.
 - Input validation follows *reject, don't repair*: `"12abc"` reps is a 400, never silently `12`.
-- `.htaccess` blocks `.git/`, `.env`, `config/`, `tests/`, dumps…; the smoke test verifies it on every push.
+- `.htaccess` is an **allow-list**: only `index.html`, `css/`, `js/` and `pages/api_*.php` can be requested; everything else (`.git/`, `.env`, `config/`, `tests/`, `vendor/`, dumps…) is a 403. Matching is case-insensitive, because on Windows `CONFIG/` opens the same folder as `config/`. The smoke test verifies it on every push.
 - No third-party requests: the font is self-hosted, with no analytics and no CDNs.
 
 **Database.**
@@ -87,7 +87,7 @@ MySQL / MariaDB (InnoDB)
 - `composer validate`, `composer audit` (known vulnerabilities), `php -l` on every file
 - **PHPStan level 6** static analysis
 - **PHPUnit** on PHP 8.1 and 8.3, with 76 unit tests using stubs instead of a database. The tests pin the model's exact numbers, not just its direction, and read the generated `.xlsx` back with an independent ZIP reader.
-- an **end-to-end smoke test**: a real Apache + MariaDB, a fresh install, then 80 HTTP checks covering file exposure (including backups), CSP, CSRF, throttling, payload limits, the full workout lifecycle, UTC handling, routines across two accounts (IDOR) and the Excel export (formula injection, time zones).
+- an **end-to-end smoke test**: a real Apache + MariaDB, a fresh install, then 92 HTTP checks covering file exposure (including backups and letter-case bypasses), CSP, CSRF, throttling, payload limits, the full workout lifecycle, UTC handling, routines across two accounts (IDOR) and the Excel export (formula injection, time zones).
 
 ## Tech stack
 
@@ -128,7 +128,7 @@ The defaults are meant for a personal machine. If others can reach your instance
 - **Keep `APP_ENV=production` and `APP_DEBUG=false`**, which are the defaults in `.env.example`.
 - **Use a dedicated database user** with a strong password, not XAMPP's password-less `root`.
 - **Set `BACKUP_DIR` outside the web root.** Dumps contain every account's data.
-- **On nginx or another server that ignores `.htaccess`**, replicate its rules. Only `index.html`, `css/`, `js/` and `pages/` should be public.
+- **On nginx or another server that ignores `.htaccess`**, replicate its allow-list. Only `index.html`, `css/`, `js/` and `pages/api_*.php` should be public.
 - **Behind a reverse proxy**, sign-in throttling sees the proxy's IP. Configure trusted forwarding first.
 - **Personal use only?** Bind Apache to `127.0.0.1` so other devices on your Wi-Fi can't reach it.
 
